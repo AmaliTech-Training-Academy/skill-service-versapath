@@ -77,8 +77,31 @@ public class TagServiceImpl implements TagService {
                 .orElseThrow( () -> new TagNotFoundException("A tag provided doesn't exist")
                 );
 
-        logger.info("Skill atom {} deleted", tag.getName());
+        logger.info("Skill tag {} deleted", tag.getName());
 
         this.tagRepository.deleteById(id);
+    }
+
+    @Override
+    public TagResponseDto partialUpdate(TagRequestDto dto, UUID id) {
+        TagEntity tag = findById(id)
+                .orElseThrow( () -> new TagNotFoundException("A tag provided doesn't exist")
+                );
+        if(tag.getName() != null){
+            tag.setName(dto.getName());
+        }
+        if(tag.getType() != null){
+            tag.setType(dto.getType());
+        }
+        if(tag.getDescription() != null){
+            tag.setDescription(dto.getDescription());
+        }
+        if(tag.getUpdatedAt() != null){
+            tag.setUpdatedAt(LocalDateTime.now());
+        }
+
+        logger.info("Skill tag {} updated", tag.getName());
+
+        return this.tagMapper.toDto(this.tagRepository.save(tag));
     }
 }
