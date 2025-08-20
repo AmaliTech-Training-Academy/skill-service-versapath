@@ -4,6 +4,7 @@ import com.capstone.skill_service.dto.CustomPageResponse;
 import com.capstone.skill_service.dto.tag.TagRequestDto;
 import com.capstone.skill_service.dto.tag.TagResponseDto;
 import com.capstone.skill_service.exception.TagExistsException;
+import com.capstone.skill_service.exception.TagNotFoundException;
 import com.capstone.skill_service.mapper.TagMapper;
 import com.capstone.skill_service.model.TagEntity;
 import com.capstone.skill_service.repository.TagRepository;
@@ -61,5 +62,14 @@ public class TagServiceImpl implements TagService {
     @Override
     public Optional<TagEntity> findById(UUID id) {
         return this.tagRepository.findById(id);
+    }
+
+    @Override
+    public void deleteById(UUID id) {
+        TagEntity tag = findById(id)
+                .orElseThrow( () -> new TagNotFoundException("A tag provided doesn't exist")
+                );
+
+        this.tagRepository.deleteById(id);
     }
 }

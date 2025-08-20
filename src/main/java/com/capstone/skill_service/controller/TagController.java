@@ -14,6 +14,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("tags")
@@ -46,6 +48,21 @@ public class TagController {
                 .errors(null)
                 .data(tags)
                 .build();
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @DeleteMapping(name = "delete_tag", path = "/{id}")
+    @Operation(summary = "Delete Tag",
+            description = "The tag is delete using its id that is passed as parameter")
+    public ResponseEntity<ClientResponseFormatDto> deleteTag(@PathVariable UUID id){
+        this.tagService.deleteById(id);
+        ClientResponseFormatDto response = ClientResponseFormatDto.builder()
+                .status(true)
+                .message("Tag deleted successfully!")
+                .errors(null)
+                .data(null)
+                .build();
+
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }

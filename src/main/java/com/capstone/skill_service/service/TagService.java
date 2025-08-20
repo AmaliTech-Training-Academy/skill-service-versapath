@@ -15,4 +15,5 @@ public interface TagService {
     Optional<TagEntity> findByName(String name);
     CustomPageResponse<TagResponseDto> findAll(Pageable pageable);
     Optional<TagEntity> findById(UUID userId);
+    void deleteById(UUID id);
 }
