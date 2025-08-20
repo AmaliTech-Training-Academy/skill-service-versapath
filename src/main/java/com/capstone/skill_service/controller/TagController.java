@@ -3,6 +3,7 @@ package com.capstone.skill_service.controller;
 import com.capstone.skill_service.dto.tag.TagRequestDto;
 import com.capstone.skill_service.dto.tag.TagResponseDto;
 import com.capstone.skill_service.service.TagService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
