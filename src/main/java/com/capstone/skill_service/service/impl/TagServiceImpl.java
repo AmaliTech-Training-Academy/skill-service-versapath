@@ -83,6 +83,17 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
+    public TagResponseDto getTag(UUID id) {
+        TagEntity tag = findById(id)
+                .orElseThrow( () -> new TagNotFoundException("A tag provided doesn't exist")
+                );
+
+        logger.info("Skill tag {} retrieved", tag.getName());
+
+        return this.tagMapper.toDto(tag);
+    }
+
+    @Override
     public TagResponseDto partialUpdate(TagRequestDto dto, UUID id) {
         TagEntity tag = findById(id)
                 .orElseThrow( () -> new TagNotFoundException("A tag provided doesn't exist")

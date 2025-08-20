@@ -51,6 +51,19 @@ public class TagController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    @GetMapping("/{tagId}")
+    @Operation(summary = "Retrieve skill tags", description = "This end point allows only admin to fetch all skill tags")
+    public ResponseEntity<ClientResponseFormatDto> retrieveSingleTag(@PathVariable UUID tagId) {
+        TagResponseDto tag = this.tagService.getTag(tagId);
+        ClientResponseFormatDto response = ClientResponseFormatDto.builder()
+                .status(true)
+                .message("Tag retrieved successfully")
+                .errors(null)
+                .data(tag)
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
     @DeleteMapping(name = "delete_tag", path = "/{id}")
     @Operation(summary = "Delete Tag",
             description = "The tag is delete using its id that is passed as parameter")
@@ -65,7 +78,7 @@ public class TagController {
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
-    
+
     @PatchMapping("/{tagId}")
     @Operation(summary = "Update skill tag", description = "This end point allows admin to update a skill tag")
     public ResponseEntity<ClientResponseFormatDto> updateTag(
