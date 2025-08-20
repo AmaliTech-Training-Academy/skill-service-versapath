@@ -21,7 +21,7 @@ import java.util.Map;
 public class GlobalException {
 
     @ExceptionHandler(TagExistsException.class)
-    public ResponseEntity<?> handleUserExists
+    public ResponseEntity<?> handleTagExists
             (TagExistsException exception, WebRequest webRequest) {
         Map<String, Object> body = new HashMap<>();
         body.put("code", HttpStatus.CONFLICT.value());
@@ -34,7 +34,7 @@ public class GlobalException {
 
 
     @ExceptionHandler(TagNotFoundException.class)
-    public ResponseEntity<?> handleUserNotFound(
+    public ResponseEntity<?> handleTagNotFound(
             TagNotFoundException exception, WebRequest webRequest) {
         Map<String, Object> body = new HashMap<>();
         body.put("code", HttpStatus.NOT_FOUND.value());

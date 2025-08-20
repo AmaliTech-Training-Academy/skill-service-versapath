@@ -2,6 +2,7 @@ package com.capstone.skill_service.service.impl;
 
 import com.capstone.skill_service.dto.tag.TagRequestDto;
 import com.capstone.skill_service.dto.tag.TagResponseDto;
+import com.capstone.skill_service.exception.TagExistsException;
 import com.capstone.skill_service.mapper.TagMapper;
 import com.capstone.skill_service.model.TagEntity;
 import com.capstone.skill_service.repository.TagRepository;
@@ -23,6 +24,11 @@ public class TagServiceImpl implements TagService {
 
     @Override
     public TagResponseDto create(TagRequestDto dto) {
+        if(findByName(dto.getName()).isPresent()){
+            throw new TagExistsException(
+                    String.format("A Tag with the email '%s' already exist",
+                            dto.getName()));
+        }
         TagEntity tagEntity = this.tagMapper.toEntity(dto);
 
         tagEntity.setCreatedAt(LocalDateTime.now());
