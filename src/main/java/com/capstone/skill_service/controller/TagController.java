@@ -65,4 +65,18 @@ public class TagController {
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
+    
+    @PatchMapping("/{tagId}")
+    @Operation(summary = "Update skill tag", description = "This end point allows admin to update a skill tag")
+    public ResponseEntity<ClientResponseFormatDto> updateTag(
+            @Valid @RequestBody TagRequestDto tagRequestDto, @PathVariable UUID tagId) {
+        TagResponseDto updatedTag = this.tagService.partialUpdate(tagRequestDto, tagId);
+        ClientResponseFormatDto response = ClientResponseFormatDto.builder()
+                .status(true)
+                .message("Tag updated successfully!")
+                .errors(null)
+                .data(updatedTag)
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
 }
