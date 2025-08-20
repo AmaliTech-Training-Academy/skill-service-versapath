@@ -7,9 +7,13 @@ import com.capstone.skill_service.model.TagEntity;
 import com.capstone.skill_service.repository.TagRepository;
 import com.capstone.skill_service.service.TagService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -25,5 +29,21 @@ public class TagServiceImpl implements TagService {
         tagEntity.setUpdatedAt(LocalDateTime.now());
 
         return this.tagMapper.toDto(tagRepository.save(tagEntity));
+    }
+
+    @Override
+    public Optional<TagEntity> findByName(String name) {
+        return this.tagRepository.findByName(name);
+    }
+
+    @Override
+    public Page<TagResponseDto> findAll(Pageable pageable) {
+        Page<TagEntity> tags = this.tagRepository.findAll(pageable);
+        return tags.map(this.tagMapper::toDto);
+    }
+
+    @Override
+    public Optional<TagEntity> findById(UUID id) {
+        return this.tagRepository.findById(id);
     }
 }
