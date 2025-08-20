@@ -1,5 +1,7 @@
 package com.capstone.skill_service.exception;
 
+import com.capstone.skill_service.dto.ClientResponseFormValidationErrorDto;
+import com.capstone.skill_service.dto.ClientResponseFormatDto;
 import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,74 +24,91 @@ public class GlobalException {
 
     @ExceptionHandler(TagExistsException.class)
     public ResponseEntity<?> handleTagExists
-            (TagExistsException exception, WebRequest webRequest) {
-        Map<String, Object> body = new HashMap<>();
-        body.put("code", HttpStatus.CONFLICT.value());
-        body.put("timestamp", LocalDateTime.now());
-        body.put("message", exception.getMessage());
-        body.put("path", webRequest.getContextPath());
-        body.put("sessionId", webRequest.getSessionId());
-        return new ResponseEntity<>(body, HttpStatus.CONFLICT);
+            (TagExistsException exception) {
+
+        ClientResponseFormatDto response = ClientResponseFormatDto.builder()
+                .status(false)
+                .message("Tag Error!")
+                .errors(List.of(Map.of("message", exception.getMessage())))
+                .data(null)
+                .build();
+        return new ResponseEntity<>(response, HttpStatus.CONFLICT);
     }
 
 
     @ExceptionHandler(TagNotFoundException.class)
     public ResponseEntity<?> handleTagNotFound(
-            TagNotFoundException exception, WebRequest webRequest) {
-        Map<String, Object> body = new HashMap<>();
-        body.put("code", HttpStatus.NOT_FOUND.value());
-        body.put("timestamp", LocalDateTime.now());
-        body.put("message", exception.getMessage());
-        body.put("path", webRequest.getContextPath());
-        body.put("sessionId", webRequest.getSessionId());
-        return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
+            TagNotFoundException exception) {
+        ClientResponseFormatDto response = ClientResponseFormatDto.builder()
+                .status(false)
+                .message("Tag Error!")
+                .errors(List.of(Map.of("message", exception.getMessage())))
+                .data(null)
+                .build();
+
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> handleException
-            (Exception exception, WebRequest webRequest) {
-        Map<String, Object> body = new HashMap<>();
-        body.put("code", HttpStatus.BAD_REQUEST.value());
-        body.put("timestamp", LocalDateTime.now());
-        body.put("message", exception.getMessage());
-        body.put("path", webRequest.getContextPath());
-        body.put("sessionId", webRequest.getSessionId());
-        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+            (Exception exception) {
+
+        ClientResponseFormatDto response = ClientResponseFormatDto.builder()
+                .status(false)
+                .message("Unexpected Exception")
+                .errors(List.of(Map.of("message", exception.getMessage())))
+                .data(null)
+                .build();
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(Error.class)
     public ResponseEntity<?> handleError
-            (Exception exception, WebRequest webRequest) {
-        Map<String, Object> body = new HashMap<>();
-        body.put("code", HttpStatus.INTERNAL_SERVER_ERROR.value());
-        body.put("timestamp", LocalDateTime.now());
-        body.put("message", exception.getMessage());
-        body.put("path", webRequest.getContextPath());
-        body.put("sessionId", webRequest.getSessionId());
-        return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
+            (Exception exception) {
+
+        ClientResponseFormatDto response = ClientResponseFormatDto.builder()
+                .status(false)
+                .message("Internal Server Error!")
+                .errors(List.of(Map.of("message", exception.getMessage())))
+                .data(null)
+                .build();
+
+        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(NoHandlerFoundException.class)
-    public ResponseEntity<Map<String, Object>> handle404(NoHandlerFoundException ex) {
-        Map<String, Object> body = Map.of(
-                "status", 404,
-                "error", "Not Found",
-                "path", ex.getRequestURL()
-        );
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
+    public ResponseEntity<?> handle404(NoHandlerFoundException exception) {
+
+        ClientResponseFormatDto response = ClientResponseFormatDto.builder()
+                .status(false)
+                .message("Page/url no found")
+                .errors(List.of(Map.of("message", exception.getMessage())))
+                .data(null)
+                .build();
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
 
     @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<Map<String, Object>> handleUnauthorized(AccessDeniedException ex) {
-
+    public ResponseEntity<?> handleUnauthorized(AccessDeniedException exception) {
+        ClientResponseFormatDto response = ClientResponseFormatDto.builder()
+                .status(false)
+                .message("Unauthorized Error!")
+                .errors(List.of(Map.of("message", exception.getMessage())))
+                .data(null)
+                .build();
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                .body(Map.of("Error", ex.getMessage()));
+                .body(response);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, List<String>>> handleValidationErrors(MethodArgumentNotValidException ex) {
+    public ResponseEntity<?> handleValidationErrors(MethodArgumentNotValidException ex) {
         Map<String, List<String>> errors = new HashMap<>();
-
+        /* group all the validation error into a respective input field
+        ex: {
+             "name":[error1,error2],
+             "email":[error1,error2]
+            }
+        */
         ex.getBindingResult().getFieldErrors().forEach(error -> {
             String field = error.getField();
             String message = error.getDefaultMessage();
@@ -97,6 +116,13 @@ public class GlobalException {
             errors.computeIfAbsent(field, key -> new ArrayList<>()).add(message);
         });
 
-        return ResponseEntity.badRequest().body(errors);
+        ClientResponseFormValidationErrorDto response = ClientResponseFormValidationErrorDto.builder()
+                .status(false)
+                .message("Form validation Error!")
+                .errors(List.of(errors))
+                .data(null)
+                .build();
+
+        return ResponseEntity.badRequest().body(response);
     }
 }

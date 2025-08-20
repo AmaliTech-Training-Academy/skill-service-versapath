@@ -1,5 +1,6 @@
 package com.capstone.skill_service.service.impl;
 
+import com.capstone.skill_service.dto.CustomPageResponse;
 import com.capstone.skill_service.dto.tag.TagRequestDto;
 import com.capstone.skill_service.dto.tag.TagResponseDto;
 import com.capstone.skill_service.exception.TagExistsException;
@@ -43,9 +44,18 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public Page<TagResponseDto> findAll(Pageable pageable) {
-        Page<TagEntity> tags = this.tagRepository.findAll(pageable);
-        return tags.map(this.tagMapper::toDto);
+    public CustomPageResponse<TagResponseDto> findAll(Pageable pageable) {
+        Page<TagEntity> tagList = this.tagRepository.findAll(pageable);
+        Page<TagResponseDto> tags = tagList.map(this.tagMapper::toDto);
+        return CustomPageResponse.<TagResponseDto>builder()
+                .items(tags.getContent())
+                .page(tags.getNumber())
+                .size(tags.getSize())
+                .totalElements(tags.getTotalElements())
+                .totalPages(tags.getTotalPages())
+                .hasNext(tags.hasNext())
+                .hasPrevious(tags.hasPrevious())
+                .build();
     }
 
     @Override
