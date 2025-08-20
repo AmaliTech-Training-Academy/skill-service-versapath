@@ -98,16 +98,16 @@ public class TagServiceImpl implements TagService {
         TagEntity tag = findById(id)
                 .orElseThrow( () -> new TagNotFoundException("A tag provided doesn't exist")
                 );
-        if(tag.getName() != null){
+        if(dto.getName() != null){
             tag.setName(dto.getName());
         }
-        if(tag.getType() != null){
+        if(dto.getType() != null){
             tag.setType(dto.getType());
         }
-        if(tag.getDescription() != null){
+        if(dto.getDescription() != null){
             tag.setDescription(dto.getDescription());
         }
-        if(tag.getUpdatedAt() != null){
+        if(dto.getUpdatedAt() != null){
             tag.setUpdatedAt(LocalDateTime.now());
         }
 
