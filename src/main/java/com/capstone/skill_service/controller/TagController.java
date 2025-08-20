@@ -5,6 +5,8 @@ import com.capstone.skill_service.dto.CustomPageResponse;
 import com.capstone.skill_service.dto.tag.TagRequestDto;
 import com.capstone.skill_service.dto.tag.TagResponseDto;
 import com.capstone.skill_service.service.TagService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -15,10 +17,12 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("tags")
+@Tag(name = "Tags Controller", description = "Manage all skill tag's api")
 public class TagController {
     private final TagService tagService;
 
     @PostMapping()
+    @Operation(summary = "Create skill tag", description = "This end point allows only admin to create a skill tag")
     public ResponseEntity<ClientResponseFormatDto> createTag(
             @Valid @RequestBody TagRequestDto tagRequestDto
     ) {
@@ -33,6 +37,7 @@ public class TagController {
     }
 
     @GetMapping()
+    @Operation(summary = "Retrieve skill tags", description = "This end point allows only admin to fetch all skill tags")
     public ResponseEntity<ClientResponseFormatDto> fetchAllTags(Pageable pageable) {
         CustomPageResponse<TagResponseDto> tags = this.tagService.findAll(pageable);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
