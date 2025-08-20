@@ -10,6 +10,8 @@ import com.capstone.skill_service.model.TagEntity;
 import com.capstone.skill_service.repository.TagRepository;
 import com.capstone.skill_service.service.TagService;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -21,6 +23,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class TagServiceImpl implements TagService {
+    private static final Logger logger = LoggerFactory.getLogger(TagServiceImpl.class);
     private final TagRepository tagRepository;
     private final TagMapper tagMapper;
 
@@ -35,6 +38,7 @@ public class TagServiceImpl implements TagService {
 
         tagEntity.setCreatedAt(LocalDateTime.now());
         tagEntity.setUpdatedAt(LocalDateTime.now());
+        logger.info("Admin created skill tag: {}", tagEntity.getName());
 
         return this.tagMapper.toDto(tagRepository.save(tagEntity));
     }
@@ -48,6 +52,9 @@ public class TagServiceImpl implements TagService {
     public CustomPageResponse<TagResponseDto> findAll(Pageable pageable) {
         Page<TagEntity> tagList = this.tagRepository.findAll(pageable);
         Page<TagResponseDto> tags = tagList.map(this.tagMapper::toDto);
+
+        logger.info("Tags list is fetched");
+
         return CustomPageResponse.<TagResponseDto>builder()
                 .items(tags.getContent())
                 .page(tags.getNumber())
@@ -69,6 +76,8 @@ public class TagServiceImpl implements TagService {
         TagEntity tag = findById(id)
                 .orElseThrow( () -> new TagNotFoundException("A tag provided doesn't exist")
                 );
+
+        logger.info("Skill atom {} deleted", tag.getName());
 
         this.tagRepository.deleteById(id);
     }
