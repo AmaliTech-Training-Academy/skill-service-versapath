@@ -7,6 +7,7 @@ import com.capstone.skill_service.dto.cluster.ClusterRequestDto;
 import com.capstone.skill_service.dto.cluster.ClusterResponseDto;
 import com.capstone.skill_service.dto.cluster.ClusterUpdateRequestDto;
 import com.capstone.skill_service.service.ClusterService;
+import com.capstone.skill_service.util.Status;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -89,6 +90,20 @@ public class ClusterController {
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
                 .status(true)
                 .message("Cluster updated successfully!")
+                .errors(null)
+                .data(updatedCluster)
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @PutMapping
+    @Operation(summary = "Update skill cluster status", description = "This end point allows admin to update a skill cluster as a soft delete")
+    public ResponseEntity<ClientResponseFormatDto> updateClusterStatus(
+            @RequestParam UUID id, @RequestParam Status status) {
+        ClusterResponseDto updatedCluster = this.clusterService.updateStatus(status, id);
+        ClientResponseFormatDto response = ClientResponseFormatDto.builder()
+                .status(true)
+                .message("Cluster status updated successfully!")
                 .errors(null)
                 .data(updatedCluster)
                 .build();

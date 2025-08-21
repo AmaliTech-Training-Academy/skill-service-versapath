@@ -5,6 +5,7 @@ import com.capstone.skill_service.dto.tag.TagRequestDto;
 import com.capstone.skill_service.dto.tag.TagResponseDto;
 import com.capstone.skill_service.dto.tag.TagUpdateRequestDto;
 import com.capstone.skill_service.model.TagEntity;
+import com.capstone.skill_service.util.Status;
 import org.springframework.data.domain.Pageable;
 
 import java.util.Optional;
@@ -18,4 +19,5 @@ public interface TagService {
     TagResponseDto getTag(UUID userId);
     void deleteById(UUID id);
     TagResponseDto partialUpdate(TagUpdateRequestDto dto, UUID id);
+    TagResponseDto updateStatus(Status status, UUID id);
 }

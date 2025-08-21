@@ -1,5 +1,6 @@
 package com.capstone.skill_service.dto.cluster;
 
+import com.capstone.skill_service.util.Status;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,5 +18,6 @@ public class ClusterResponseDto {
     private String name;
     private String type;
     private String description;
+    private Status status;
     private LocalDateTime createdAt;
 }

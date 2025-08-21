@@ -11,6 +11,7 @@ import com.capstone.skill_service.mapper.ClusterMapper;
 import com.capstone.skill_service.model.ClusterEntity;
 import com.capstone.skill_service.repository.ClusterRepository;
 import com.capstone.skill_service.service.ClusterService;
+import com.capstone.skill_service.util.Status;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -114,6 +115,16 @@ public class ClusterServiceImpl implements ClusterService {
         }
 
         logger.info("Skill cluster {} updated", cluster.getName());
+
+        return this.clusterMapper.toDto(this.clusterRepository.save(cluster));
+    }
+
+    @Override
+    public ClusterResponseDto updateStatus(Status status, UUID id) {
+        ClusterEntity cluster = findById(id)
+                .orElseThrow( () -> new ClusterNotFoundException("A cluster provided doesn't exist")
+                );
+        cluster.setStatus(status);
 
         return this.clusterMapper.toDto(this.clusterRepository.save(cluster));
     }
