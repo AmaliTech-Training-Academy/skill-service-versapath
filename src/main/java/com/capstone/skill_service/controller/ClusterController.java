@@ -52,4 +52,45 @@ public class ClusterController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    @GetMapping("/{clusterId}")
+    @Operation(summary = "Retrieve skill clusters", description = "This end point allows only admin to fetch all skill clusters")
+    public ResponseEntity<ClientResponseFormatDto> retrieveSingleCluster(@PathVariable UUID clusterId) {
+        ClusterResponseDto cluster = this.clusterService.getCluster(clusterId);
+        ClientResponseFormatDto response = ClientResponseFormatDto.builder()
+                .status(true)
+                .message("Cluster retrieved successfully")
+                .errors(null)
+                .data(cluster)
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @DeleteMapping(name = "delete_cluster", path = "/{id}")
+    @Operation(summary = "Delete Cluster",
+            description = "The cluster is delete using its id that is passed as parameter")
+    public ResponseEntity<ClientResponseFormatDto> deleteCluster(@PathVariable UUID id){
+        this.clusterService.deleteById(id);
+        ClientResponseFormatDto response = ClientResponseFormatDto.builder()
+                .status(true)
+                .message("Cluster deleted successfully!")
+                .errors(null)
+                .data(null)
+                .build();
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @PatchMapping("/{clusterId}")
+    @Operation(summary = "Update skill cluster", description = "This end point allows admin to update a skill cluster")
+    public ResponseEntity<ClientResponseFormatDto> updateCluster(
+            @Valid @RequestBody ClusterRequestDto clusterRequestDto, @PathVariable UUID clusterId) {
+        ClusterResponseDto updatedCluster = this.clusterService.partialUpdate(clusterRequestDto, clusterId);
+        ClientResponseFormatDto response = ClientResponseFormatDto.builder()
+                .status(true)
+                .message("Cluster updated successfully!")
+                .errors(null)
+                .data(updatedCluster)
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
 }

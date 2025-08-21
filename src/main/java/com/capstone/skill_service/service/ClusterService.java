@@ -14,5 +14,7 @@ public interface ClusterService {
     Optional<ClusterEntity> findByName(String name);
     CustomPageResponse<ClusterResponseDto> findAll(Pageable pageable);
     Optional<ClusterEntity> findById(UUID userId);
-
+    ClusterResponseDto getCluster(UUID userId);
+    void deleteById(UUID id);
+    ClusterResponseDto partialUpdate(ClusterRequestDto dto, UUID id);
 }

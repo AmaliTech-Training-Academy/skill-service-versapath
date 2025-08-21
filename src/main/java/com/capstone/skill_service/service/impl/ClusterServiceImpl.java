@@ -72,4 +72,48 @@ public class ClusterServiceImpl implements ClusterService {
         return this.clusterRepository.findById(id);
     }
 
+    @Override
+    public void deleteById(UUID id) {
+        ClusterEntity cluster = findById(id)
+                .orElseThrow( () -> new ClusterNotFoundException("A cluster provided doesn't exist")
+                );
+
+        logger.info("Skill cluster {} deleted", cluster.getName());
+
+        this.clusterRepository.deleteById(id);
+    }
+
+    @Override
+    public ClusterResponseDto getCluster(UUID id) {
+        ClusterEntity cluster = findById(id)
+                .orElseThrow( () -> new ClusterNotFoundException("A cluster provided doesn't exist")
+                );
+
+        logger.info("Skill cluster {} retrieved", cluster.getName());
+
+        return this.clusterMapper.toDto(cluster);
+    }
+
+    @Override
+    public ClusterResponseDto partialUpdate(ClusterRequestDto dto, UUID id) {
+        ClusterEntity cluster = findById(id)
+                .orElseThrow( () -> new ClusterNotFoundException("A cluster provided doesn't exist")
+                );
+        if(dto.getName() != null){
+            cluster.setName(dto.getName());
+        }
+        if(dto.getType() != null){
+            cluster.setType(dto.getType());
+        }
+        if(dto.getDescription() != null){
+            cluster.setDescription(dto.getDescription());
+        }
+        if(dto.getUpdatedAt() != null){
+            cluster.setUpdatedAt(LocalDateTime.now());
+        }
+
+        logger.info("Skill cluster {} updated", cluster.getName());
+
+        return this.clusterMapper.toDto(this.clusterRepository.save(cluster));
+    }
 }
