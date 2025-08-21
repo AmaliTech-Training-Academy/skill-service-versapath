@@ -2,8 +2,10 @@ package com.capstone.skill_service.controller;
 
 import com.capstone.skill_service.dto.ClientResponseFormatDto;
 import com.capstone.skill_service.dto.CustomPageResponse;
+import com.capstone.skill_service.dto.cluster.ClusterResponseDto;
 import com.capstone.skill_service.dto.tag.TagRequestDto;
 import com.capstone.skill_service.dto.tag.TagResponseDto;
+import com.capstone.skill_service.dto.tag.TagUpdateRequestDto;
 import com.capstone.skill_service.service.TagService;
 import com.capstone.skill_service.util.Status;
 import io.swagger.v3.oas.annotations.Operation;
@@ -83,7 +85,8 @@ public class TagController {
     @PatchMapping("/{tagId}")
     @Operation(summary = "Update skill tag", description = "This end point allows admin to update a skill tag")
     public ResponseEntity<ClientResponseFormatDto> updateTag(
-            @Valid @RequestBody TagRequestDto tagRequestDto, @PathVariable UUID tagId) {
+            @Valid @RequestBody TagUpdateRequestDto tagRequestDto, @PathVariable UUID tagId) {
+
         TagResponseDto updatedTag = this.tagService.partialUpdate(tagRequestDto, tagId);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
                 .status(true)

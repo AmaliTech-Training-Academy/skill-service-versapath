@@ -11,12 +11,12 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "tags")
+@Table(name = "clusters")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class TagEntity {
+public class ClusterEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;

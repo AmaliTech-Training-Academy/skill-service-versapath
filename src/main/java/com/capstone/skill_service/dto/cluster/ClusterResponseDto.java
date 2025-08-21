@@ -1,7 +1,6 @@
-package com.capstone.skill_service.model;
+package com.capstone.skill_service.dto.cluster;
 
 import com.capstone.skill_service.util.Status;
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,29 +9,15 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-@Entity
-@Table(name = "tags")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class TagEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+public class ClusterResponseDto {
     private UUID id;
-
-    @Column(nullable = false, unique = true)
     private String name;
-
     private String type;
-
-    @Column(columnDefinition = "TEXT")
     private String description;
-
-    @Enumerated(EnumType.STRING)
     private Status status;
-
     private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
-
 }

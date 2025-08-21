@@ -3,6 +3,7 @@ package com.capstone.skill_service;
 import com.capstone.skill_service.dto.CustomPageResponse;
 import com.capstone.skill_service.dto.tag.TagRequestDto;
 import com.capstone.skill_service.dto.tag.TagResponseDto;
+import com.capstone.skill_service.dto.tag.TagUpdateRequestDto;
 import com.capstone.skill_service.exception.TagExistsException;
 import com.capstone.skill_service.exception.TagNotFoundException;
 import com.capstone.skill_service.mapper.TagMapper;
@@ -145,7 +146,7 @@ public class TagServiceTest {
     @Test
     void partialUpdate_shouldUpdateFields_whenTagExists() {
         UUID id = entity.getId();
-        TagRequestDto updateDto = TagRequestDto.builder()
+        TagUpdateRequestDto updateDto = TagUpdateRequestDto.builder()
                 .name("Spring")
                 .type("framework")
                 .description("Spring Boot tag")
@@ -163,7 +164,7 @@ public class TagServiceTest {
     @Test
     void partialUpdate_shouldThrowException_whenNotExists() {
         UUID id = UUID.randomUUID();
-        TagRequestDto updateDto = TagRequestDto.builder()
+        TagUpdateRequestDto updateDto = TagUpdateRequestDto.builder()
                 .name("Spring")
                 .type("framework")
                 .description("Spring Boot tag")

@@ -35,6 +35,19 @@ public class GlobalException {
         return new ResponseEntity<>(response, HttpStatus.CONFLICT);
     }
 
+    @ExceptionHandler(ClusterExistsException.class)
+    public ResponseEntity<?> handleClusterExists
+            (ClusterExistsException exception) {
+
+        ClientResponseFormatDto response = ClientResponseFormatDto.builder()
+                .status(false)
+                .message("Cluster Error!")
+                .errors(List.of(Map.of("message", exception.getMessage())))
+                .data(null)
+                .build();
+        return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+    }
+
 
     @ExceptionHandler(TagNotFoundException.class)
     public ResponseEntity<?> handleTagNotFound(
@@ -42,6 +55,19 @@ public class GlobalException {
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
                 .status(false)
                 .message("Tag Error!")
+                .errors(List.of(Map.of("message", exception.getMessage())))
+                .data(null)
+                .build();
+
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(ClusterNotFoundException.class)
+    public ResponseEntity<?> handleClusterNotFound(
+            ClusterNotFoundException exception) {
+        ClientResponseFormatDto response = ClientResponseFormatDto.builder()
+                .status(false)
+                .message("Cluster Error!")
                 .errors(List.of(Map.of("message", exception.getMessage())))
                 .data(null)
                 .build();
