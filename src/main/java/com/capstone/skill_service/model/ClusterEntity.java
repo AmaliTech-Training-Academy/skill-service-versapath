@@ -24,7 +24,10 @@ public class ClusterEntity {
     private String name;
 
     private String type;
+
+    @Column(columnDefinition = "TEXT")
     private String description;
+
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
