@@ -5,6 +5,7 @@ import com.capstone.skill_service.dto.ClientResponseFormatDto;
 import com.capstone.skill_service.dto.CustomPageResponse;
 import com.capstone.skill_service.dto.cluster.ClusterRequestDto;
 import com.capstone.skill_service.dto.cluster.ClusterResponseDto;
+import com.capstone.skill_service.dto.cluster.ClusterUpdateRequestDto;
 import com.capstone.skill_service.service.ClusterService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -83,7 +84,7 @@ public class ClusterController {
     @PatchMapping("/{clusterId}")
     @Operation(summary = "Update skill cluster", description = "This end point allows admin to update a skill cluster")
     public ResponseEntity<ClientResponseFormatDto> updateCluster(
-            @Valid @RequestBody ClusterRequestDto clusterRequestDto, @PathVariable UUID clusterId) {
+            @Valid @RequestBody ClusterUpdateRequestDto clusterRequestDto, @PathVariable UUID clusterId) {
         ClusterResponseDto updatedCluster = this.clusterService.partialUpdate(clusterRequestDto, clusterId);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
                 .status(true)

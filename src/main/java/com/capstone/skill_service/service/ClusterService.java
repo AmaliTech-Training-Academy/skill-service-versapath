@@ -3,6 +3,7 @@ package com.capstone.skill_service.service;
 import com.capstone.skill_service.dto.CustomPageResponse;
 import com.capstone.skill_service.dto.cluster.ClusterRequestDto;
 import com.capstone.skill_service.dto.cluster.ClusterResponseDto;
+import com.capstone.skill_service.dto.cluster.ClusterUpdateRequestDto;
 import com.capstone.skill_service.model.ClusterEntity;
 import org.springframework.data.domain.Pageable;
 
@@ -16,5 +17,5 @@ public interface ClusterService {
     Optional<ClusterEntity> findById(UUID userId);
     ClusterResponseDto getCluster(UUID userId);
     void deleteById(UUID id);
-    ClusterResponseDto partialUpdate(ClusterRequestDto dto, UUID id);
+    ClusterResponseDto partialUpdate(ClusterUpdateRequestDto dto, UUID id);
 }

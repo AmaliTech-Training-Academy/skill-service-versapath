@@ -3,6 +3,7 @@ package com.capstone.skill_service.service.impl;
 import com.capstone.skill_service.dto.CustomPageResponse;
 import com.capstone.skill_service.dto.tag.TagRequestDto;
 import com.capstone.skill_service.dto.tag.TagResponseDto;
+import com.capstone.skill_service.dto.tag.TagUpdateRequestDto;
 import com.capstone.skill_service.exception.TagExistsException;
 import com.capstone.skill_service.exception.TagNotFoundException;
 import com.capstone.skill_service.mapper.TagMapper;
@@ -94,7 +95,7 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public TagResponseDto partialUpdate(TagRequestDto dto, UUID id) {
+    public TagResponseDto partialUpdate(TagUpdateRequestDto dto, UUID id) {
         TagEntity tag = findById(id)
                 .orElseThrow( () -> new TagNotFoundException("A tag provided doesn't exist")
                 );

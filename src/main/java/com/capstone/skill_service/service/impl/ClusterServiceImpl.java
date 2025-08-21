@@ -4,6 +4,7 @@ import com.capstone.skill_service.dto.CustomPageResponse;
 
 import com.capstone.skill_service.dto.cluster.ClusterRequestDto;
 import com.capstone.skill_service.dto.cluster.ClusterResponseDto;
+import com.capstone.skill_service.dto.cluster.ClusterUpdateRequestDto;
 import com.capstone.skill_service.exception.ClusterExistsException;
 import com.capstone.skill_service.exception.ClusterNotFoundException;
 import com.capstone.skill_service.mapper.ClusterMapper;
@@ -95,7 +96,7 @@ public class ClusterServiceImpl implements ClusterService {
     }
 
     @Override
-    public ClusterResponseDto partialUpdate(ClusterRequestDto dto, UUID id) {
+    public ClusterResponseDto partialUpdate(ClusterUpdateRequestDto dto, UUID id) {
         ClusterEntity cluster = findById(id)
                 .orElseThrow( () -> new ClusterNotFoundException("A cluster provided doesn't exist")
                 );
