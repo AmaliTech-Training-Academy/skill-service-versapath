@@ -15,8 +15,8 @@ public interface AtomService {
     AtomResponseDto create(AtomRequestDto dto);
     Optional<SkillAtomEntity> findByName(String name);
     CustomPageResponse<AtomResponseDto> findAll(Pageable pageable);
-    Optional<SkillAtomEntity> findById(UUID userId);
-    AtomResponseDto getAtom(UUID userId);
+    Optional<SkillAtomEntity> findById(UUID id);
+    AtomResponseDto getAtom(UUID id);
     void deleteById(UUID id);
     AtomResponseDto partialUpdate(AtomUpdateRequestDto dto, UUID id);
     AtomResponseDto updateStatus(Status status, UUID id);

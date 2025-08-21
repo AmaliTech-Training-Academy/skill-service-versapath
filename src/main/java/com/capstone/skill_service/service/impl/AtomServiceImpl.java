@@ -53,8 +53,20 @@ public class AtomServiceImpl implements AtomService {
 
     @Override
     public CustomPageResponse<AtomResponseDto> findAll(Pageable pageable) {
-        //TODO
-        return null;
+        Page<SkillAtomEntity> atomList = this.atomRepository.findAll(pageable);
+        Page<AtomResponseDto> atoms = atomList.map(this.atomMapper::toDto);
+
+        logger.info("Atoms list is fetched");
+
+        return CustomPageResponse.<AtomResponseDto>builder()
+                .items(atoms.getContent())
+                .page(atoms.getNumber())
+                .size(atoms.getSize())
+                .totalElements(atoms.getTotalElements())
+                .totalPages(atoms.getTotalPages())
+                .hasNext(atoms.hasNext())
+                .hasPrevious(atoms.hasPrevious())
+                .build();
     }
 
     @Override
@@ -63,9 +75,14 @@ public class AtomServiceImpl implements AtomService {
     }
 
     @Override
-    public AtomResponseDto getAtom(UUID userId) {
-        //TODO
-        return null;
+    public AtomResponseDto getAtom(UUID id) {
+        SkillAtomEntity atom = findById(id)
+                .orElseThrow( () -> new AtomNotFoundException("A atom provided doesn't exist")
+                );
+
+        logger.info("Skill atom {} retrieved", atom.getName());
+
+        return this.atomMapper.toDto(atom);
     }
 
     @Override

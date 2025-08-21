@@ -16,8 +16,8 @@ public interface TagService {
     TagResponseDto create(TagRequestDto dto);
     Optional<TagEntity> findByName(String name);
     CustomPageResponse<TagResponseDto> findAll(Pageable pageable);
-    Optional<TagEntity> findById(UUID userId);
-    TagResponseDto getTag(UUID userId);
+    Optional<TagEntity> findById(UUID id);
+    TagResponseDto getTag(UUID id);
     void deleteById(UUID id);
     TagResponseDto partialUpdate(TagUpdateRequestDto dto, UUID id);
     TagResponseDto updateStatus(Status status, UUID id);
