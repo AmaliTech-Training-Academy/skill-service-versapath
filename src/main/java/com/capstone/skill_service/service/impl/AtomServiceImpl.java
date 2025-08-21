@@ -77,7 +77,7 @@ public class AtomServiceImpl implements AtomService {
     @Override
     public AtomResponseDto getAtom(UUID id) {
         SkillAtomEntity atom = findById(id)
-                .orElseThrow( () -> new AtomNotFoundException("A atom provided doesn't exist")
+                .orElseThrow( () -> new AtomNotFoundException("A Skill atom provided doesn't exist")
                 );
 
         logger.info("Skill atom {} retrieved", atom.getName());
@@ -88,7 +88,7 @@ public class AtomServiceImpl implements AtomService {
     @Override
     public void deleteById(UUID id) {
         SkillAtomEntity atom = findById(id)
-                .orElseThrow( () -> new AtomNotFoundException("A atom provided doesn't exist")
+                .orElseThrow( () -> new AtomNotFoundException("A Skill atom provided doesn't exist")
                 );
 
         logger.info("Skill atom {} deleted", atom.getName());
@@ -98,14 +98,35 @@ public class AtomServiceImpl implements AtomService {
 
     @Override
     public AtomResponseDto partialUpdate(AtomUpdateRequestDto dto, UUID id) {
-        //TODO
-        return null;
+        SkillAtomEntity atom = findById(id)
+                .orElseThrow( () -> new AtomNotFoundException("A Skill atom provided doesn't exist")
+                );
+        if(dto.getName() != null){
+            atom.setName(dto.getName());
+        }
+        if(dto.getObjectives() != null){
+            atom.setObjectives(dto.getObjectives());
+        }
+        if(dto.getDescription() != null){
+            atom.setDescription(dto.getDescription());
+        }
+        if(dto.getUpdatedAt() != null){
+            atom.setUpdatedAt(LocalDateTime.now());
+        }
+
+        logger.info("Skill atom {} updated", atom.getName());
+
+        return this.atomMapper.toDto(this.atomRepository.save(atom));
     }
 
     @Override
     public AtomResponseDto updateStatus(Status status, UUID id) {
-        //TODO
-        return null;
+        SkillAtomEntity atom = findById(id)
+                .orElseThrow( () -> new AtomNotFoundException("A Skill atom provided doesn't exist")
+                );
+        atom.setStatus(status);
+
+        return this.atomMapper.toDto(this.atomRepository.save(atom));
     }
 
 }

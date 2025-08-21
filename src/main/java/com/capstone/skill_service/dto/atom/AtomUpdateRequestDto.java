@@ -1,6 +1,8 @@
 package com.capstone.skill_service.dto.atom;
 
 import com.capstone.skill_service.util.Status;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -20,7 +22,6 @@ public class AtomUpdateRequestDto {
     @Pattern(regexp = "^[A-Za-z ]+$", message = "name cannot contain numbers")
     private String name;
 
-    @Pattern(regexp = "^[0-9]+$", message = "only digits are allowed")
     private int estimatedHours;
 
     private String description;
