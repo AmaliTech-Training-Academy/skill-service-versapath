@@ -113,6 +113,7 @@ public class AtomServiceImpl implements AtomService {
         if(dto.getUpdatedAt() != null){
             atom.setUpdatedAt(LocalDateTime.now());
         }
+        atom.setUpdatedAt(LocalDateTime.now());
 
         logger.info("Skill atom {} updated", atom.getName());
 

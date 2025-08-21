@@ -114,6 +114,7 @@ public class ClusterServiceImpl implements ClusterService {
         if(dto.getUpdatedAt() != null){
             cluster.setUpdatedAt(LocalDateTime.now());
         }
+        cluster.setUpdatedAt(LocalDateTime.now());
 
         logger.info("Skill cluster {} updated", cluster.getName());
 
