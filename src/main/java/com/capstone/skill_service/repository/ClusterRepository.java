@@ -8,6 +8,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public interface TagRepository extends JpaRepository<TagEntity, UUID> {
+public interface ClusterRepository extends JpaRepository<TagEntity, UUID> {
     Optional<TagEntity> findByName(String name);
 }
