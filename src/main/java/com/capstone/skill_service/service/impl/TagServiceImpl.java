@@ -31,7 +31,7 @@ public class TagServiceImpl implements TagService {
     public TagResponseDto create(TagRequestDto dto) {
         if(findByName(dto.getName()).isPresent()){
             throw new TagExistsException(
-                    String.format("A Tag with the email '%s' already exist",
+                    String.format("A Tag with the name '%s' already exist",
                             dto.getName()));
         }
         TagEntity tagEntity = this.tagMapper.toEntity(dto);
