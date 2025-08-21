@@ -21,7 +21,7 @@ public class TagRequestDto {
     @Pattern(regexp = "^[A-Za-z ]+$", message = "name cannot contain numbers")
     private String name;
 
-    @Pattern(regexp = "^[A-Za-z ]+$", message = "name cannot contain numbers")
+    @Pattern(regexp = "^[A-Za-z ]+$", message = "type cannot contain numbers")
     private String type;
 
     private String description;
