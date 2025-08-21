@@ -41,6 +41,7 @@ public class TagServiceImpl implements TagService {
 
         tagEntity.setCreatedAt(LocalDateTime.now());
         tagEntity.setUpdatedAt(LocalDateTime.now());
+        tagEntity.setStatus(Status.ACTIVE);
         logger.info("Admin created skill tag: {}", tagEntity.getName());
 
         return this.tagMapper.toDto(tagRepository.save(tagEntity));

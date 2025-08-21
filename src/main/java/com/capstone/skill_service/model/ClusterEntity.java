@@ -30,8 +30,7 @@ public class ClusterEntity {
     private String description;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, columnDefinition = "VARCHAR(20)")
-    private Status status = Status.ACTIVE;
+    private Status status;
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

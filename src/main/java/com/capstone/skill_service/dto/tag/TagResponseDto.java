@@ -18,6 +18,6 @@ public class TagResponseDto {
     private String name;
     private String type;
     private String description;
-    Status status;
+    private Status status;
     private LocalDateTime createdAt;
 }

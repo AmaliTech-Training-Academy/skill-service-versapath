@@ -41,6 +41,7 @@ public class ClusterServiceImpl implements ClusterService {
 
         clusterEntity.setCreatedAt(LocalDateTime.now());
         clusterEntity.setUpdatedAt(LocalDateTime.now());
+        clusterEntity.setStatus(Status.ACTIVE);
         logger.info("Admin created skill cluster: {}", clusterEntity.getName());
 
         return this.clusterMapper.toDto(clusterRepository.save(clusterEntity));
