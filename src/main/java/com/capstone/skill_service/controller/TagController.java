@@ -86,6 +86,7 @@ public class TagController {
     @Operation(summary = "Update skill tag", description = "This end point allows admin to update a skill tag")
     public ResponseEntity<ClientResponseFormatDto> updateTag(
             @Valid @RequestBody TagUpdateRequestDto tagRequestDto, @PathVariable UUID tagId) {
+
         TagResponseDto updatedTag = this.tagService.partialUpdate(tagRequestDto, tagId);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
                 .status(true)
