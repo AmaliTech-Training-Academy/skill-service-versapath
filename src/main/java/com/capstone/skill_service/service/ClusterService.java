@@ -12,5 +12,7 @@ import java.util.UUID;
 public interface ClusterService {
     ClusterResponseDto create(ClusterRequestDto dto);
     Optional<ClusterEntity> findByName(String name);
+    CustomPageResponse<ClusterResponseDto> findAll(Pageable pageable);
     Optional<ClusterEntity> findById(UUID userId);
+
 }

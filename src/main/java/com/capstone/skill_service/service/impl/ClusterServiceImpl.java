@@ -50,6 +50,24 @@ public class ClusterServiceImpl implements ClusterService {
     }
 
     @Override
+    public CustomPageResponse<ClusterResponseDto> findAll(Pageable pageable) {
+        Page<ClusterEntity> clusterList = this.clusterRepository.findAll(pageable);
+        Page<ClusterResponseDto> clusters = clusterList.map(this.clusterMapper::toDto);
+
+        logger.info("Clusters list is fetched");
+
+        return CustomPageResponse.<ClusterResponseDto>builder()
+                .items(clusters.getContent())
+                .page(clusters.getNumber())
+                .size(clusters.getSize())
+                .totalElements(clusters.getTotalElements())
+                .totalPages(clusters.getTotalPages())
+                .hasNext(clusters.hasNext())
+                .hasPrevious(clusters.hasPrevious())
+                .build();
+    }
+
+    @Override
     public Optional<ClusterEntity> findById(UUID id) {
         return this.clusterRepository.findById(id);
     }
