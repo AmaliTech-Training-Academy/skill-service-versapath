@@ -5,6 +5,7 @@ import com.capstone.skill_service.dto.CustomPageResponse;
 import com.capstone.skill_service.dto.tag.TagRequestDto;
 import com.capstone.skill_service.dto.tag.TagResponseDto;
 import com.capstone.skill_service.service.TagService;
+import com.capstone.skill_service.util.Status;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -87,6 +88,20 @@ public class TagController {
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
                 .status(true)
                 .message("Tag updated successfully!")
+                .errors(null)
+                .data(updatedTag)
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @PutMapping
+    @Operation(summary = "Update skill tag status", description = "This end point allows admin to update a skill tag as a soft delete")
+    public ResponseEntity<ClientResponseFormatDto> updateClusterStatus(
+            @RequestParam UUID id, @RequestParam Status status) {
+        TagResponseDto updatedTag = this.tagService.updateStatus(status, id);
+        ClientResponseFormatDto response = ClientResponseFormatDto.builder()
+                .status(true)
+                .message("Tag status updated successfully!")
                 .errors(null)
                 .data(updatedTag)
                 .build();

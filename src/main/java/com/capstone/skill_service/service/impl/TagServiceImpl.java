@@ -9,6 +9,7 @@ import com.capstone.skill_service.mapper.TagMapper;
 import com.capstone.skill_service.model.TagEntity;
 import com.capstone.skill_service.repository.TagRepository;
 import com.capstone.skill_service.service.TagService;
+import com.capstone.skill_service.util.Status;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +39,7 @@ public class TagServiceImpl implements TagService {
 
         tagEntity.setCreatedAt(LocalDateTime.now());
         tagEntity.setUpdatedAt(LocalDateTime.now());
+        tagEntity.setStatus(Status.ACTIVE);
         logger.info("Admin created skill tag: {}", tagEntity.getName());
 
         return this.tagMapper.toDto(tagRepository.save(tagEntity));
@@ -112,6 +114,16 @@ public class TagServiceImpl implements TagService {
         }
 
         logger.info("Skill tag {} updated", tag.getName());
+
+        return this.tagMapper.toDto(this.tagRepository.save(tag));
+    }
+
+    @Override
+    public TagResponseDto updateStatus(Status status, UUID id) {
+        TagEntity tag = findById(id)
+                .orElseThrow( () -> new TagNotFoundException("A tag provided doesn't exist")
+                );
+        tag.setStatus(status);
 
         return this.tagMapper.toDto(this.tagRepository.save(tag));
     }

@@ -1,5 +1,6 @@
 package com.capstone.skill_service.model;
 
+import com.capstone.skill_service.util.Status;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,6 +26,10 @@ public class TagEntity {
 
     private String type;
     private String description;
+
+    @Enumerated(EnumType.STRING)
+    private Status status;
+
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
