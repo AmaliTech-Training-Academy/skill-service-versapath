@@ -114,6 +114,7 @@ public class TagServiceImpl implements TagService {
         if(dto.getUpdatedAt() != null){
             tag.setUpdatedAt(LocalDateTime.now());
         }
+        tag.setUpdatedAt(LocalDateTime.now());
 
         logger.info("Skill tag {} updated", tag.getName());
 
