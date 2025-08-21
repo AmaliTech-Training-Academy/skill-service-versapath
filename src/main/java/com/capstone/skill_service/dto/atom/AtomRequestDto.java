@@ -1,9 +1,7 @@
 package com.capstone.skill_service.dto.atom;
 
 import com.capstone.skill_service.util.Status;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,7 +19,8 @@ public class AtomRequestDto {
     @Pattern(regexp = "^[A-Za-z ]+$", message = "name cannot contain numbers")
     private String name;
 
-    @Pattern(regexp = "^[0-9]+$", message = "only digits are allowed")
+    @Min(value = 1, message = "Must be at least 1 hour")
+    @Max(value = 1000, message = "Must not exceed 1000 hours")
     private int estimatedHours;
 
     private String description;

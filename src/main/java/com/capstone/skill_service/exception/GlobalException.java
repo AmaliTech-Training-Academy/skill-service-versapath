@@ -8,11 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.NoHandlerFoundException;
-
 import java.nio.file.AccessDeniedException;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -47,7 +44,6 @@ public class GlobalException {
                 .build();
         return new ResponseEntity<>(response, HttpStatus.CONFLICT);
     }
-
 
     @ExceptionHandler(TagNotFoundException.class)
     public ResponseEntity<?> handleTagNotFound(
@@ -150,5 +146,31 @@ public class GlobalException {
                 .build();
 
         return ResponseEntity.badRequest().body(response);
+    }
+
+    @ExceptionHandler(AtomNotFoundException.class)
+    public ResponseEntity<?> handleAtomNotFound(
+            AtomNotFoundException exception) {
+        ClientResponseFormatDto response = ClientResponseFormatDto.builder()
+                .status(false)
+                .message("Skill Atom Error!")
+                .errors(List.of(Map.of("message", exception.getMessage())))
+                .data(null)
+                .build();
+
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(AtomExistsException.class)
+    public ResponseEntity<?> handleAtomExists
+            (AtomExistsException exception) {
+
+        ClientResponseFormatDto response = ClientResponseFormatDto.builder()
+                .status(false)
+                .message("Skill Atom Error!")
+                .errors(List.of(Map.of("message", exception.getMessage())))
+                .data(null)
+                .build();
+        return new ResponseEntity<>(response, HttpStatus.CONFLICT);
     }
 }
