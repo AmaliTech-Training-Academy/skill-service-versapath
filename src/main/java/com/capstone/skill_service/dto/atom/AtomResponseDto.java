@@ -23,6 +23,6 @@ public class AtomResponseDto {
     private String objectives;
     private int estimatedHours;
     private Status status;
-    private int moodle_section_id;
+    private int moodleSectionId;
     private LocalDateTime createdAt;
 }

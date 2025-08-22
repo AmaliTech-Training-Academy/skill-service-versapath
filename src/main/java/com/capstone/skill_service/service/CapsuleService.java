@@ -1,0 +1,23 @@
+package com.capstone.skill_service.service;
+
+import com.capstone.skill_service.dto.CustomPageResponse;
+import com.capstone.skill_service.dto.capsule.CapsuleRequestDto;
+import com.capstone.skill_service.dto.capsule.CapsuleResponseDto;
+import com.capstone.skill_service.dto.capsule.CapsuleUpdateRequestDto;
+import com.capstone.skill_service.model.SkillCapsuleEntity;
+import com.capstone.skill_service.util.Status;
+import org.springframework.data.domain.Pageable;
+
+import java.util.Optional;
+import java.util.UUID;
+
+public interface CapsuleService {
+    CapsuleResponseDto create(CapsuleRequestDto dto);
+    Optional<SkillCapsuleEntity> findByName(String name);
+    CustomPageResponse<CapsuleResponseDto> findAll(Pageable pageable);
+    Optional<SkillCapsuleEntity> findById(UUID id);
+    CapsuleResponseDto getCapsule(UUID id);
+    void deleteById(UUID id);
+    CapsuleResponseDto partialUpdate(CapsuleUpdateRequestDto dto, UUID id);
+    CapsuleResponseDto updateStatus(Status status, UUID id);
+}

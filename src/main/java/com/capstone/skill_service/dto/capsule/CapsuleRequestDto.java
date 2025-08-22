@@ -27,8 +27,8 @@ public class CapsuleRequestDto {
     private int estimatedHours;
 
     private String difficulty;
-    private ProficiencyLevel proficiency_level;
-    private String category_type;
+    private ProficiencyLevel proficiencyLevel;
+    private String categoryType;
     private String description;
     private String objectives;
     private Status status;

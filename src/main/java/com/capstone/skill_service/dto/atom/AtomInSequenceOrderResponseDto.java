@@ -14,6 +14,6 @@ public class AtomInSequenceOrderResponseDto {
     private UUID id;
     private String name;
     private String description;
-    private int moodle_section_id;
+    private int moodleSectionId;
     private int sequenceOrder;
 }

@@ -30,11 +30,11 @@ public class SkillCapsuleEntity {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    private String category_type;
+    private String categoryType;
     private String difficulty;
 
     @Enumerated(EnumType.STRING)
-    private ProficiencyLevel proficiency_level;
+    private ProficiencyLevel proficiencyLevel;
 
     @Enumerated(EnumType.STRING)
     private Status status;
@@ -42,8 +42,8 @@ public class SkillCapsuleEntity {
     @OneToMany(mappedBy = "capsule", cascade = CascadeType.ALL, orphanRemoval = true) // just remove child from capsule list
     private List<CapsuleAtomMappingEntity> skillAtoms = new ArrayList<>();
 
-    private int moodle_course_id; // id from moodle database on course table
-    private int estimated_hours;
+    private int moodleCourseId; // id from moodle database on course table
+    private int estimatedHours;
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
