@@ -1,5 +1,6 @@
 package com.capstone.skill_service.model;
 
+import com.capstone.skill_service.util.ProficiencyLevel;
 import com.capstone.skill_service.util.Status;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -31,12 +32,14 @@ public class SkillCapsuleEntity {
 
     private String category_type;
     private String difficulty;
-    private int proficiency_level;
+
+    @Enumerated(EnumType.STRING)
+    private ProficiencyLevel proficiency_level;
 
     @Enumerated(EnumType.STRING)
     private Status status;
 
-    @OneToMany(mappedBy = "capsule", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "capsule", cascade = CascadeType.ALL, orphanRemoval = true) // just remove child from capsule list
     private List<CapsuleAtomMappingEntity> skillAtoms = new ArrayList<>();
 
     private int moodle_course_id; // id from moodle database on course table
