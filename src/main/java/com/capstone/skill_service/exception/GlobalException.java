@@ -173,4 +173,30 @@ public class GlobalException {
                 .build();
         return new ResponseEntity<>(response, HttpStatus.CONFLICT);
     }
+
+    @ExceptionHandler(CapsuleNotFoundException.class)
+    public ResponseEntity<?> handleCapsuleNotFound(
+            CapsuleNotFoundException exception) {
+        ClientResponseFormatDto response = ClientResponseFormatDto.builder()
+                .status(false)
+                .message("Skill Capsule Error!")
+                .errors(List.of(Map.of("message", exception.getMessage())))
+                .data(null)
+                .build();
+
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(CapsuleExistsException.class)
+    public ResponseEntity<?> handleCapsuleExists
+            (CapsuleExistsException exception) {
+
+        ClientResponseFormatDto response = ClientResponseFormatDto.builder()
+                .status(false)
+                .message("Skill Capsule Error!")
+                .errors(List.of(Map.of("message", exception.getMessage())))
+                .data(null)
+                .build();
+        return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+    }
 }
