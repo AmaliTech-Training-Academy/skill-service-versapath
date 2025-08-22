@@ -1,0 +1,28 @@
+services:
+  postgres-db:
+    image: postgres:16
+    container_name: postgres-db
+    environment:
+      POSTGRES_USER: skilluser
+      POSTGRES_PASSWORD: skillpass
+      POSTGRES_DB: skilldb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  skill-service:
+    build: .
+    container_name: skill-service
+    ports:
+      - "8060:8060"
+    environment:
+      SPRING_PROFILES_ACTIVE: development
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-db:5432/skilldb
+      SPRING_DATASOURCE_USERNAME: skilluser
+      SPRING_DATASOURCE_PASSWORD: skillpass
+    depends_on:
+      - postgres-db
+
+volumes:
+  postgres_data:
