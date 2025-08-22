@@ -134,6 +134,53 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>0.8.12</version>
+				<configuration>
+					<excludes>
+						<!-- Application Entry Point -->
+						<exclude>**/*Application.*</exclude>
+
+						<!-- Config Folder -->
+						<exclude>**/config/**</exclude>
+
+						<!-- Listeners Folder (singular and plural) -->
+						<exclude>**/listener/**</exclude>
+						<exclude>**/listeners/**</exclude>
+
+						<!-- Filters Folder (singular and plural) -->
+						<exclude>**/filter/**</exclude>
+						<exclude>**/filters/**</exclude>
+
+						<!-- Security Folder -->
+						<exclude>**/security/**</exclude>
+
+						<!-- Dtos & Custom exceptions -->
+						<exclude>**/dto/**</exclude>
+						<exclude>**/dtos/**</exclude>
+						<exclude>**/exception/**</exclude>
+						<exclude>**/exceptions/**</exclude>
+					</excludes>
+				</configuration>
+				<executions>
+					<execution>
+						<id>prepare-agent</id>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+						<phase>initialize</phase>
+					</execution>
+					<execution>
+						<id>report</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>report</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 
