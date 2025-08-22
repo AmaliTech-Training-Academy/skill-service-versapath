@@ -82,8 +82,20 @@ public class CapsuleServiceImpl implements CapsuleService {
 
     @Override
     public CustomPageResponse<CapsuleResponseDto> findAll(Pageable pageable) {
-        //TODO
-        return null;
+        Page<SkillCapsuleEntity> capsuleList = this.capsuleRepository.findAll(pageable);
+        Page<CapsuleResponseDto> capsules = capsuleList.map(this.capsuleMapper::toDto);
+
+        logger.info("Capsules list is fetched");
+
+        return CustomPageResponse.<CapsuleResponseDto>builder()
+                .items(capsules.getContent())
+                .page(capsules.getNumber())
+                .size(capsules.getSize())
+                .totalElements(capsules.getTotalElements())
+                .totalPages(capsules.getTotalPages())
+                .hasNext(capsules.hasNext())
+                .hasPrevious(capsules.hasPrevious())
+                .build();
     }
 
     @Override
@@ -93,8 +105,13 @@ public class CapsuleServiceImpl implements CapsuleService {
 
     @Override
     public CapsuleResponseDto getCapsule(UUID id) {
-        //TODO
-        return null;
+        SkillCapsuleEntity capsule = findById(id)
+                .orElseThrow( () -> new CapsuleNotFoundException("A Skill capsule provided doesn't exist")
+                );
+
+        logger.info("Skill capsule {} retrieved", capsule.getName());
+
+        return this.capsuleMapper.toDto(capsule);
     }
 
     @Override

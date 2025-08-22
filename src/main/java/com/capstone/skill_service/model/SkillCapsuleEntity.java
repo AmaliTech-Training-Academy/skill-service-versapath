@@ -30,6 +30,9 @@ public class SkillCapsuleEntity {
     @Column(columnDefinition = "TEXT")
     private String description;
 
+    @Column(columnDefinition = "TEXT")
+    private String objectives;
+
     private String categoryType;
     private String difficulty;
 
