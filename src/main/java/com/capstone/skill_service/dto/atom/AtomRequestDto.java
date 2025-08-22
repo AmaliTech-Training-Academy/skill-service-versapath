@@ -1,8 +1,11 @@
-package com.capstone.skill_service.dto.cluster;
+package com.capstone.skill_service.dto.atom;
 
+import com.capstone.skill_service.util.Status;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,15 +17,20 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ClusterUpdateRequestDto {
+public class AtomRequestDto {
+    @NotBlank(message = "Name is required")
     @Size(min = 3, message = "Name must have at least 3 characters")
     @Pattern(regexp = "^[A-Za-z ]+$", message = "name cannot contain numbers")
     private String name;
 
-    @Pattern(regexp = "^[A-Za-z ]+$", message = "type cannot contain numbers")
-    private String type;
+    @Min(value = 1, message = "Must be at least 1 hour")
+    @Max(value = 1000, message = "Must not exceed 1000 hours")
+    private int estimatedHours;
 
     private String description;
+    private String objectives;
+    private Status status;
+
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
