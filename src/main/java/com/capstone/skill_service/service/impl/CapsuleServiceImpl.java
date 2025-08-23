@@ -15,7 +15,6 @@ import com.capstone.skill_service.model.SkillAtomEntity;
 import com.capstone.skill_service.model.SkillCapsuleEntity;
 import com.capstone.skill_service.repository.AtomRepository;
 import com.capstone.skill_service.repository.CapsuleRepository;
-import com.capstone.skill_service.service.AtomService;
 import com.capstone.skill_service.service.CapsuleService;
 import com.capstone.skill_service.util.Status;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +29,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -212,6 +210,27 @@ public class CapsuleServiceImpl implements CapsuleService {
             capsuleEntity.getSkillAtoms().add(assignAtomToCapsule);// add a single assignment to assigment collection
         }
 
+    }
+
+    @Override
+    public CapsuleResponseDto removeAtomFromCapsule(UUID capsuleId, UUID atomId) {
+        SkillCapsuleEntity capsuleEntity = findById(capsuleId)
+                .orElseThrow(() -> new CapsuleNotFoundException("A Skill capsule provided doesn't exist"));
+
+        // find the atom to remove from capsule
+        CapsuleAtomMappingEntity atomToRemove = capsuleEntity.getSkillAtoms().stream()
+                .filter(mapping -> mapping.getAtom().getId().equals(atomId))
+                .findFirst()
+                .orElseThrow(() -> new AtomNotFoundException("A skill atom provided doesn't exist in capsule"));
+
+        capsuleEntity.getSkillAtoms().remove(atomToRemove); // remove atom from capsule collection
+
+        //Rearrange the sequence order
+        int order = 1;
+        for (CapsuleAtomMappingEntity mapping : capsuleEntity.getSkillAtoms()) {
+            mapping.setSequenceOrder(order++);
+        }
+        return capsuleMapper.toDto(capsuleRepository.save(capsuleEntity));
     }
 
 }
