@@ -82,7 +82,7 @@ public class CapsuleServiceImpl implements CapsuleService {
 
     @Override
     public CustomPageResponse<CapsuleResponseDto> findAll(Pageable pageable) {
-        Page<SkillCapsuleEntity> capsuleList = this.capsuleRepository.findAll(pageable);
+        Page<SkillCapsuleEntity> capsuleList = this.capsuleRepository.findAllWithSkillAtoms(pageable);
         Page<CapsuleResponseDto> capsules = capsuleList.map(this.capsuleMapper::toDto);
 
         logger.info("Capsules list is fetched");
@@ -100,7 +100,7 @@ public class CapsuleServiceImpl implements CapsuleService {
 
     @Override
     public Optional<SkillCapsuleEntity> findById(UUID id) {
-        return this.capsuleRepository.findById(id);
+        return this.capsuleRepository.findByIdWithSkillAtoms(id);
     }
 
     @Override
