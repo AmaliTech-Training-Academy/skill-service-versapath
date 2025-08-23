@@ -105,6 +105,11 @@ public class TagServiceImpl implements TagService {
                 .orElseThrow( () -> new TagNotFoundException("A tag provided doesn't exist")
                 );
         if(dto.getName() != null){
+            if(findByName(dto.getName()).isPresent()){
+                throw new TagExistsException(
+                        String.format("A Tag with the name '%s' already exist",
+                                dto.getName()));
+            }
             tag.setName(dto.getName());
         }
         if(dto.getType() != null){
@@ -113,8 +118,8 @@ public class TagServiceImpl implements TagService {
         if(dto.getDescription() != null){
             tag.setDescription(dto.getDescription());
         }
-        if(dto.getUpdatedAt() != null){
-            tag.setUpdatedAt(LocalDateTime.now());
+        if(dto.getStatus() != null){
+            tag.setStatus(dto.getStatus());
         }
         tag.setUpdatedAt(LocalDateTime.now());
 

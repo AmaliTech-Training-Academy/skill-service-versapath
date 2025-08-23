@@ -105,6 +105,11 @@ public class ClusterServiceImpl implements ClusterService {
                 .orElseThrow( () -> new ClusterNotFoundException("A cluster provided doesn't exist")
                 );
         if(dto.getName() != null){
+            if(findByName(dto.getName()).isPresent()){
+                throw new ClusterExistsException(
+                        String.format("A Cluster with the name '%s' already exist",
+                                dto.getName()));
+            }
             cluster.setName(dto.getName());
         }
         if(dto.getType() != null){
@@ -113,8 +118,8 @@ public class ClusterServiceImpl implements ClusterService {
         if(dto.getDescription() != null){
             cluster.setDescription(dto.getDescription());
         }
-        if(dto.getUpdatedAt() != null){
-            cluster.setUpdatedAt(LocalDateTime.now());
+        if(dto.getStatus() != null){
+            cluster.setStatus(dto.getStatus());
         }
         cluster.setUpdatedAt(LocalDateTime.now());
 

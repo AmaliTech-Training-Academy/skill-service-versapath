@@ -19,7 +19,10 @@ import com.capstone.skill_service.util.Status;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -122,15 +125,59 @@ public class CapsuleServiceImpl implements CapsuleService {
     }
 
     @Override
+    @Caching(
+            evict = @CacheEvict(value = "capsuleList", allEntries = true), // to update the entire list
+            put = @CachePut(value = "capsule", key = "#result.id") // Different cache name for individual capsule
+    )
     public CapsuleResponseDto partialUpdate(CapsuleUpdateRequestDto dto, UUID id) {
-        //TODO
-        return null;
+        SkillCapsuleEntity capsule = findById(id)
+                .orElseThrow( () -> new CapsuleNotFoundException("A Skill capsule provided doesn't exist")
+                );
+        if(dto.getName() != null){
+            if(findByName(dto.getName()).isPresent()){
+                throw new CapsuleExistsException(
+                        String.format("A Skill Capsule with the name '%s' already exist",
+                                dto.getName()));
+            }
+            capsule.setName(dto.getName());
+        }
+        if(dto.getObjectives() != null){
+            capsule.setObjectives(dto.getObjectives());
+        }
+        if(dto.getDescription() != null){
+            capsule.setDescription(dto.getDescription());
+        }
+        if(dto.getDifficulty() != null){
+            capsule.setDifficulty(dto.getDifficulty());
+        }
+        if(dto.getProficiencyLevel() != null){
+            capsule.setProficiencyLevel(dto.getProficiencyLevel());
+        }
+        if(dto.getCategoryType() != null){
+            capsule.setCategoryType(dto.getCategoryType());
+        }
+        if(dto.getEstimatedHours() != capsule.getEstimatedHours()){
+            capsule.setEstimatedHours(dto.getEstimatedHours());
+        }
+        if(dto.getStatus() != null){
+            capsule.setStatus(dto.getStatus());
+        }
+
+        capsule.setUpdatedAt(LocalDateTime.now());
+
+        logger.info("Skill capsule {} updated", capsule.getName());
+
+        return this.capsuleMapper.toDto(this.capsuleRepository.save(capsule));
     }
 
     @Override
     public CapsuleResponseDto updateStatus(Status status, UUID id) {
-        //TODO
-        return null;
+        SkillCapsuleEntity capsule = findById(id)
+                .orElseThrow( () -> new CapsuleNotFoundException("A Skill capsule provided doesn't exist")
+                );
+        capsule.setStatus(status);
+
+        return this.capsuleMapper.toDto(this.capsuleRepository.save(capsule));
     }
 
 }
