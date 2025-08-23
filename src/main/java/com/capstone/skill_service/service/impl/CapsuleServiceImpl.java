@@ -5,6 +5,7 @@ import com.capstone.skill_service.dto.atom.AtomIdsRequestDto;
 import com.capstone.skill_service.dto.capsule.CapsuleRequestDto;
 import com.capstone.skill_service.dto.capsule.CapsuleResponseDto;
 import com.capstone.skill_service.dto.capsule.CapsuleUpdateRequestDto;
+import com.capstone.skill_service.exception.AlreadyAssignedException;
 import com.capstone.skill_service.exception.AtomNotFoundException;
 import com.capstone.skill_service.exception.CapsuleExistsException;
 import com.capstone.skill_service.exception.CapsuleNotFoundException;
@@ -183,10 +184,7 @@ public class CapsuleServiceImpl implements CapsuleService {
         return this.capsuleMapper.toDto(capsuleRepository.save(capsuleEntity));
     }
 
-
     void addAtomsToCapsule(SkillCapsuleEntity capsuleEntity, List<UUID> atomIds){
-        // add skill atom to skill capsule collection
-        List<CapsuleAtomMappingEntity> assignAtomToCapsuleCollection = new ArrayList<>();
 
         int numberOfAtomsInCapsule = capsuleEntity.getSkillAtoms().size();
 
@@ -196,6 +194,13 @@ public class CapsuleServiceImpl implements CapsuleService {
             SkillAtomEntity atom = this.atomRepository.findById(atomId)
                     .orElseThrow( () -> new AtomNotFoundException("A Skill atom provided doesn't exist")
                     );
+
+            boolean alreadyAssignedToCapsule = capsuleEntity.getSkillAtoms().stream()
+                    .anyMatch(mapping -> mapping.getAtom().getId().equals(atomId));
+
+            if(alreadyAssignedToCapsule){
+                throw new AlreadyAssignedException("Atom is already assigned to this capsule");
+            }
 
             // assign atom to capsule
             CapsuleAtomMappingEntity assignAtomToCapsule = CapsuleAtomMappingEntity.builder()
