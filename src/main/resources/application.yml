@@ -10,6 +10,14 @@ spring:
     username: ${SPRING_DATASOURCE_USERNAME}
     password: ${SPRING_DATASOURCE_PASSWORD}
 
+  data:
+    redis:
+      host: ${SPRING_REDIS_HOST}
+      port: ${SPRING_REDIS_PORT}
+
+  cache:
+    type: redis
+
   jpa:
     hibernate:
       ddl-auto: update
@@ -18,10 +26,17 @@ spring:
   config:
     import: optional:configserver:${CONFIG_SERVER_URL}
 
+# Set spring to only create beans when needed
+  main:
+    lazy-initialization: true
+
+# Register to service discovery
 eureka:
   client:
     service-url:
       defaultZone: ${EUREKA_CLIENT_URL}
+
+#Actuator
 management:
   endpoints:
     web:
