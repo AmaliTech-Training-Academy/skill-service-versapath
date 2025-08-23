@@ -5,6 +5,7 @@ import com.capstone.skill_service.dto.atom.AtomIdsRequestDto;
 import com.capstone.skill_service.dto.capsule.CapsuleRequestDto;
 import com.capstone.skill_service.dto.capsule.CapsuleResponseDto;
 import com.capstone.skill_service.dto.capsule.CapsuleUpdateRequestDto;
+import com.capstone.skill_service.dto.tag.TagIdsRequestDto;
 import com.capstone.skill_service.exception.*;
 import com.capstone.skill_service.mapper.CapsuleMapper;
 import com.capstone.skill_service.model.CapsuleAtomMappingEntity;
@@ -298,6 +299,36 @@ public class CapsuleServiceImpl implements CapsuleService {
             capsuleEntity.getTags().add(tag);// add a tag to capsule
         }
 
+    }
+
+    @Override
+    public CapsuleResponseDto assignTagToCapsule(UUID capsuleId, TagIdsRequestDto dto){
+        SkillCapsuleEntity capsuleEntity = findById(capsuleId)
+                .orElseThrow( () -> new CapsuleNotFoundException("A Skill capsule provided doesn't exist")
+                );
+
+        addAtomsToCapsule(capsuleEntity, dto.getTagIds()); // link capsule to all the tags assigned to
+
+        logger.info("Admin added new tags to skill capsule: {}", capsuleEntity.getName());
+
+        return this.capsuleMapper.toDto(capsuleRepository.save(capsuleEntity));
+    }
+
+    @Override
+    @Transactional
+    public CapsuleResponseDto removeTagFromCapsule(UUID capsuleId, UUID tagId) {
+        SkillCapsuleEntity capsuleEntity = findById(capsuleId)
+                .orElseThrow(() -> new CapsuleNotFoundException("A Skill capsule provided doesn't exist"));
+
+        // find the tag to remove from capsule
+        TagEntity tagToRemove = capsuleEntity.getTags().stream()
+                .filter(mapping -> mapping.getId().equals(tagId))
+                .findFirst()
+                .orElseThrow(() -> new TagNotFoundException("A tag provided doesn't exist in capsule"));
+
+        capsuleEntity.getTags().remove(tagToRemove); // remove tag from capsule
+
+        return capsuleMapper.toDto(capsuleRepository.save(capsuleEntity));
     }
 
 }

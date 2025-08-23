@@ -6,6 +6,7 @@ import com.capstone.skill_service.dto.atom.AtomIdsRequestDto;
 import com.capstone.skill_service.dto.capsule.CapsuleRequestDto;
 import com.capstone.skill_service.dto.capsule.CapsuleResponseDto;
 import com.capstone.skill_service.dto.capsule.CapsuleUpdateRequestDto;
+import com.capstone.skill_service.dto.tag.TagIdsRequestDto;
 import com.capstone.skill_service.service.CapsuleService;
 import com.capstone.skill_service.util.Status;
 import io.swagger.v3.oas.annotations.Operation;
@@ -148,6 +149,34 @@ public class CapsuleController {
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
                 .status(true)
                 .message("Atoms reordered in capsule successfully!")
+                .errors(null)
+                .data(updatedCapsule)
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @PatchMapping("/assignTag/{capsuleId}")
+    @Operation(summary = "Assign new skill tag to capsule", description = "This end point allows admin to add new skill tag to capsule")
+    public ResponseEntity<ClientResponseFormatDto> assignTagToCapsule(
+            @RequestBody TagIdsRequestDto tagIds, @PathVariable UUID capsuleId) {
+        CapsuleResponseDto updatedCapsule = this.capsuleService.assignTagToCapsule(capsuleId, tagIds);
+        ClientResponseFormatDto response = ClientResponseFormatDto.builder()
+                .status(true)
+                .message("Tags added to capsule successfully!")
+                .errors(null)
+                .data(updatedCapsule)
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @DeleteMapping("/removeTag")
+    @Operation(summary = "Remove a skill tag from capsule", description = "This end point allows admin to remove a skill tag from capsule")
+    public ResponseEntity<ClientResponseFormatDto> removeTagFromCapsule(
+            @RequestParam UUID capsuleId, @RequestParam UUID tagId) {
+        CapsuleResponseDto updatedCapsule = this.capsuleService.removeTagFromCapsule(capsuleId, tagId);
+        ClientResponseFormatDto response = ClientResponseFormatDto.builder()
+                .status(true)
+                .message("Tag removed from capsule successfully!")
                 .errors(null)
                 .data(updatedCapsule)
                 .build();
