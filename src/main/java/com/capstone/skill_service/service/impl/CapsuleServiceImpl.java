@@ -5,10 +5,7 @@ import com.capstone.skill_service.dto.atom.AtomIdsRequestDto;
 import com.capstone.skill_service.dto.capsule.CapsuleRequestDto;
 import com.capstone.skill_service.dto.capsule.CapsuleResponseDto;
 import com.capstone.skill_service.dto.capsule.CapsuleUpdateRequestDto;
-import com.capstone.skill_service.exception.AlreadyAssignedException;
-import com.capstone.skill_service.exception.AtomNotFoundException;
-import com.capstone.skill_service.exception.CapsuleExistsException;
-import com.capstone.skill_service.exception.CapsuleNotFoundException;
+import com.capstone.skill_service.exception.*;
 import com.capstone.skill_service.mapper.CapsuleMapper;
 import com.capstone.skill_service.model.CapsuleAtomMappingEntity;
 import com.capstone.skill_service.model.SkillAtomEntity;
@@ -30,9 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -236,6 +231,36 @@ public class CapsuleServiceImpl implements CapsuleService {
         int order = 1;
         for (CapsuleAtomMappingEntity mapping : capsuleEntity.getSkillAtoms()) {
             mapping.setSequenceOrder(order++);
+        }
+        return capsuleMapper.toDto(capsuleRepository.save(capsuleEntity));
+    }
+
+    @Override
+    public CapsuleResponseDto reorderAtoms(UUID capsuleId, List<UUID> orderedAtomIds) {
+        SkillCapsuleEntity capsuleEntity = findById(capsuleId)
+                .orElseThrow( () -> new CapsuleNotFoundException("A Skill capsule provided doesn't exist")
+                );
+
+        // check whether all the incoming atoms exist in capsule list in DB
+        List<CapsuleAtomMappingEntity> existingAtoms = capsuleEntity.getSkillAtoms(); // in database
+        List<UUID> existingAtomIds = existingAtoms.stream().map(m->m.getAtom().getId()).toList();
+
+        Set<UUID> noneDuplicateOrderedAtomIds = new HashSet<>(orderedAtomIds);
+
+        if(! new HashSet<>(existingAtomIds).containsAll(orderedAtomIds) || noneDuplicateOrderedAtomIds.size() != orderedAtomIds.size()){
+            throw new InvalidAtomIdsException("Invalid skill atoms for this capsule");
+        }
+
+        // Update sequence order
+        for (int i = 0; i < orderedAtomIds.size(); i++) {
+            UUID atomId = orderedAtomIds.get(i); // incoming atom
+
+            CapsuleAtomMappingEntity existingAtomMapping = existingAtoms.stream()
+                    .filter(m -> m.getAtom().getId().equals(atomId))
+                    .findFirst()
+                    .orElseThrow(() -> new AtomNotFoundException("A skill atom provided doesn't exist in capsule"));
+
+            existingAtomMapping.setSequenceOrder(i + 1); // update sequence order
         }
         return capsuleMapper.toDto(capsuleRepository.save(capsuleEntity));
     }
