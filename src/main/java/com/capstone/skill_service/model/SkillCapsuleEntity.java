@@ -43,6 +43,7 @@ public class SkillCapsuleEntity {
     private Status status;
 
     @OneToMany(mappedBy = "capsule", cascade = CascadeType.ALL, orphanRemoval = true) // just remove child from capsule list
+    @OrderBy("sequenceOrder ASC") // to always display atoms in sequence order
     private List<CapsuleAtomMappingEntity> skillAtoms = new ArrayList<>();
 
     private int moodleCourseId; // id from moodle database on course table
