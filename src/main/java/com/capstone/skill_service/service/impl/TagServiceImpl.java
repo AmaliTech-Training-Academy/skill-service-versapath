@@ -15,6 +15,7 @@ import com.capstone.skill_service.util.Status;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -53,6 +54,7 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
+    @Cacheable("tagList")
     public CustomPageResponse<TagResponseDto> findAll(Pageable pageable) {
         Page<TagEntity> tagList = this.tagRepository.findAll(pageable);
         Page<TagResponseDto> tags = tagList.map(this.tagMapper::toDto);

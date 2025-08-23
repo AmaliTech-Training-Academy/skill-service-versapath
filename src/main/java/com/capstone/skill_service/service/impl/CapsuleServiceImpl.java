@@ -19,6 +19,7 @@ import com.capstone.skill_service.util.Status;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -81,6 +82,7 @@ public class CapsuleServiceImpl implements CapsuleService {
     }
 
     @Override
+    @Cacheable("capsuleList")
     public CustomPageResponse<CapsuleResponseDto> findAll(Pageable pageable) {
         Page<SkillCapsuleEntity> capsuleList = this.capsuleRepository.findAllWithSkillAtoms(pageable);
         Page<CapsuleResponseDto> capsules = capsuleList.map(this.capsuleMapper::toDto);
