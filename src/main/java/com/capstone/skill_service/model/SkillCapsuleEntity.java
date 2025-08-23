@@ -9,9 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Entity
 @Table(name = "skill_capsules")
@@ -45,6 +43,14 @@ public class SkillCapsuleEntity {
     @OneToMany(mappedBy = "capsule", cascade = CascadeType.ALL, orphanRemoval = true) // just remove child from capsule list
     @OrderBy("sequenceOrder ASC") // to always display atoms in sequence order
     private List<CapsuleAtomMappingEntity> skillAtoms = new ArrayList<>();
+
+    @ManyToMany(cascade = { CascadeType.MERGE }) // auto removing association when capsule is deleted
+    @JoinTable(
+            name = "capsule_tags", // join table name
+            joinColumns = @JoinColumn(name = "skill_capsule_id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id")
+    )
+    private List<TagEntity> tags = new ArrayList<>();
 
     private int moodleCourseId; // id from moodle database on course table
     private int estimatedHours;
