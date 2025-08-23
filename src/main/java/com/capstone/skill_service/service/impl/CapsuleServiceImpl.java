@@ -10,8 +10,10 @@ import com.capstone.skill_service.mapper.CapsuleMapper;
 import com.capstone.skill_service.model.CapsuleAtomMappingEntity;
 import com.capstone.skill_service.model.SkillAtomEntity;
 import com.capstone.skill_service.model.SkillCapsuleEntity;
+import com.capstone.skill_service.model.TagEntity;
 import com.capstone.skill_service.repository.AtomRepository;
 import com.capstone.skill_service.repository.CapsuleRepository;
+import com.capstone.skill_service.repository.TagRepository;
 import com.capstone.skill_service.service.CapsuleService;
 import com.capstone.skill_service.util.Status;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +38,7 @@ public class CapsuleServiceImpl implements CapsuleService {
     private final CapsuleRepository capsuleRepository;
     private final CapsuleMapper capsuleMapper;
     private final AtomRepository atomRepository;
+    private final TagRepository tagRepository;
 
     @Override
     public CapsuleResponseDto create(CapsuleRequestDto dto) {
@@ -50,6 +53,7 @@ public class CapsuleServiceImpl implements CapsuleService {
         capsuleEntity.setUpdatedAt(LocalDateTime.now());
         capsuleEntity.setStatus(Status.ACTIVE);
         addAtomsToCapsule(capsuleEntity, dto.getAtomIds()); // link capsule to all the atoms assigned to
+        addTagsToCapsule(capsuleEntity, dto.getTagIds()); // link capsule to all the tags assigned to
 
         logger.info("Admin created skill capsule: {}", capsuleEntity.getName());
 
@@ -184,6 +188,9 @@ public class CapsuleServiceImpl implements CapsuleService {
     }
 
     void addAtomsToCapsule(SkillCapsuleEntity capsuleEntity, List<UUID> atomIds){
+        if (capsuleEntity.getSkillAtoms() == null) {
+            capsuleEntity.setSkillAtoms(new ArrayList<>());
+        }
 
         int numberOfAtomsInCapsule = capsuleEntity.getSkillAtoms().size();
 
@@ -263,6 +270,28 @@ public class CapsuleServiceImpl implements CapsuleService {
             existingAtomMapping.setSequenceOrder(i + 1); // update sequence order
         }
         return capsuleMapper.toDto(capsuleRepository.save(capsuleEntity));
+    }
+
+    void addTagsToCapsule(SkillCapsuleEntity capsuleEntity, List<UUID> tagIds){
+        if (capsuleEntity.getTags() == null) {
+            capsuleEntity.setTags(new ArrayList<>());
+        }
+        //get tag id
+        for (UUID tagId : tagIds) {
+            TagEntity tag = this.tagRepository.findById(tagId)
+                    .orElseThrow(() -> new TagNotFoundException("A tag provided doesn't exist")
+                    );
+
+            boolean alreadyAssignedToCapsule = capsuleEntity.getTags().stream()
+                    .anyMatch(tagItem -> tagItem.getId().equals(tagId));
+
+            if (alreadyAssignedToCapsule) {
+                throw new AlreadyAssignedException("The tag is already assigned to this capsule");
+            }
+
+            capsuleEntity.getTags().add(tag);// add a tag to capsule
+        }
+
     }
 
 }

@@ -33,6 +33,7 @@ public class CapsuleRequestDto {
     private String objectives;
     private Status status;
     List<UUID> atomIds; // list of skill atom ids in sequence order
+    List<UUID> tagIds; // list of tag ids
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
