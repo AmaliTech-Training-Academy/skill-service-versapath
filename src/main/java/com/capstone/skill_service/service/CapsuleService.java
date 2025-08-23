@@ -24,4 +24,5 @@ public interface CapsuleService {
     CapsuleResponseDto updateStatus(Status status, UUID id);
     CapsuleResponseDto assignAtomToCapsule(UUID capsuleId, AtomIdsRequestDto dto);
     CapsuleResponseDto removeAtomFromCapsule(UUID capsuleId, UUID atomId);
+    CapsuleResponseDto reorderAtoms(UUID capsuleId, List<UUID> orderedAtomIds);
 }

@@ -212,4 +212,17 @@ public class GlobalException {
                 .build();
         return new ResponseEntity<>(response, HttpStatus.CONFLICT);
     }
+
+    @ExceptionHandler(InvalidAtomIdsException.class)
+    public ResponseEntity<?> handleInvalidAtomIdsException
+            (InvalidAtomIdsException exception) {
+
+        ClientResponseFormatDto response = ClientResponseFormatDto.builder()
+                .status(false)
+                .message("Invalid skill atoms Error!")
+                .errors(List.of(Map.of("message", exception.getMessage())))
+                .data(null)
+                .build();
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
 }

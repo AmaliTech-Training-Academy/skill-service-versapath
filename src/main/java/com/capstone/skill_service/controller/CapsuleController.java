@@ -138,4 +138,19 @@ public class CapsuleController {
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
+
+    @PutMapping("/reorderAtom/{capsuleId}")
+    @Operation(summary = "Reorder new skill atom in capsule collection", description = "This end point allows admin " +
+            "to shift atom sequence order in capsule however they want")
+    public ResponseEntity<ClientResponseFormatDto> reorderAtom(
+            @RequestBody AtomIdsRequestDto atomIds, @PathVariable UUID capsuleId) {
+        CapsuleResponseDto updatedCapsule = this.capsuleService.reorderAtoms(capsuleId, atomIds.getAtomIds());
+        ClientResponseFormatDto response = ClientResponseFormatDto.builder()
+                .status(true)
+                .message("Atoms reordered in capsule successfully!")
+                .errors(null)
+                .data(updatedCapsule)
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
 }
