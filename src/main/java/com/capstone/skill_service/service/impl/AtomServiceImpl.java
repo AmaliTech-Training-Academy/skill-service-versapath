@@ -104,6 +104,11 @@ public class AtomServiceImpl implements AtomService {
                 .orElseThrow( () -> new AtomNotFoundException("A Skill atom provided doesn't exist")
                 );
         if(dto.getName() != null){
+            if(findByName(dto.getName()).isPresent()){
+                throw new AtomExistsException(
+                        String.format("A Skill Atom with the name '%s' already exist",
+                                dto.getName()));
+            }
             atom.setName(dto.getName());
         }
         if(dto.getObjectives() != null){
@@ -112,8 +117,11 @@ public class AtomServiceImpl implements AtomService {
         if(dto.getDescription() != null){
             atom.setDescription(dto.getDescription());
         }
-        if(dto.getUpdatedAt() != null){
-            atom.setUpdatedAt(LocalDateTime.now());
+        if(dto.getEstimatedHours() != atom.getEstimatedHours()){
+            atom.setEstimatedHours(dto.getEstimatedHours());
+        }
+        if(dto.getStatus() != null){
+            atom.setStatus(dto.getStatus());
         }
         atom.setUpdatedAt(LocalDateTime.now());
 

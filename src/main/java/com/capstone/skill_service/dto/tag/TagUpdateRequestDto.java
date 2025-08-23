@@ -1,5 +1,6 @@
 package com.capstone.skill_service.dto.tag;
 
+import com.capstone.skill_service.util.Status;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -22,6 +23,7 @@ public class TagUpdateRequestDto {
     private String type;
 
     private String description;
+    private Status status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 

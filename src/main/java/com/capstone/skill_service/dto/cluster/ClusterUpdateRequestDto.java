@@ -1,5 +1,6 @@
 package com.capstone.skill_service.dto.cluster;
 
+import com.capstone.skill_service.util.Status;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -23,6 +24,7 @@ public class ClusterUpdateRequestDto {
     private String type;
 
     private String description;
+    private Status status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
