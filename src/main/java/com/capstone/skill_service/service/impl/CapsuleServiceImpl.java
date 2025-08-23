@@ -27,6 +27,7 @@ import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -101,6 +102,7 @@ public class CapsuleServiceImpl implements CapsuleService {
     }
 
     @Override
+    @CacheEvict(value = "capsuleList", key = "#id")
     public void deleteById(UUID id) {
         SkillCapsuleEntity capsule = findById(id)
                 .orElseThrow( () -> new CapsuleNotFoundException("A Skill capsule provided doesn't exist")
@@ -158,6 +160,10 @@ public class CapsuleServiceImpl implements CapsuleService {
     }
 
     @Override
+    @Caching(
+            evict = @CacheEvict(value = "capsuleList", allEntries = true), // to update the entire list
+            put = @CachePut(value = "capsule", key = "#result.id") // Different cache name for individual capsule
+    )
     public CapsuleResponseDto updateStatus(Status status, UUID id) {
         SkillCapsuleEntity capsule = findById(id)
                 .orElseThrow( () -> new CapsuleNotFoundException("A Skill capsule provided doesn't exist")
@@ -213,6 +219,7 @@ public class CapsuleServiceImpl implements CapsuleService {
     }
 
     @Override
+    @Transactional
     public CapsuleResponseDto removeAtomFromCapsule(UUID capsuleId, UUID atomId) {
         SkillCapsuleEntity capsuleEntity = findById(capsuleId)
                 .orElseThrow(() -> new CapsuleNotFoundException("A Skill capsule provided doesn't exist"));
