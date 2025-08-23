@@ -2,6 +2,7 @@ package com.capstone.skill_service.controller;
 
 import com.capstone.skill_service.dto.ClientResponseFormatDto;
 import com.capstone.skill_service.dto.CustomPageResponse;
+import com.capstone.skill_service.dto.atom.AtomIdsRequestDto;
 import com.capstone.skill_service.dto.capsule.CapsuleRequestDto;
 import com.capstone.skill_service.dto.capsule.CapsuleResponseDto;
 import com.capstone.skill_service.dto.capsule.CapsuleUpdateRequestDto;
@@ -16,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -103,6 +105,20 @@ public class CapsuleController {
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
                 .status(true)
                 .message("Capsule status updated successfully!")
+                .errors(null)
+                .data(updatedCapsule)
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @PatchMapping("/assignAtom/{capsuleId}")
+    @Operation(summary = "Assign new skill atom to capsule", description = "This end point allows admin to add new skill atom to capsule")
+    public ResponseEntity<ClientResponseFormatDto> assignAtomToCapsule(
+            @RequestBody AtomIdsRequestDto atomIds, @PathVariable UUID capsuleId) {
+        CapsuleResponseDto updatedCapsule = this.capsuleService.assignAtomToCapsule(capsuleId, atomIds);
+        ClientResponseFormatDto response = ClientResponseFormatDto.builder()
+                .status(true)
+                .message("Capsule updated successfully!")
                 .errors(null)
                 .data(updatedCapsule)
                 .build();

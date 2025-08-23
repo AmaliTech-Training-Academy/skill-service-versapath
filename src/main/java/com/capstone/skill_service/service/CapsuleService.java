@@ -1,6 +1,7 @@
 package com.capstone.skill_service.service;
 
 import com.capstone.skill_service.dto.CustomPageResponse;
+import com.capstone.skill_service.dto.atom.AtomIdsRequestDto;
 import com.capstone.skill_service.dto.capsule.CapsuleRequestDto;
 import com.capstone.skill_service.dto.capsule.CapsuleResponseDto;
 import com.capstone.skill_service.dto.capsule.CapsuleUpdateRequestDto;
@@ -8,6 +9,7 @@ import com.capstone.skill_service.model.SkillCapsuleEntity;
 import com.capstone.skill_service.util.Status;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -20,4 +22,5 @@ public interface CapsuleService {
     void deleteById(UUID id);
     CapsuleResponseDto partialUpdate(CapsuleUpdateRequestDto dto, UUID id);
     CapsuleResponseDto updateStatus(Status status, UUID id);
+    CapsuleResponseDto assignAtomToCapsule(UUID capsuleId, AtomIdsRequestDto dto);
 }

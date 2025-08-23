@@ -1,6 +1,7 @@
 package com.capstone.skill_service.service.impl;
 
 import com.capstone.skill_service.dto.CustomPageResponse;
+import com.capstone.skill_service.dto.atom.AtomIdsRequestDto;
 import com.capstone.skill_service.dto.capsule.CapsuleRequestDto;
 import com.capstone.skill_service.dto.capsule.CapsuleResponseDto;
 import com.capstone.skill_service.dto.capsule.CapsuleUpdateRequestDto;
@@ -53,26 +54,7 @@ public class CapsuleServiceImpl implements CapsuleService {
         capsuleEntity.setCreatedAt(LocalDateTime.now());
         capsuleEntity.setUpdatedAt(LocalDateTime.now());
         capsuleEntity.setStatus(Status.ACTIVE);
-
-        // add skill atom to skill capsule collection
-        List<CapsuleAtomMappingEntity> assignAtomToCapsuleCollection = new ArrayList<>();
-        for(int i=0; i<dto.getAtomIds().size(); i++){
-            UUID atomId=dto.getAtomIds().get(i); //get atom id
-
-            SkillAtomEntity atom = this.atomRepository.findById(atomId)
-                    .orElseThrow( () -> new AtomNotFoundException("A Skill atom provided doesn't exist")
-                    );
-
-            // assign atom to capsule
-            CapsuleAtomMappingEntity assignAtomToCapsule = CapsuleAtomMappingEntity.builder()
-                    .atom(atom)
-                    .capsule(capsuleEntity)
-                    .sequenceOrder(i+1) // set default sequence order
-                    .build();
-
-            assignAtomToCapsuleCollection.add(assignAtomToCapsule); // add a single assignment to assigment collection
-        }
-        capsuleEntity.setSkillAtoms(assignAtomToCapsuleCollection); // link capsule to all the atoms assigned to
+        addAtomsToCapsule(capsuleEntity, dto.getAtomIds()); // link capsule to all the atoms assigned to
 
         logger.info("Admin created skill capsule: {}", capsuleEntity.getName());
 
@@ -184,6 +166,47 @@ public class CapsuleServiceImpl implements CapsuleService {
         capsule.setStatus(status);
 
         return this.capsuleMapper.toDto(this.capsuleRepository.save(capsule));
+    }
+
+
+    // update capsule by adding new atoms to it.
+    @Override
+    public CapsuleResponseDto assignAtomToCapsule(UUID capsuleId, AtomIdsRequestDto dto){
+        SkillCapsuleEntity capsuleEntity = findById(capsuleId)
+                .orElseThrow( () -> new CapsuleNotFoundException("A Skill capsule provided doesn't exist")
+                );
+
+        addAtomsToCapsule(capsuleEntity, dto.getAtomIds()); // link capsule to all the atoms assigned to
+
+        logger.info("Admin added new skill atoms to skill capsule: {}", capsuleEntity.getName());
+
+        return this.capsuleMapper.toDto(capsuleRepository.save(capsuleEntity));
+    }
+
+
+    void addAtomsToCapsule(SkillCapsuleEntity capsuleEntity, List<UUID> atomIds){
+        // add skill atom to skill capsule collection
+        List<CapsuleAtomMappingEntity> assignAtomToCapsuleCollection = new ArrayList<>();
+
+        int numberOfAtomsInCapsule = capsuleEntity.getSkillAtoms().size();
+
+        for(int i=0; i<atomIds.size(); i++){
+            UUID atomId=atomIds.get(i); //get atom id
+
+            SkillAtomEntity atom = this.atomRepository.findById(atomId)
+                    .orElseThrow( () -> new AtomNotFoundException("A Skill atom provided doesn't exist")
+                    );
+
+            // assign atom to capsule
+            CapsuleAtomMappingEntity assignAtomToCapsule = CapsuleAtomMappingEntity.builder()
+                    .atom(atom)
+                    .capsule(capsuleEntity)
+                    .sequenceOrder(numberOfAtomsInCapsule + i + 1) // set default sequence order, when child size is 0, order starts from 1 else starts from size number + 1
+                    .build();
+
+            capsuleEntity.getSkillAtoms().add(assignAtomToCapsule);// add a single assignment to assigment collection
+        }
+
     }
 
 }
