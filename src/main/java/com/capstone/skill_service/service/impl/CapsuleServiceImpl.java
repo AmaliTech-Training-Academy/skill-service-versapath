@@ -150,6 +150,12 @@ public class CapsuleServiceImpl implements CapsuleService {
         if(dto.getStatus() != null){
             capsule.setStatus(dto.getStatus());
         }
+        if(dto.getAtomIds() != null){
+            addAtomsToCapsule(capsule, dto.getAtomIds());
+        }
+        if(dto.getTagIds() != null){
+            addTagsToCapsule(capsule, dto.getTagIds());
+        }
 
         capsule.setUpdatedAt(LocalDateTime.now());
 

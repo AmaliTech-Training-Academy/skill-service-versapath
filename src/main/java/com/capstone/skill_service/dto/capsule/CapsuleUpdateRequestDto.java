@@ -9,6 +9,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
 
 @Data
 @NoArgsConstructor
@@ -26,6 +28,8 @@ public class CapsuleUpdateRequestDto {
     private String description;
     private String objectives;
     private Status status;
+    List<UUID> atomIds;
+    List<UUID> tagIds;
     private LocalDateTime updatedAt;
 
 }
