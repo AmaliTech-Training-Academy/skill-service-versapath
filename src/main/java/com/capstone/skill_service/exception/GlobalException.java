@@ -199,4 +199,17 @@ public class GlobalException {
                 .build();
         return new ResponseEntity<>(response, HttpStatus.CONFLICT);
     }
+
+    @ExceptionHandler(AlreadyAssignedException.class)
+    public ResponseEntity<?> handleAlreadyAssignedException
+            (AlreadyAssignedException exception) {
+
+        ClientResponseFormatDto response = ClientResponseFormatDto.builder()
+                .status(false)
+                .message("Assignment Error!")
+                .errors(List.of(Map.of("message", exception.getMessage())))
+                .data(null)
+                .build();
+        return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+    }
 }
