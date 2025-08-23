@@ -121,7 +121,13 @@ public class CapsuleServiceImpl implements CapsuleService {
 
     @Override
     public void deleteById(UUID id) {
-        //TODO
+        SkillCapsuleEntity capsule = findById(id)
+                .orElseThrow( () -> new CapsuleNotFoundException("A Skill capsule provided doesn't exist")
+                );
+
+        logger.info("Skill capsule {} deleted", capsule.getName());
+
+        this.capsuleRepository.deleteById(id);
     }
 
     @Override
