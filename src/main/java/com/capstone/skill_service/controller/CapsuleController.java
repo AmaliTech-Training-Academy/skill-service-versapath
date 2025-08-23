@@ -118,7 +118,21 @@ public class CapsuleController {
         CapsuleResponseDto updatedCapsule = this.capsuleService.assignAtomToCapsule(capsuleId, atomIds);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
                 .status(true)
-                .message("Capsule updated successfully!")
+                .message("Atoms added to capsule successfully!")
+                .errors(null)
+                .data(updatedCapsule)
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @DeleteMapping("/removeAtom")
+    @Operation(summary = "Remove a skill atom from capsule", description = "This end point allows admin to remove a skill atom from capsule")
+    public ResponseEntity<ClientResponseFormatDto> removeAtomFromCapsule(
+            @RequestParam UUID capsuleId, @RequestParam UUID atomId) {
+        CapsuleResponseDto updatedCapsule = this.capsuleService.removeAtomFromCapsule(capsuleId, atomId);
+        ClientResponseFormatDto response = ClientResponseFormatDto.builder()
+                .status(true)
+                .message("Atom removed from capsule successfully!")
                 .errors(null)
                 .data(updatedCapsule)
                 .build();
