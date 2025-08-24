@@ -23,7 +23,10 @@ import com.capstone.skill_service.util.Status;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -90,6 +93,7 @@ public class ClusterServiceImpl implements ClusterService {
     }
 
     @Override
+    @CacheEvict(value = "clusterList", key = "#id")
     public void deleteById(UUID id) {
         ClusterEntity cluster = findById(id)
                 .orElseThrow( () -> new ClusterNotFoundException("A cluster provided doesn't exist")
@@ -112,6 +116,10 @@ public class ClusterServiceImpl implements ClusterService {
     }
 
     @Override
+    @Caching(
+            evict = @CacheEvict(value = "clusterList", allEntries = true), // to update the entire list
+            put = @CachePut(value = "cluster", key = "#result.id") // Different cache name for individual cluster
+    )
     public ClusterResponseDto partialUpdate(ClusterUpdateRequestDto dto, UUID id) {
         ClusterEntity cluster = findById(id)
                 .orElseThrow( () -> new ClusterNotFoundException("A cluster provided doesn't exist")
@@ -141,6 +149,10 @@ public class ClusterServiceImpl implements ClusterService {
     }
 
     @Override
+    @Caching(
+            evict = @CacheEvict(value = "clusterList", allEntries = true), // to update the entire list
+            put = @CachePut(value = "cluster", key = "#result.id") // Different cache name for individual cluster
+    )
     public ClusterResponseDto updateStatus(Status status, UUID id) {
         ClusterEntity cluster = findById(id)
                 .orElseThrow( () -> new ClusterNotFoundException("A cluster provided doesn't exist")
@@ -151,6 +163,7 @@ public class ClusterServiceImpl implements ClusterService {
     }
 
     @Override
+    @Cacheable(value = "cluster", key = "#clusterId")
     public ClusterWithCapsuleResponseDto getClusterWithCapsules(UUID clusterId) {
         ClusterEntity cluster = clusterRepository.findByIdWithCapsules(clusterId)
                 .orElseThrow(() -> new ClusterNotFoundException("Cluster not found"));
