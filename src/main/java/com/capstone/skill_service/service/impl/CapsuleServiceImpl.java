@@ -2,17 +2,21 @@ package com.capstone.skill_service.service.impl;
 
 import com.capstone.skill_service.dto.CustomPageResponse;
 import com.capstone.skill_service.dto.atom.AtomIdsRequestDto;
+import com.capstone.skill_service.dto.atom.AtomInSequenceOrderResponseDto;
 import com.capstone.skill_service.dto.capsule.CapsuleRequestDto;
 import com.capstone.skill_service.dto.capsule.CapsuleResponseDto;
 import com.capstone.skill_service.dto.capsule.CapsuleUpdateRequestDto;
 import com.capstone.skill_service.dto.tag.TagIdsRequestDto;
 import com.capstone.skill_service.exception.*;
+import com.capstone.skill_service.mapper.AtomMapper;
 import com.capstone.skill_service.mapper.CapsuleMapper;
+import com.capstone.skill_service.mapper.TagMapper;
 import com.capstone.skill_service.model.CapsuleAtomMappingEntity;
 import com.capstone.skill_service.model.SkillAtomEntity;
 import com.capstone.skill_service.model.SkillCapsuleEntity;
 import com.capstone.skill_service.model.TagEntity;
 import com.capstone.skill_service.repository.AtomRepository;
+import com.capstone.skill_service.repository.CapsuleAtomMappingRepository;
 import com.capstone.skill_service.repository.CapsuleRepository;
 import com.capstone.skill_service.repository.TagRepository;
 import com.capstone.skill_service.service.CapsuleService;
@@ -31,6 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -38,8 +43,11 @@ public class CapsuleServiceImpl implements CapsuleService {
     private static final Logger logger = LoggerFactory.getLogger(CapsuleServiceImpl.class);
     private final CapsuleRepository capsuleRepository;
     private final CapsuleMapper capsuleMapper;
+    private final AtomMapper atomMapper;
+    private final TagMapper tagMapper;
     private final AtomRepository atomRepository;
     private final TagRepository tagRepository;
+    private final CapsuleAtomMappingRepository capsuleAtomMappingRepository;
 
     @Override
     public CapsuleResponseDto create(CapsuleRequestDto dto) {
@@ -69,19 +77,76 @@ public class CapsuleServiceImpl implements CapsuleService {
     @Override
     @Cacheable("capsuleList")
     public CustomPageResponse<CapsuleResponseDto> findAll(Pageable pageable) {
-        Page<SkillCapsuleEntity> capsuleList = this.capsuleRepository.findAllWithSkillAtoms(pageable);
-        Page<CapsuleResponseDto> capsules = capsuleList.map(this.capsuleMapper::toDto);
+        /* Fetching is done using two-step approach to void MultipleBagFetchException
+        as well as the cartesian product with pagination */
 
+        Page<UUID> pageIds = capsuleRepository.findPagedIds(pageable);
+
+        if (pageIds.isEmpty()) {
+            return CustomPageResponse.<CapsuleResponseDto>builder()
+                    .items(List.of())
+                    .page(pageable.getPageNumber())
+                    .size(pageable.getPageSize())
+                    .totalElements(0)
+                    .totalPages(0)
+                    .hasNext(false)
+                    .hasPrevious(false)
+                    .build();
+        }
+        List<UUID> capsuleIds = pageIds.getContent();
+
+        // fetch capsules by id
+        List<SkillCapsuleEntity> capsules = capsuleRepository.findByIdIn(capsuleIds);
+
+        // fetch children
+        List<TagEntity> tagsByCapsule = tagRepository.findTagsByCapsuleIds(capsuleIds);
+
+        List<CapsuleAtomMappingEntity> mappings = capsuleAtomMappingRepository.findByCapsuleIdsWithAtoms(capsuleIds);
+
+        /* Each CapsuleAtomMappingEntity contains the capsule, the atom, and its sequenceOrder so in order to build
+        the list of atoms for each capsule, I've grouped them by capsule ID*/
+        Map<UUID, List<AtomInSequenceOrderResponseDto>> atomsByCapsule = mappings.stream()
+                .collect(Collectors.groupingBy(
+                        m -> m.getCapsule().getId(),          // group by capsule id
+                        LinkedHashMap::new,                   // preserve insertion order
+                        Collectors.mapping(
+                                capsuleMapper::toAtomDto,     // map each mapping to Atom DTO
+                                Collectors.toList()
+                        )
+                ));
+
+        // Map the result to dto
+        List<CapsuleResponseDto> capsuleResponse = capsules.stream()
+                .map(capsule -> {
+                    CapsuleResponseDto dto = capsuleMapper.toDto(capsule);
+
+                    // link atoms
+                    dto.setSkillAtoms(
+                            atomsByCapsule.getOrDefault(capsule.getId(), List.of())
+                                    .stream()
+                                    .sorted(Comparator.comparingInt(AtomInSequenceOrderResponseDto::getSequenceOrder))
+                                    .toList()
+                    );
+
+                    // link tags
+                    dto.setTags(tagsByCapsule
+                            .stream()
+                            .map(tagMapper::toSummaryDto)
+                            .toList());
+
+                    return dto;
+                })
+                .toList();
         logger.info("Capsules list is fetched");
 
         return CustomPageResponse.<CapsuleResponseDto>builder()
-                .items(capsules.getContent())
-                .page(capsules.getNumber())
-                .size(capsules.getSize())
-                .totalElements(capsules.getTotalElements())
-                .totalPages(capsules.getTotalPages())
-                .hasNext(capsules.hasNext())
-                .hasPrevious(capsules.hasPrevious())
+                .items(capsuleResponse)
+                .page(pageIds.getNumber())
+                .size(pageIds.getSize())
+                .totalElements(pageIds.getTotalElements())
+                .totalPages(pageIds.getTotalPages())
+                .hasNext(pageIds.hasNext())
+                .hasPrevious(pageIds.hasPrevious())
                 .build();
     }
 
