@@ -218,7 +218,7 @@ public class CapsuleServiceImpl implements CapsuleService {
             addTagsToCapsule(capsule, dto.getTagIds());
         }
         if(dto.getClusterIds() != null){
-            addTagsToCapsule(capsule, dto.getClusterIds());
+            addClustersToCapsule(capsule, dto.getClusterIds());
         }
 
         capsule.setUpdatedAt(LocalDateTime.now());
@@ -428,5 +428,23 @@ public class CapsuleServiceImpl implements CapsuleService {
 
         return this.capsuleMapper.toDto(capsuleRepository.save(capsuleEntity));
     }
+
+    @Override
+    @Transactional
+    public CapsuleResponseDto removeClusterFromCapsule(UUID capsuleId, UUID clusterId) {
+        SkillCapsuleEntity capsuleEntity = findById(capsuleId)
+                .orElseThrow(() -> new CapsuleNotFoundException("A Skill capsule provided doesn't exist"));
+
+        // find the cluster to remove from capsule
+        ClusterEntity clusterToRemove = capsuleEntity.getClusters().stream()
+                .filter(mapping -> mapping.getId().equals(clusterId))
+                .findFirst()
+                .orElseThrow(() -> new ClusterNotFoundException("A cluster provided doesn't exist in capsule"));
+
+        capsuleEntity.getClusters().remove(clusterToRemove); // remove cluster from capsule
+
+        return capsuleMapper.toDto(capsuleRepository.save(capsuleEntity));
+    }
+
 
 }

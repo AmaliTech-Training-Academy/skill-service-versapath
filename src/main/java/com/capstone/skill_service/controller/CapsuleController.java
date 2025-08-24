@@ -196,4 +196,17 @@ public class CapsuleController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    @DeleteMapping("/removeCluster")
+    @Operation(summary = "Remove a skill cluster from capsule", description = "This end point allows admin to remove a skill cluster from capsule")
+    public ResponseEntity<ClientResponseFormatDto> removeClusterFromCapsule(
+            @RequestParam UUID capsuleId, @RequestParam UUID clusterId) {
+        CapsuleResponseDto updatedCapsule = this.capsuleService.removeClusterFromCapsule(capsuleId, clusterId);
+        ClientResponseFormatDto response = ClientResponseFormatDto.builder()
+                .status(true)
+                .message("Cluster removed from capsule successfully!")
+                .errors(null)
+                .data(updatedCapsule)
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
 }
