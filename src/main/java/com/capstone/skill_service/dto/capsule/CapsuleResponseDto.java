@@ -1,6 +1,7 @@
 package com.capstone.skill_service.dto.capsule;
 
 import com.capstone.skill_service.dto.atom.AtomInSequenceOrderResponseDto;
+import com.capstone.skill_service.dto.cluster.ClusterSummaryResponseDto;
 import com.capstone.skill_service.dto.tag.TagSummaryResponseDto;
 import com.capstone.skill_service.util.ProficiencyLevel;
 import com.capstone.skill_service.util.Status;
@@ -35,5 +36,6 @@ public class CapsuleResponseDto implements Serializable {
     private Status status;
     List<AtomInSequenceOrderResponseDto> skillAtoms; // list of skill atom in sequence order
     List<TagSummaryResponseDto> tags;
+    List<ClusterSummaryResponseDto> clusters;
     private LocalDateTime createdAt;
 }

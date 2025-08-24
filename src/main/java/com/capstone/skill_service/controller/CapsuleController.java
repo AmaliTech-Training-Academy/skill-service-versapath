@@ -6,6 +6,7 @@ import com.capstone.skill_service.dto.atom.AtomIdsRequestDto;
 import com.capstone.skill_service.dto.capsule.CapsuleRequestDto;
 import com.capstone.skill_service.dto.capsule.CapsuleResponseDto;
 import com.capstone.skill_service.dto.capsule.CapsuleUpdateRequestDto;
+import com.capstone.skill_service.dto.cluster.ClusterIdsRequestDto;
 import com.capstone.skill_service.dto.tag.TagIdsRequestDto;
 import com.capstone.skill_service.service.CapsuleService;
 import com.capstone.skill_service.util.Status;
@@ -180,4 +181,19 @@ public class CapsuleController {
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
+
+    @PatchMapping("/assignCluster/{capsuleId}")
+    @Operation(summary = "Assign new skill cluster to capsule", description = "This end point allows admin to add new skill cluster to capsule")
+    public ResponseEntity<ClientResponseFormatDto> assignClusterToCapsule(
+            @RequestBody ClusterIdsRequestDto clusterIds, @PathVariable UUID capsuleId) {
+        CapsuleResponseDto updatedCapsule = this.capsuleService.assignClusterToCapsule(capsuleId, clusterIds);
+        ClientResponseFormatDto response = ClientResponseFormatDto.builder()
+                .status(true)
+                .message("Clusters added to capsule successfully!")
+                .errors(null)
+                .data(updatedCapsule)
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
 }

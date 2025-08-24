@@ -5,6 +5,7 @@ import com.capstone.skill_service.dto.atom.AtomIdsRequestDto;
 import com.capstone.skill_service.dto.capsule.CapsuleRequestDto;
 import com.capstone.skill_service.dto.capsule.CapsuleResponseDto;
 import com.capstone.skill_service.dto.capsule.CapsuleUpdateRequestDto;
+import com.capstone.skill_service.dto.cluster.ClusterIdsRequestDto;
 import com.capstone.skill_service.dto.tag.TagIdsRequestDto;
 import com.capstone.skill_service.model.SkillCapsuleEntity;
 import com.capstone.skill_service.util.Status;
@@ -28,4 +29,5 @@ public interface CapsuleService {
     CapsuleResponseDto reorderAtoms(UUID capsuleId, List<UUID> orderedAtomIds);
     CapsuleResponseDto assignTagToCapsule(UUID capsuleId, TagIdsRequestDto dto);
     CapsuleResponseDto removeTagFromCapsule(UUID capsuleId, UUID tagId);
+    CapsuleResponseDto assignClusterToCapsule(UUID capsuleId, ClusterIdsRequestDto dto);
 }

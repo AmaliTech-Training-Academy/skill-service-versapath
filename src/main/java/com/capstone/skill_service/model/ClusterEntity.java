@@ -8,6 +8,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -31,6 +33,9 @@ public class ClusterEntity {
 
     @Enumerated(EnumType.STRING)
     private Status status;
+
+    @ManyToMany(mappedBy = "clusters")
+    private List<SkillCapsuleEntity> capsules = new ArrayList<>();
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
