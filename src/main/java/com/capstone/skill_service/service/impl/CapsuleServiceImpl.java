@@ -98,12 +98,29 @@ public class CapsuleServiceImpl implements CapsuleService {
         // fetch children
         List<TagEntity> tagsByCapsule = tagRepository.findTagsByCapsuleIds(capsuleIds);
         List<ClusterEntity> clustersByCapsule = clusterRepository.findClustersByCapsuleIds(capsuleIds);
+        Map<UUID, List<AtomInSequenceOrderResponseDto>> atomsByCapsule = getAtomsByCapsule(capsuleIds);
 
+        // Map the result to dto
+        List<CapsuleResponseDto> capsuleResponse = mapResultToDto(capsules, tagsByCapsule,clustersByCapsule,atomsByCapsule);
+        logger.info("Capsules list is fetched");
+
+        return CustomPageResponse.<CapsuleResponseDto>builder()
+                .items(capsuleResponse)
+                .page(pageIds.getNumber())
+                .size(pageIds.getSize())
+                .totalElements(pageIds.getTotalElements())
+                .totalPages(pageIds.getTotalPages())
+                .hasNext(pageIds.hasNext())
+                .hasPrevious(pageIds.hasPrevious())
+                .build();
+    }
+
+    public Map<UUID, List<AtomInSequenceOrderResponseDto>> getAtomsByCapsule(List<UUID> capsuleIds){
         List<CapsuleAtomMappingEntity> mappings = capsuleAtomMappingRepository.findByCapsuleIdsWithAtoms(capsuleIds);
 
         /* Each CapsuleAtomMappingEntity contains the capsule, the atom, and its sequenceOrder so in order to build
         the list of atoms for each capsule, I've grouped them by capsule ID*/
-        Map<UUID, List<AtomInSequenceOrderResponseDto>> atomsByCapsule = mappings.stream()
+        return mappings.stream()
                 .collect(Collectors.groupingBy(
                         m -> m.getCapsule().getId(),          // group by capsule id
                         LinkedHashMap::new,                   // preserve insertion order
@@ -112,9 +129,12 @@ public class CapsuleServiceImpl implements CapsuleService {
                                 Collectors.toList()
                         )
                 ));
+    }
 
-        // Map the result to dto
-        List<CapsuleResponseDto> capsuleResponse = capsules.stream()
+    public List<CapsuleResponseDto> mapResultToDto(List<SkillCapsuleEntity> capsules,List<TagEntity> tagsByCapsule,
+                                                   List<ClusterEntity> clustersByCapsule,
+                                                   Map<UUID, List<AtomInSequenceOrderResponseDto>> atomsByCapsule  ){
+        return capsules.stream()
                 .map(capsule -> {
                     CapsuleResponseDto dto = capsuleMapper.toDto(capsule);
 
@@ -141,17 +161,6 @@ public class CapsuleServiceImpl implements CapsuleService {
                     return dto;
                 })
                 .toList();
-        logger.info("Capsules list is fetched");
-
-        return CustomPageResponse.<CapsuleResponseDto>builder()
-                .items(capsuleResponse)
-                .page(pageIds.getNumber())
-                .size(pageIds.getSize())
-                .totalElements(pageIds.getTotalElements())
-                .totalPages(pageIds.getTotalPages())
-                .hasNext(pageIds.hasNext())
-                .hasPrevious(pageIds.hasPrevious())
-                .build();
     }
 
     @Override
