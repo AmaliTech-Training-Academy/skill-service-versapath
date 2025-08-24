@@ -6,6 +6,7 @@ import com.capstone.skill_service.dto.CustomPageResponse;
 import com.capstone.skill_service.dto.cluster.ClusterRequestDto;
 import com.capstone.skill_service.dto.cluster.ClusterResponseDto;
 import com.capstone.skill_service.dto.cluster.ClusterUpdateRequestDto;
+import com.capstone.skill_service.dto.cluster.ClusterWithCapsuleResponseDto;
 import com.capstone.skill_service.service.ClusterService;
 import com.capstone.skill_service.util.Status;
 import io.swagger.v3.oas.annotations.Operation;
@@ -55,7 +56,7 @@ public class ClusterController {
     }
 
     @GetMapping("/{clusterId}")
-    @Operation(summary = "Retrieve skill clusters", description = "This end point allows only admin to fetch all skill clusters")
+    @Operation(summary = "Retrieve skill clusters by Id", description = "This end point allows only admin to fetch a skill clusters by id")
     public ResponseEntity<ClientResponseFormatDto> retrieveSingleCluster(@PathVariable UUID clusterId) {
         ClusterResponseDto cluster = this.clusterService.getCluster(clusterId);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
@@ -106,6 +107,19 @@ public class ClusterController {
                 .message("Cluster status updated successfully!")
                 .errors(null)
                 .data(updatedCluster)
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @GetMapping("/{clusterId}/capsules")
+    @Operation(summary = "Retrieve skill clusters by Id", description = "This end point allows only admin to fetch a skill clusters by id")
+    public ResponseEntity<ClientResponseFormatDto> retrieveSingleClusterWithCapsules(@PathVariable UUID clusterId) {
+        ClusterWithCapsuleResponseDto cluster = this.clusterService.getClusterWithCapsules(clusterId);
+        ClientResponseFormatDto response = ClientResponseFormatDto.builder()
+                .status(true)
+                .message("Cluster retrieved successfully")
+                .errors(null)
+                .data(cluster)
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }

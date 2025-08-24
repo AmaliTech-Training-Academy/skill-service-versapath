@@ -2,14 +2,22 @@ package com.capstone.skill_service.service.impl;
 
 import com.capstone.skill_service.dto.CustomPageResponse;
 
+import com.capstone.skill_service.dto.atom.AtomInSequenceOrderResponseDto;
+import com.capstone.skill_service.dto.capsule.CapsuleSummaryWithNoClusterResponseDto;
 import com.capstone.skill_service.dto.cluster.ClusterRequestDto;
 import com.capstone.skill_service.dto.cluster.ClusterResponseDto;
 import com.capstone.skill_service.dto.cluster.ClusterUpdateRequestDto;
+import com.capstone.skill_service.dto.cluster.ClusterWithCapsuleResponseDto;
 import com.capstone.skill_service.exception.ClusterExistsException;
 import com.capstone.skill_service.exception.ClusterNotFoundException;
+import com.capstone.skill_service.mapper.CapsuleMapper;
 import com.capstone.skill_service.mapper.ClusterMapper;
+import com.capstone.skill_service.mapper.TagMapper;
+import com.capstone.skill_service.model.CapsuleAtomMappingEntity;
 import com.capstone.skill_service.model.ClusterEntity;
-import com.capstone.skill_service.repository.ClusterRepository;
+import com.capstone.skill_service.model.SkillCapsuleEntity;
+import com.capstone.skill_service.model.TagEntity;
+import com.capstone.skill_service.repository.*;
 import com.capstone.skill_service.service.ClusterService;
 import com.capstone.skill_service.util.Status;
 import lombok.RequiredArgsConstructor;
@@ -21,14 +29,18 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class ClusterServiceImpl implements ClusterService {
     private static final Logger logger = LoggerFactory.getLogger(ClusterServiceImpl.class);
     private final ClusterRepository clusterRepository;
+    private final CapsuleMapper capsuleMapper;
+    private final TagMapper tagMapper;
+    private final CapsuleAtomMappingRepository capsuleAtomMappingRepository;
+    private final TagRepository tagRepository;
     private final ClusterMapper clusterMapper;
 
     @Override
@@ -136,5 +148,54 @@ public class ClusterServiceImpl implements ClusterService {
         cluster.setStatus(status);
 
         return this.clusterMapper.toDto(this.clusterRepository.save(cluster));
+    }
+
+    @Override
+    public ClusterWithCapsuleResponseDto getClusterWithCapsules(UUID clusterId) {
+        ClusterEntity cluster = clusterRepository.findByIdWithCapsules(clusterId)
+                .orElseThrow(() -> new ClusterNotFoundException("Cluster not found"));
+
+        // capsules belong to the cluster
+        List<SkillCapsuleEntity> capsules = cluster.getCapsules();
+
+        if (capsules.isEmpty()) {
+            ClusterWithCapsuleResponseDto dto = clusterMapper.toWithCapsuleDto(cluster);
+            dto.setCapsules(List.of()); // return empty list in capsule field
+            return dto;
+        }
+
+        // fetch children
+        List<UUID> capsuleIds = capsules.stream().map(SkillCapsuleEntity::getId).toList();
+        List<TagEntity> tagsByCapsule = tagRepository.findTagsByCapsuleIds(capsuleIds);
+        List<CapsuleAtomMappingEntity> mappings = capsuleAtomMappingRepository.findByCapsuleIdsWithAtoms(capsuleIds);
+
+        // group atoms by capsule
+        Map<UUID, List<AtomInSequenceOrderResponseDto>> atomsByCapsule = mappings.stream()
+                .collect(Collectors.groupingBy(
+                        m -> m.getCapsule().getId(),
+                        LinkedHashMap::new,
+                        Collectors.mapping(capsuleMapper::toAtomDto, Collectors.toList())
+                ));
+
+        // map capsules to ResponseDto
+        List<CapsuleSummaryWithNoClusterResponseDto> capsuleResponse = capsules.stream()
+                .map(capsule -> {
+                    CapsuleSummaryWithNoClusterResponseDto dto = capsuleMapper.toNoClusterDto(capsule);
+                    //link atoms
+                    dto.setSkillAtoms(atomsByCapsule.getOrDefault(capsule.getId(), List.of()));
+                    //link tags
+                    dto.setTags(tagsByCapsule.stream()
+                            .map(tagMapper::toSummaryDto)
+                            .toList());
+
+                    return dto;
+                })
+                .toList();
+
+        // build the final dto response
+        ClusterWithCapsuleResponseDto dto = clusterMapper.toWithCapsuleDto(cluster);
+        dto.setCapsules(capsuleResponse);
+
+        return dto;
     }
 }
