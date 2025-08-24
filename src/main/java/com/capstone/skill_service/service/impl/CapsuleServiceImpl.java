@@ -160,6 +160,7 @@ public class CapsuleServiceImpl implements CapsuleService {
     }
 
     @Override
+    @Cacheable(value = "capsule", key = "#id")
     public CapsuleResponseDto getCapsule(UUID id) {
         SkillCapsuleEntity capsule = findById(id)
                 .orElseThrow( () -> new CapsuleNotFoundException("A Skill capsule provided doesn't exist")
