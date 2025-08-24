@@ -52,6 +52,14 @@ public class SkillCapsuleEntity {
     )
     private List<TagEntity> tags = new ArrayList<>();
 
+    @ManyToMany(cascade = { CascadeType.MERGE }) // auto removing association when capsule is deleted
+    @JoinTable(
+            name = "capsule_clusters", // join table name
+            joinColumns = @JoinColumn(name = "skill_capsule_id"),
+            inverseJoinColumns = @JoinColumn(name = "cluster_id")
+    )
+    private List<ClusterEntity> clusters = new ArrayList<>();
+
     private int moodleCourseId; // id from moodle database on course table
     private int estimatedHours;
 

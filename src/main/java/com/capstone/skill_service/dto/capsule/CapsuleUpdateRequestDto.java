@@ -30,6 +30,7 @@ public class CapsuleUpdateRequestDto {
     private Status status;
     List<UUID> atomIds;
     List<UUID> tagIds;
+    List<UUID> clusterIds;
     private LocalDateTime updatedAt;
 
 }

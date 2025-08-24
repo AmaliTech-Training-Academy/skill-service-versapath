@@ -6,19 +6,13 @@ import com.capstone.skill_service.dto.atom.AtomInSequenceOrderResponseDto;
 import com.capstone.skill_service.dto.capsule.CapsuleRequestDto;
 import com.capstone.skill_service.dto.capsule.CapsuleResponseDto;
 import com.capstone.skill_service.dto.capsule.CapsuleUpdateRequestDto;
+import com.capstone.skill_service.dto.cluster.ClusterIdsRequestDto;
 import com.capstone.skill_service.dto.tag.TagIdsRequestDto;
 import com.capstone.skill_service.exception.*;
-import com.capstone.skill_service.mapper.AtomMapper;
 import com.capstone.skill_service.mapper.CapsuleMapper;
 import com.capstone.skill_service.mapper.TagMapper;
-import com.capstone.skill_service.model.CapsuleAtomMappingEntity;
-import com.capstone.skill_service.model.SkillAtomEntity;
-import com.capstone.skill_service.model.SkillCapsuleEntity;
-import com.capstone.skill_service.model.TagEntity;
-import com.capstone.skill_service.repository.AtomRepository;
-import com.capstone.skill_service.repository.CapsuleAtomMappingRepository;
-import com.capstone.skill_service.repository.CapsuleRepository;
-import com.capstone.skill_service.repository.TagRepository;
+import com.capstone.skill_service.model.*;
+import com.capstone.skill_service.repository.*;
 import com.capstone.skill_service.service.CapsuleService;
 import com.capstone.skill_service.util.Status;
 import lombok.RequiredArgsConstructor;
@@ -43,10 +37,10 @@ public class CapsuleServiceImpl implements CapsuleService {
     private static final Logger logger = LoggerFactory.getLogger(CapsuleServiceImpl.class);
     private final CapsuleRepository capsuleRepository;
     private final CapsuleMapper capsuleMapper;
-    private final AtomMapper atomMapper;
     private final TagMapper tagMapper;
     private final AtomRepository atomRepository;
     private final TagRepository tagRepository;
+    private final ClusterRepository clusterRepository;
     private final CapsuleAtomMappingRepository capsuleAtomMappingRepository;
 
     @Override
@@ -63,6 +57,7 @@ public class CapsuleServiceImpl implements CapsuleService {
         capsuleEntity.setStatus(Status.ACTIVE);
         addAtomsToCapsule(capsuleEntity, dto.getAtomIds()); // link capsule to all the atoms assigned to
         addTagsToCapsule(capsuleEntity, dto.getTagIds()); // link capsule to all the tags assigned to
+        addClustersToCapsule(capsuleEntity, dto.getClusterIds()); // link capsule to all the clusters assigned to
 
         logger.info("Admin created skill capsule: {}", capsuleEntity.getName());
 
@@ -222,6 +217,9 @@ public class CapsuleServiceImpl implements CapsuleService {
         if(dto.getTagIds() != null){
             addTagsToCapsule(capsule, dto.getTagIds());
         }
+        if(dto.getClusterIds() != null){
+            addTagsToCapsule(capsule, dto.getClusterIds());
+        }
 
         capsule.setUpdatedAt(LocalDateTime.now());
 
@@ -366,13 +364,35 @@ public class CapsuleServiceImpl implements CapsuleService {
 
     }
 
+    void addClustersToCapsule(SkillCapsuleEntity capsuleEntity, List<UUID> clusterIds){
+        if (capsuleEntity.getClusters() == null) {
+            capsuleEntity.setClusters(new ArrayList<>());
+        }
+        //get tag id
+        for (UUID clusterId : clusterIds) {
+            ClusterEntity cluster = this.clusterRepository.findById(clusterId)
+                    .orElseThrow(() -> new ClusterNotFoundException("A cluster provided doesn't exist")
+                    );
+
+            boolean alreadyAssignedToCapsule = capsuleEntity.getClusters().stream()
+                    .anyMatch(clusterItem -> clusterItem.getId().equals(clusterId));
+
+            if (alreadyAssignedToCapsule) {
+                throw new AlreadyAssignedException("The cluster is already assigned to this capsule");
+            }
+
+            capsuleEntity.getClusters().add(cluster);// add a tag to capsule
+        }
+
+    }
+
     @Override
     public CapsuleResponseDto assignTagToCapsule(UUID capsuleId, TagIdsRequestDto dto){
         SkillCapsuleEntity capsuleEntity = findById(capsuleId)
                 .orElseThrow( () -> new CapsuleNotFoundException("A Skill capsule provided doesn't exist")
                 );
 
-        addAtomsToCapsule(capsuleEntity, dto.getTagIds()); // link capsule to all the tags assigned to
+        addTagsToCapsule(capsuleEntity, dto.getTagIds()); // link capsule to all the tags assigned to
 
         logger.info("Admin added new tags to skill capsule: {}", capsuleEntity.getName());
 
@@ -394,6 +414,19 @@ public class CapsuleServiceImpl implements CapsuleService {
         capsuleEntity.getTags().remove(tagToRemove); // remove tag from capsule
 
         return capsuleMapper.toDto(capsuleRepository.save(capsuleEntity));
+    }
+
+    @Override
+    public CapsuleResponseDto assignClusterToCapsule(UUID capsuleId, ClusterIdsRequestDto dto){
+        SkillCapsuleEntity capsuleEntity = findById(capsuleId)
+                .orElseThrow( () -> new CapsuleNotFoundException("A Skill capsule provided doesn't exist")
+                );
+
+        addClustersToCapsule(capsuleEntity, dto.getClusterIds()); // link capsule to all the clusters assigned to
+
+        logger.info("Admin added new clusters to skill capsule: {}", capsuleEntity.getName());
+
+        return this.capsuleMapper.toDto(capsuleRepository.save(capsuleEntity));
     }
 
 }

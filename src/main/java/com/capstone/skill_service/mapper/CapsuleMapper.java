@@ -12,6 +12,7 @@ import org.mapstruct.Mapping;
 public interface CapsuleMapper {
     @Mapping(target = "skillAtoms", source = "skillAtoms")
     @Mapping(target = "tags", source = "tags")
+    @Mapping(target = "clusters", source = "clusters")
     CapsuleResponseDto toDto(SkillCapsuleEntity entity);
 
     // map from junction entity to atomSummaryDto
