@@ -30,4 +30,5 @@ public interface CapsuleService {
     CapsuleResponseDto assignTagToCapsule(UUID capsuleId, TagIdsRequestDto dto);
     CapsuleResponseDto removeTagFromCapsule(UUID capsuleId, UUID tagId);
     CapsuleResponseDto assignClusterToCapsule(UUID capsuleId, ClusterIdsRequestDto dto);
+    CapsuleResponseDto removeClusterFromCapsule(UUID capsuleId, UUID clusterId);
 }
