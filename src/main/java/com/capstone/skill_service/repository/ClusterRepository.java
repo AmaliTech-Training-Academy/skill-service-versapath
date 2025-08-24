@@ -22,4 +22,12 @@ public interface ClusterRepository extends JpaRepository<ClusterEntity, UUID> {
 """)
     List<ClusterEntity> findClustersByCapsuleIds(@Param("capsuleIds") List<UUID> capsuleIds);
 
+    @Query("""
+        select cl
+        from ClusterEntity cl
+        left join fetch cl.capsules c
+        where cl.id = :id
+    """)
+    Optional<ClusterEntity> findByIdWithCapsules(@Param("id") UUID id);
+
 }

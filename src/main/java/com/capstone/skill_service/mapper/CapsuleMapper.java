@@ -3,6 +3,7 @@ package com.capstone.skill_service.mapper;
 import com.capstone.skill_service.dto.atom.AtomInSequenceOrderResponseDto;
 import com.capstone.skill_service.dto.capsule.CapsuleRequestDto;
 import com.capstone.skill_service.dto.capsule.CapsuleResponseDto;
+import com.capstone.skill_service.dto.capsule.CapsuleSummaryWithNoClusterResponseDto;
 import com.capstone.skill_service.model.CapsuleAtomMappingEntity;
 import com.capstone.skill_service.model.SkillCapsuleEntity;
 import org.mapstruct.Mapper;
@@ -25,5 +26,10 @@ public interface CapsuleMapper {
 
     @Mapping(target = "skillAtoms", ignore = true) // handle mapping in service
     SkillCapsuleEntity toEntity(CapsuleRequestDto dto);
+
+    @Mapping(target = "skillAtoms", source = "skillAtoms")
+    @Mapping(target = "tags", source = "tags")
+    CapsuleSummaryWithNoClusterResponseDto toNoClusterDto(SkillCapsuleEntity entity);
+
 
 }
