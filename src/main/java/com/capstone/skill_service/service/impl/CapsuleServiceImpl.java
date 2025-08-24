@@ -10,6 +10,7 @@ import com.capstone.skill_service.dto.cluster.ClusterIdsRequestDto;
 import com.capstone.skill_service.dto.tag.TagIdsRequestDto;
 import com.capstone.skill_service.exception.*;
 import com.capstone.skill_service.mapper.CapsuleMapper;
+import com.capstone.skill_service.mapper.ClusterMapper;
 import com.capstone.skill_service.mapper.TagMapper;
 import com.capstone.skill_service.model.*;
 import com.capstone.skill_service.repository.*;
@@ -38,6 +39,7 @@ public class CapsuleServiceImpl implements CapsuleService {
     private final CapsuleRepository capsuleRepository;
     private final CapsuleMapper capsuleMapper;
     private final TagMapper tagMapper;
+    private final ClusterMapper clusterMapper;
     private final AtomRepository atomRepository;
     private final TagRepository tagRepository;
     private final ClusterRepository clusterRepository;
@@ -95,6 +97,7 @@ public class CapsuleServiceImpl implements CapsuleService {
 
         // fetch children
         List<TagEntity> tagsByCapsule = tagRepository.findTagsByCapsuleIds(capsuleIds);
+        List<ClusterEntity> clustersByCapsule = clusterRepository.findClustersByCapsuleIds(capsuleIds);
 
         List<CapsuleAtomMappingEntity> mappings = capsuleAtomMappingRepository.findByCapsuleIdsWithAtoms(capsuleIds);
 
@@ -127,6 +130,12 @@ public class CapsuleServiceImpl implements CapsuleService {
                     dto.setTags(tagsByCapsule
                             .stream()
                             .map(tagMapper::toSummaryDto)
+                            .toList());
+
+                    // link cluster
+                    dto.setClusters(clustersByCapsule
+                            .stream()
+                            .map(clusterMapper::toSummaryDto)
                             .toList());
 
                     return dto;
