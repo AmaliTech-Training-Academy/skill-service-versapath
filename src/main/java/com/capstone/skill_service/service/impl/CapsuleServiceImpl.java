@@ -254,6 +254,10 @@ public class CapsuleServiceImpl implements CapsuleService {
 
     // update capsule by adding new atoms to it.
     @Override
+    @Caching(
+            evict = @CacheEvict(value = "capsuleList", allEntries = true), // to update the entire list
+            put = @CachePut(value = "capsule", key = "#result.id") // Different cache name for individual capsule
+    )
     public CapsuleResponseDto assignAtomToCapsule(UUID capsuleId, AtomIdsRequestDto dto){
         SkillCapsuleEntity capsuleEntity = findById(capsuleId)
                 .orElseThrow( () -> new CapsuleNotFoundException("A Skill capsule provided doesn't exist")
@@ -301,6 +305,7 @@ public class CapsuleServiceImpl implements CapsuleService {
 
     @Override
     @Transactional
+    @Caching(evict = @CacheEvict(value = "capsuleList", key = "#result.id"))
     public CapsuleResponseDto removeAtomFromCapsule(UUID capsuleId, UUID atomId) {
         SkillCapsuleEntity capsuleEntity = findById(capsuleId)
                 .orElseThrow(() -> new CapsuleNotFoundException("A Skill capsule provided doesn't exist"));
@@ -322,6 +327,10 @@ public class CapsuleServiceImpl implements CapsuleService {
     }
 
     @Override
+    @Caching(
+            evict = @CacheEvict(value = "capsuleList", allEntries = true), // to update the entire list
+            put = @CachePut(value = "capsule", key = "#result.id") // Different cache name for individual capsule
+    )
     public CapsuleResponseDto reorderAtoms(UUID capsuleId, List<UUID> orderedAtomIds) {
         SkillCapsuleEntity capsuleEntity = findById(capsuleId)
                 .orElseThrow( () -> new CapsuleNotFoundException("A Skill capsule provided doesn't exist")
@@ -396,6 +405,10 @@ public class CapsuleServiceImpl implements CapsuleService {
     }
 
     @Override
+    @Caching(
+            evict = @CacheEvict(value = "capsuleList", allEntries = true), // to update the entire list
+            put = @CachePut(value = "capsule", key = "#result.id") // Different cache name for individual capsule
+    )
     public CapsuleResponseDto assignTagToCapsule(UUID capsuleId, TagIdsRequestDto dto){
         SkillCapsuleEntity capsuleEntity = findById(capsuleId)
                 .orElseThrow( () -> new CapsuleNotFoundException("A Skill capsule provided doesn't exist")
@@ -410,6 +423,7 @@ public class CapsuleServiceImpl implements CapsuleService {
 
     @Override
     @Transactional
+    @Caching(evict = @CacheEvict(value = "capsuleList", key = "#result.id"))
     public CapsuleResponseDto removeTagFromCapsule(UUID capsuleId, UUID tagId) {
         SkillCapsuleEntity capsuleEntity = findById(capsuleId)
                 .orElseThrow(() -> new CapsuleNotFoundException("A Skill capsule provided doesn't exist"));
@@ -426,6 +440,10 @@ public class CapsuleServiceImpl implements CapsuleService {
     }
 
     @Override
+    @Caching(
+            evict = @CacheEvict(value = "capsuleList", allEntries = true), // to update the entire list
+            put = @CachePut(value = "capsule", key = "#result.id") // Different cache name for individual capsule
+    )
     public CapsuleResponseDto assignClusterToCapsule(UUID capsuleId, ClusterIdsRequestDto dto){
         SkillCapsuleEntity capsuleEntity = findById(capsuleId)
                 .orElseThrow( () -> new CapsuleNotFoundException("A Skill capsule provided doesn't exist")
@@ -440,6 +458,7 @@ public class CapsuleServiceImpl implements CapsuleService {
 
     @Override
     @Transactional
+    @Caching(evict = @CacheEvict(value = "capsuleList", key = "#result.id"))
     public CapsuleResponseDto removeClusterFromCapsule(UUID capsuleId, UUID clusterId) {
         SkillCapsuleEntity capsuleEntity = findById(capsuleId)
                 .orElseThrow(() -> new CapsuleNotFoundException("A Skill capsule provided doesn't exist"));
