@@ -9,7 +9,6 @@ import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface TrackMapper {
-    @Mapping(target = "capsules",  source = "capsules")
     TrackResponseDto toDto(GrowthTrackEntity entity);
 
     GrowthTrackEntity toEntity(TrackRequestDto dto);
