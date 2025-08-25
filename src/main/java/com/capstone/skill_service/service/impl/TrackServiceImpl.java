@@ -1,14 +1,15 @@
 package com.capstone.skill_service.service.impl;
 
 import com.capstone.skill_service.dto.CustomPageResponse;
+import com.capstone.skill_service.dto.atom.AtomInSequenceOrderResponseDto;
 import com.capstone.skill_service.dto.capsule.CapsuleIdsRequestDto;
+import com.capstone.skill_service.dto.capsule.CapsuleInSequenceOrderResponseDto;
 import com.capstone.skill_service.dto.track.TrackRequestDto;
 import com.capstone.skill_service.dto.track.TrackResponseDto;
 import com.capstone.skill_service.dto.track.TrackUpdateRequestDto;
+import com.capstone.skill_service.dto.track.TrackWithCapsuleResponseDto;
 import com.capstone.skill_service.exception.*;
 import com.capstone.skill_service.mapper.CapsuleMapper;
-import com.capstone.skill_service.mapper.ClusterMapper;
-import com.capstone.skill_service.mapper.TagMapper;
 import com.capstone.skill_service.mapper.TrackMapper;
 import com.capstone.skill_service.model.*;
 import com.capstone.skill_service.repository.*;
@@ -17,11 +18,14 @@ import com.capstone.skill_service.util.Status;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -31,7 +35,8 @@ public class TrackServiceImpl implements TrackService {
     private final CapsuleMapper capsuleMapper;
     private final TrackRepository trackRepository;
     private final TrackMapper trackMapper;
-
+    private final TrackCapsuleMappingRepository trackCapsuleMappingRepository;
+    private final CapsuleAtomMappingRepository capsuleAtomMappingRepository;
 
     @Override
     public TrackResponseDto create(TrackRequestDto dto) {
@@ -95,46 +100,138 @@ public class TrackServiceImpl implements TrackService {
 
     @Override
     public Optional<GrowthTrackEntity> findById(UUID id) {
-        return Optional.empty();
+        return this.trackRepository.findById(id);
     }
 
     @Override
+    @Cacheable("growthTrackList")
     public CustomPageResponse<TrackResponseDto> findAll(Pageable pageable) {
-        return null;
+        Page<GrowthTrackEntity> growthTrackList = this.trackRepository.findAllWithSkillCapsule(pageable);
+        Page<TrackResponseDto> growthTracks = growthTrackList.map(this.trackMapper::toDto);
+
+        logger.info("Growth tracks list is fetched");
+
+        return CustomPageResponse.<TrackResponseDto>builder()
+                .items(growthTracks.getContent())
+                .page(growthTracks.getNumber())
+                .size(growthTracks.getSize())
+                .totalElements(growthTracks.getTotalElements())
+                .totalPages(growthTracks.getTotalPages())
+                .hasNext(growthTracks.hasNext())
+                .hasPrevious(growthTracks.hasPrevious())
+                .build();
+    }
+
+    @Override
+    @Cacheable(value = "growthTrack", key = "#trackId")
+    public TrackWithCapsuleResponseDto getTrackWithCapsules(UUID trackId) {
+        GrowthTrackEntity track = trackRepository.findByIdWithCapsules(trackId)
+                .orElseThrow(() -> new TrackNotFoundException("A Growth Track not found"));
+
+        // get mappings (capsule and sequence order)
+        List<TrackCapsuleMappingEntity> mappings =
+                trackCapsuleMappingRepository.findByTrackIdsWithCapsules(trackId);
+
+        if (mappings.isEmpty()) {
+            TrackWithCapsuleResponseDto dto = trackMapper.toWithCapsuleDto(track);
+            dto.setCapsules(List.of()); // return empty list in capsule field
+            return dto;
+        }
+
+        // fetch capsules in growth track
+        List<SkillCapsuleEntity> capsules = mappings.stream().map(TrackCapsuleMappingEntity::getCapsule).toList();
+
+        // fetch capsule children (atoms and tags for all capsules)
+        List<UUID> capsuleIds = capsules.stream().map(SkillCapsuleEntity::getId).toList();
+        Map<UUID, List<AtomInSequenceOrderResponseDto>> atomsByCapsule = getAtomsByCapsule(capsuleIds);
+
+        // map capsules to ResponseDto
+        List<CapsuleInSequenceOrderResponseDto> capsuleResponse = mapResultToDto(mappings, atomsByCapsule);
+
+        // build the final dto response
+        TrackWithCapsuleResponseDto dto = trackMapper.toWithCapsuleDto(track);
+        dto.setCapsules(capsuleResponse);
+
+        return dto;
+    }
+
+
+    public Map<UUID, List<AtomInSequenceOrderResponseDto>> getAtomsByCapsule(List<UUID> capsuleIds){
+        List<CapsuleAtomMappingEntity> mappings = capsuleAtomMappingRepository.findByCapsuleIdsWithAtoms(capsuleIds);
+
+        // group atoms by capsule
+        return mappings.stream()
+                .collect(Collectors.groupingBy(
+                        m -> m.getCapsule().getId(),
+                        LinkedHashMap::new,
+                        Collectors.mapping(capsuleMapper::toAtomDto, Collectors.toList())
+                ));
+    }
+
+    public List<CapsuleInSequenceOrderResponseDto> mapResultToDto(List<TrackCapsuleMappingEntity> mappings ,
+                                                                  Map<UUID, List<AtomInSequenceOrderResponseDto>> atomsByCapsule){
+        return mappings.stream()
+                .map(mapping -> {
+                    SkillCapsuleEntity capsule = mapping.getCapsule();
+
+                    CapsuleInSequenceOrderResponseDto dto = capsuleMapper.toInSequenceOrderDto(mapping);
+                    dto.setSequenceOrder(mapping.getSequenceOrder()); // link the sequence order
+                    dto.setSkillAtoms(atomsByCapsule.getOrDefault(capsule.getId(), List.of()));
+
+                    return dto;
+                })
+                .toList();
     }
 
     @Override
     public TrackResponseDto getTrack(UUID id) {
-        return null;
+        GrowthTrackEntity track = findById(id)
+                .orElseThrow( () -> new TrackNotFoundException("A growth track provided doesn't exist")
+                );
+
+        logger.info("Growth track {} retrieved", track.getName());
+
+        return this.trackMapper.toDto(track);
     }
 
     @Override
     public void deleteById(UUID id) {
+        GrowthTrackEntity track = findById(id)
+                .orElseThrow( () -> new TrackNotFoundException("A growth track provided doesn't exist")
+                );
 
+        logger.info("Growth track {} deleted", track.getName());
+
+        this.capsuleRepository.deleteById(id);
     }
 
     @Override
     public TrackResponseDto partialUpdate(TrackUpdateRequestDto dto, UUID id) {
+        //TODO
         return null;
     }
 
     @Override
     public TrackResponseDto updateStatus(Status status, UUID id) {
+        //TODO
         return null;
     }
 
     @Override
     public TrackResponseDto assignCapsuleToTrack(UUID trackId, CapsuleIdsRequestDto dto) {
+        //TODO
         return null;
     }
 
     @Override
     public TrackResponseDto removeCapsuleFromTrack(UUID trackId, UUID capsuleId) {
+        //TODO
         return null;
     }
 
     @Override
     public TrackResponseDto reorderCapsules(UUID trackId, List<UUID> orderedCapsuleIds) {
+        //TODO
         return null;
     }
 

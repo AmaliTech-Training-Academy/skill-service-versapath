@@ -1,11 +1,13 @@
 package com.capstone.skill_service.mapper;
 
 import com.capstone.skill_service.dto.atom.AtomInSequenceOrderResponseDto;
+import com.capstone.skill_service.dto.capsule.CapsuleInSequenceOrderResponseDto;
 import com.capstone.skill_service.dto.capsule.CapsuleRequestDto;
 import com.capstone.skill_service.dto.capsule.CapsuleResponseDto;
 import com.capstone.skill_service.dto.capsule.CapsuleSummaryWithNoClusterResponseDto;
 import com.capstone.skill_service.model.CapsuleAtomMappingEntity;
 import com.capstone.skill_service.model.SkillCapsuleEntity;
+import com.capstone.skill_service.model.TrackCapsuleMappingEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -31,5 +33,14 @@ public interface CapsuleMapper {
     @Mapping(target = "tags", source = "tags")
     CapsuleSummaryWithNoClusterResponseDto toNoClusterDto(SkillCapsuleEntity entity);
 
+    @Mapping(target = "id", source = "capsule.id")
+    @Mapping(target = "name", source = "capsule.name")
+    @Mapping(target = "estimatedHours", source = "capsule.estimatedHours")
+    @Mapping(target = "difficulty", source = "capsule.difficulty")
+    @Mapping(target = "proficiencyLevel", source = "capsule.proficiencyLevel")
+    @Mapping(target = "description", source = "capsule.description")
+    @Mapping(target = "skillAtoms", source = "capsule.skillAtoms")
+    @Mapping(target = "sequenceOrder", source = "sequenceOrder")
+    CapsuleInSequenceOrderResponseDto toInSequenceOrderDto(TrackCapsuleMappingEntity mapping);
 
 }
