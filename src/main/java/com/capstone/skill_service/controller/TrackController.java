@@ -2,13 +2,11 @@ package com.capstone.skill_service.controller;
 
 import com.capstone.skill_service.dto.ClientResponseFormatDto;
 import com.capstone.skill_service.dto.CustomPageResponse;
-import com.capstone.skill_service.dto.atom.AtomIdsRequestDto;
 import com.capstone.skill_service.dto.capsule.CapsuleIdsRequestDto;
-import com.capstone.skill_service.dto.cluster.ClusterIdsRequestDto;
-import com.capstone.skill_service.dto.tag.TagIdsRequestDto;
 import com.capstone.skill_service.dto.track.TrackRequestDto;
 import com.capstone.skill_service.dto.track.TrackResponseDto;
 import com.capstone.skill_service.dto.track.TrackUpdateRequestDto;
+import com.capstone.skill_service.dto.track.TrackWithCapsuleResponseDto;
 import com.capstone.skill_service.service.TrackService;
 import com.capstone.skill_service.util.Status;
 import io.swagger.v3.oas.annotations.Operation;
@@ -60,7 +58,7 @@ public class TrackController {
     @GetMapping("/{trackId}")
     @Operation(summary = "Retrieve growth tracks", description = "This end point allows only admin to fetch all growth tracks")
     public ResponseEntity<ClientResponseFormatDto> retrieveSingleTrack(@PathVariable UUID trackId) {
-        TrackResponseDto track = this.trackService.getTrack(trackId);
+        TrackWithCapsuleResponseDto track = this.trackService.getTrackWithCapsules(trackId);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
                 .status(true)
                 .message("Track retrieved successfully")

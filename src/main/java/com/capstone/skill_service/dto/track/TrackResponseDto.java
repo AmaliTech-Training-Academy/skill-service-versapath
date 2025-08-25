@@ -1,6 +1,6 @@
 package com.capstone.skill_service.dto.track;
 
-import com.capstone.skill_service.dto.capsule.CapsuleResponseDto;
+import com.capstone.skill_service.dto.capsule.CapsuleSummaryResponseDto;
 import com.capstone.skill_service.util.Status;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.AllArgsConstructor;
@@ -27,6 +27,7 @@ public class TrackResponseDto implements Serializable {
     private String description;
     private int estimatedMonths;
     private Status status;
+    private List<CapsuleSummaryResponseDto> capsules;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }
