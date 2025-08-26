@@ -1,6 +1,8 @@
 package com.capstone.skill_service.service.impl;
 
 import com.capstone.skill_service.dto.CustomPageResponse;
+import com.capstone.skill_service.dto.atom.AtomInSequenceOrderResponseDto;
+import com.capstone.skill_service.dto.capsule.CapsuleInSequenceOrderResponseDto;
 import com.capstone.skill_service.dto.route.RouteRequestDto;
 import com.capstone.skill_service.dto.route.RouteResponseDto;
 import com.capstone.skill_service.dto.route.RouteUpdateRequestDto;
@@ -13,6 +15,7 @@ import com.capstone.skill_service.mapper.TrackMapper;
 import com.capstone.skill_service.model.*;
 import com.capstone.skill_service.repository.*;
 import com.capstone.skill_service.service.RouteService;
+import com.capstone.skill_service.service.TrackService;
 import com.capstone.skill_service.util.Status;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -29,14 +32,12 @@ import java.util.*;
 @RequiredArgsConstructor
 public class RouteServiceImpl implements RouteService {
     private static final Logger logger = LoggerFactory.getLogger(RouteServiceImpl.class);
-    private final CapsuleRepository capsuleRepository;
-    private final CapsuleMapper capsuleMapper;
     private final TrackRepository trackRepository;
     private final RouteRepository routeRepository;
     private final RouteMapper routeMapper;
-    private final TrackMapper trackMapper;
-    private final TrackCapsuleMappingRepository trackCapsuleMappingRepository;
-    private final CapsuleAtomMappingRepository capsuleAtomMappingRepository;
+    private final RouteTrackMappingRepository routeTrackMappingRepository;
+    private final TrackService trackService;
+
 
 
     @Override
@@ -147,8 +148,51 @@ public class RouteServiceImpl implements RouteService {
     }
 
     @Override
+    @Cacheable(value = "talentRoute", key = "#routeId")
     public RouteWithTrackResponseDto getRouteWithTracks(UUID routeId) {
-        return null;
+        TalentRouteEntity route = routeRepository.findByIdWithGrowthTracks(routeId)
+                .orElseThrow(() -> new RouteNotFoundException("A Talent Route not found"));
+
+        // get mappings (growth track and sequence order)
+        List<RouteTrackMappingEntity> mappings =
+                routeTrackMappingRepository.findByTrackIdsWithCapsules(routeId);
+
+        if (mappings.isEmpty()) {
+            RouteWithTrackResponseDto dto = routeMapper.toWithTrackDto(route);
+            dto.setTracks(List.of()); // return empty list in growth track field
+            return dto;
+        }
+
+        // fetch each growth track with its capsules
+        List<TrackInSequenceOrderResponseDto> growthTrackInSequenceOrder = getGrowthTrackInSequenceOrder(mappings);
+
+        // build final response
+        RouteWithTrackResponseDto dto = routeMapper.toWithTrackDto(route);
+        dto.setTracks(growthTrackInSequenceOrder);
+        return dto;
+    }
+
+    public List<TrackInSequenceOrderResponseDto> getGrowthTrackInSequenceOrder(List<RouteTrackMappingEntity> mappings ){
+        return mappings.stream()
+                .map(mapping -> {
+                    GrowthTrackEntity track = mapping.getGrowthTrack();
+
+                    // get each growth track from growth track service
+                    TrackWithCapsuleResponseDto trackWithCapsules =
+                            trackService.getTrackWithCapsules(track.getId());
+
+                    // wrap in dto that is in routeResponseDto
+                    TrackInSequenceOrderResponseDto dto = new TrackInSequenceOrderResponseDto();
+                    dto.setId(trackWithCapsules.getId());
+                    dto.setName(trackWithCapsules.getName());
+                    dto.setDescription(trackWithCapsules.getDescription());
+                    dto.setEstimatedMonths(trackWithCapsules.getEstimatedMonths());
+                    dto.setStatus(trackWithCapsules.getStatus());
+                    dto.setCapsules(trackWithCapsules.getCapsules());
+                    dto.setSequenceOrder(mapping.getSequenceOrder());
+                    return dto;
+                })
+                .toList();
     }
 
     @Override
