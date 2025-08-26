@@ -286,8 +286,33 @@ public class TrackServiceImpl implements TrackService {
 
     @Override
     public TrackResponseDto reorderCapsules(UUID trackId, List<UUID> orderedCapsuleIds) {
-        //TODO
-        return null;
+        GrowthTrackEntity trackEntity = findById(trackId)
+                .orElseThrow( () -> new TrackNotFoundException("A growth track provided doesn't exist")
+                );
+
+        // check whether all the incoming capsules exist in track list in DB
+        List<TrackCapsuleMappingEntity> existingCapsules = trackEntity.getSkillCapsules(); // in database
+        List<UUID> existingCapsuleIds = existingCapsules.stream().map(m->m.getCapsule().getId()).toList();
+
+        Set<UUID> noneDuplicateOrderedCapsuleIds = new HashSet<>(orderedCapsuleIds);
+
+        if(! new HashSet<>(existingCapsuleIds).containsAll(orderedCapsuleIds) || noneDuplicateOrderedCapsuleIds.size() != orderedCapsuleIds.size()){
+            throw new InvalidCapsuleIdsException("Invalid skill capsule for this track");
+        }
+
+        // Update sequence order
+        for (int i = 0; i < orderedCapsuleIds.size(); i++) {
+            UUID capsuleId = orderedCapsuleIds.get(i); // incoming capsule
+
+            TrackCapsuleMappingEntity existingCapsuleMapping = existingCapsules.stream()
+                    .filter(m -> m.getCapsule().getId().equals(capsuleId))
+                    .findFirst()
+                    .orElseThrow(() -> new CapsuleNotFoundException("A skill capsule provided doesn't exist in track"));
+
+            existingCapsuleMapping.setSequenceOrder(i + 1); // update sequence order
+        }
+        return trackMapper.toDto(trackRepository.save(trackEntity));
+
     }
 
 }
