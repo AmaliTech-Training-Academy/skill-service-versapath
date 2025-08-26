@@ -17,6 +17,8 @@ import com.capstone.skill_service.util.Status;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -108,17 +110,40 @@ public class RouteServiceImpl implements RouteService {
 
     @Override
     public Optional<TalentRouteEntity> findById(UUID id) {
-        return Optional.empty();
+
+        return this.routeRepository.findById(id);
     }
 
     @Override
+    @Cacheable("talentRouteList")
     public CustomPageResponse<RouteResponseDto> findAll(Pageable pageable) {
-        return null;
+
+        Page<TalentRouteEntity> routeList = this.routeRepository.findAllWithGrowthTrack(pageable);
+        Page<RouteResponseDto> routes = routeList.map(this.routeMapper::toDto);
+
+        logger.info("Talent route list is fetched");
+
+        return CustomPageResponse.<RouteResponseDto>builder()
+                .items(routes.getContent())
+                .page(routes.getNumber())
+                .size(routes.getSize())
+                .totalElements(routes.getTotalElements())
+                .totalPages(routes.getTotalPages())
+                .hasNext(routes.hasNext())
+                .hasPrevious(routes.hasPrevious())
+                .build();
     }
 
     @Override
     public RouteResponseDto getRoute(UUID id) {
-        return null;
+
+        TalentRouteEntity route = findById(id)
+                .orElseThrow( () -> new RouteNotFoundException("A talent route provided doesn't exist")
+                );
+
+        logger.info("Talent route {} retrieved", route.getName());
+
+        return this.routeMapper.toDto(route);
     }
 
     @Override
