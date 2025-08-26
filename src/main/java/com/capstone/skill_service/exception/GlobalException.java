@@ -252,6 +252,32 @@ public class GlobalException {
         return new ResponseEntity<>(response, HttpStatus.CONFLICT);
     }
 
+    @ExceptionHandler(RouteExistsException.class)
+    public ResponseEntity<?> handleRouteExists
+            (RouteExistsException exception) {
+
+        ClientResponseFormatDto response = ClientResponseFormatDto.builder()
+                .status(false)
+                .message("Talent Route Error!")
+                .errors(List.of(Map.of("message", exception.getMessage())))
+                .data(null)
+                .build();
+        return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(RouteNotFoundException.class)
+    public ResponseEntity<?> handleRouteNotFound(
+            RouteNotFoundException exception) {
+        ClientResponseFormatDto response = ClientResponseFormatDto.builder()
+                .status(false)
+                .message("Talent Route Error!")
+                .errors(List.of(Map.of("message", exception.getMessage())))
+                .data(null)
+                .build();
+
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    }
+
     @ExceptionHandler(InvalidCapsuleIdsException.class)
     public ResponseEntity<?> handleInvalidCapsuleIdsException
             (InvalidCapsuleIdsException exception) {

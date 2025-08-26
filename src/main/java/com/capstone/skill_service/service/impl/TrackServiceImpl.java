@@ -68,7 +68,7 @@ public class TrackServiceImpl implements TrackService {
             trackEntity.setSkillCapsules(new ArrayList<>());
         }
 
-        int numberOfCapsulesInCapsule = trackEntity.getSkillCapsules().size();
+        int numberOfCapsulesInTrack = trackEntity.getSkillCapsules().size();
 
         for(int i=0; i<capsuleIds.size(); i++){
             UUID capsuleId=capsuleIds.get(i); //get capsule id
@@ -85,13 +85,13 @@ public class TrackServiceImpl implements TrackService {
             }
 
             // assign capsule to track
-            TrackCapsuleMappingEntity assignCapsuleToCapsule = TrackCapsuleMappingEntity.builder()
+            TrackCapsuleMappingEntity assignCapsuleToTrack = TrackCapsuleMappingEntity.builder()
                     .capsule(capsule)
                     .growthTrack(trackEntity)
-                    .sequenceOrder(numberOfCapsulesInCapsule + i + 1) // set default sequence order, when child size is 0, order starts from 1 else starts from size number + 1
+                    .sequenceOrder(numberOfCapsulesInTrack + i + 1) // set default sequence order, when child size is 0, order starts from 1 else starts from size number + 1
                     .build();
 
-            trackEntity.getSkillCapsules().add(assignCapsuleToCapsule);// add a single assignment to assigment collection
+            trackEntity.getSkillCapsules().add(assignCapsuleToTrack);// add a single capsule to growth track collection
         }
 
     }
