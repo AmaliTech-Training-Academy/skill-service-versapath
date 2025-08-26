@@ -18,7 +18,10 @@ import com.capstone.skill_service.util.Status;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -206,9 +209,44 @@ public class TrackServiceImpl implements TrackService {
     }
 
     @Override
+    @Caching(
+            evict = @CacheEvict(value = "trackList", allEntries = true), // to update the entire list
+            put = @CachePut(value = "track", key = "#result.id") // Different cache name for individual track
+    )
     public TrackResponseDto partialUpdate(TrackUpdateRequestDto dto, UUID id) {
-        //TODO
-        return null;
+        GrowthTrackEntity track = findById(id)
+                .orElseThrow( () -> new TrackNotFoundException("A growth track provided doesn't exist")
+                );
+        if(dto.getName() != null){
+            if(findByName(dto.getName()).isPresent()){
+                throw new TrackNotFoundException(
+                        String.format("A Growth track with the name '%s' already exist",
+                                dto.getName()));
+            }
+            track.setName(dto.getName());
+        }
+        if(dto.getDescription() != null){
+            track.setDescription(dto.getDescription());
+        }
+        if(dto.getDescription() != null){
+            track.setDescription(dto.getDescription());
+        }
+
+        if(dto.getEstimatedMonths() != track.getEstimatedMonths()){
+            track.setEstimatedMonths(dto.getEstimatedMonths());
+        }
+        if(dto.getStatus() != null){
+            track.setStatus(dto.getStatus());
+        }
+        if(dto.getCapsuleIds() != null){
+            addCapsulesToTrack(track, dto.getCapsuleIds());
+        }
+
+        track.setUpdatedAt(LocalDateTime.now());
+
+        logger.info("Growth track {} updated", track.getName());
+
+        return this.trackMapper.toDto(this.trackRepository.save(track));
     }
 
     @Override
