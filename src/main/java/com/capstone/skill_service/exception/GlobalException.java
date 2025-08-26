@@ -251,4 +251,17 @@ public class GlobalException {
                 .build();
         return new ResponseEntity<>(response, HttpStatus.CONFLICT);
     }
+
+    @ExceptionHandler(InvalidCapsuleIdsException.class)
+    public ResponseEntity<?> handleInvalidCapsuleIdsException
+            (InvalidCapsuleIdsException exception) {
+
+        ClientResponseFormatDto response = ClientResponseFormatDto.builder()
+                .status(false)
+                .message("Invalid skill capsule Error!")
+                .errors(List.of(Map.of("message", exception.getMessage())))
+                .data(null)
+                .build();
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
 }
