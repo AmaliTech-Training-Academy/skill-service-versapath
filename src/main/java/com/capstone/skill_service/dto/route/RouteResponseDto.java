@@ -1,6 +1,7 @@
 package com.capstone.skill_service.dto.route;
 
 import com.capstone.skill_service.dto.capsule.CapsuleSummaryResponseDto;
+import com.capstone.skill_service.dto.track.TrackSummaryResponseDto;
 import com.capstone.skill_service.util.Status;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.AllArgsConstructor;
@@ -27,7 +28,7 @@ public class RouteResponseDto implements Serializable {
     private String roleName;
     private String description;
     private Status status;
-    private List<CapsuleSummaryResponseDto> tracks;
+    private List<TrackSummaryResponseDto> tracks;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }
