@@ -261,9 +261,21 @@ public class TrackServiceImpl implements TrackService {
     }
 
     @Override
+    @Caching(
+            evict = @CacheEvict(value = "trackList", allEntries = true), // to update the entire list
+            put = @CachePut(value = "track", key = "#result.id") // Different cache name for individual track
+    )
     public TrackResponseDto assignCapsuleToTrack(UUID trackId, CapsuleIdsRequestDto dto) {
-        //TODO
-        return null;
+        GrowthTrackEntity track = findById(trackId)
+                .orElseThrow( () -> new TrackNotFoundException("A growth track provided doesn't exist")
+                );
+
+        addCapsulesToTrack(track, dto.getCapsuleIds()); // link track to all the capsules assigned to it
+
+        logger.info("Admin added new skill capsule to growth track: {}", track.getName());
+
+        return this.trackMapper.toDto(trackRepository.save(track));
+
     }
 
     @Override
