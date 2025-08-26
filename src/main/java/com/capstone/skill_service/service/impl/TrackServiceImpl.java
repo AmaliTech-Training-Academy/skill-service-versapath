@@ -251,8 +251,13 @@ public class TrackServiceImpl implements TrackService {
 
     @Override
     public TrackResponseDto updateStatus(Status status, UUID id) {
-        //TODO
-        return null;
+        GrowthTrackEntity track = findById(id)
+                .orElseThrow( () -> new TrackNotFoundException("A growth track provided doesn't exist")
+                );
+        track.setStatus(status);
+
+        return this.trackMapper.toDto(this.trackRepository.save(track));
+
     }
 
     @Override
