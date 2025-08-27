@@ -274,7 +274,27 @@ public class RouteServiceImpl implements RouteService {
 
     @Override
     public RouteResponseDto removeTrackFromRoute(UUID routeId, UUID trackId) {
-        return null;
+
+        TalentRouteEntity route = findById(routeId)
+                .orElseThrow(() -> new RouteNotFoundException("A talent route provided doesn't exist"));
+
+        // find the growth track to remove from talent route
+        RouteTrackMappingEntity growthTrackToRemove = route.getTracks().stream()
+                .filter(mapping -> mapping.getGrowthTrack().getId().equals(trackId))
+                .findFirst()
+                .orElseThrow(() -> new TrackNotFoundException("A growth track provided doesn't exist in talent route"));
+
+        route.getTracks().remove(growthTrackToRemove); // remove growth track from track collection
+
+        //Rearrange the sequence order
+        int order = 1;
+        for (RouteTrackMappingEntity mapping : route.getTracks()) {
+            mapping.setSequenceOrder(order++);
+        }
+        TalentRouteEntity savedTrack = routeRepository.save(route);
+
+        // map growth track to response dto
+        return this.routeMapper.toDto(savedTrack);
     }
 
     @Override

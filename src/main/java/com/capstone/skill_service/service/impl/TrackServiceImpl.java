@@ -6,6 +6,7 @@ import com.capstone.skill_service.dto.capsule.CapsuleInSequenceOrderResponseDto;
 import com.capstone.skill_service.dto.capsule.CapsuleWithDetailsResponseDto;
 import com.capstone.skill_service.dto.track.*;
 import com.capstone.skill_service.exception.*;
+import com.capstone.skill_service.mapper.CapsuleMapper;
 import com.capstone.skill_service.mapper.TrackMapper;
 import com.capstone.skill_service.model.*;
 import com.capstone.skill_service.repository.*;
@@ -33,6 +34,7 @@ public class TrackServiceImpl implements TrackService {
     private final CapsuleRepository capsuleRepository;
     private final TrackRepository trackRepository;
     private final TrackMapper trackMapper;
+    private final CapsuleMapper capsuleMapper;
     private final CapsuleService capsuleService;
     private final TrackCapsuleMappingRepository trackCapsuleMappingRepository;
 
@@ -263,8 +265,26 @@ public class TrackServiceImpl implements TrackService {
 
     @Override
     public TrackResponseDto removeCapsuleFromTrack(UUID trackId, UUID capsuleId) {
-        //TODO
-        return null;
+        GrowthTrackEntity trackEntity = findById(trackId)
+                .orElseThrow(() -> new TrackNotFoundException("A growth track provided doesn't exist"));
+
+        // find the capsule to remove from growth track
+        TrackCapsuleMappingEntity capsuleToRemove = trackEntity.getSkillCapsules().stream()
+                .filter(mapping -> mapping.getCapsule().getId().equals(capsuleId))
+                .findFirst()
+                .orElseThrow(() -> new CapsuleNotFoundException("A skill capsule provided doesn't exist in growth track"));
+
+        trackEntity.getSkillCapsules().remove(capsuleToRemove); // remove capsule from growth track collection
+
+        //Rearrange the sequence order
+        int order = 1;
+        for (TrackCapsuleMappingEntity mapping : trackEntity.getSkillCapsules()) {
+            mapping.setSequenceOrder(order++);
+        }
+        GrowthTrackEntity savedTrack = trackRepository.save(trackEntity);
+
+        // map growth track to response dto
+        return this.trackMapper.toDto(savedTrack);
     }
 
     @Override

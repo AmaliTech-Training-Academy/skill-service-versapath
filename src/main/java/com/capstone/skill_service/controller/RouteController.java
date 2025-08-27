@@ -126,10 +126,10 @@ public class RouteController {
     }
 
     @DeleteMapping("/removeTrack")
-    @Operation(summary = "Remove a growth atom from route", description = "This end point allows admin to remove a growth atom from route")
+    @Operation(summary = "Remove a growth track from route", description = "This end point allows admin to remove a growth track from route")
     public ResponseEntity<ClientResponseFormatDto> removeTrackFromRoute(
-            @RequestParam UUID routeId, @RequestParam UUID atomId) {
-        RouteResponseDto updatedRoute = this.routeService.removeTrackFromRoute(routeId, atomId);
+            @RequestParam UUID routeId, @RequestParam UUID trackId) {
+        RouteResponseDto updatedRoute = this.routeService.removeTrackFromRoute(routeId, trackId);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
                 .status(true)
                 .message("Track removed from route successfully!")
