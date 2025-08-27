@@ -3,9 +3,7 @@ package com.capstone.skill_service.controller;
 import com.capstone.skill_service.dto.ClientResponseFormatDto;
 import com.capstone.skill_service.dto.CustomPageResponse;
 import com.capstone.skill_service.dto.atom.AtomIdsRequestDto;
-import com.capstone.skill_service.dto.capsule.CapsuleRequestDto;
-import com.capstone.skill_service.dto.capsule.CapsuleResponseDto;
-import com.capstone.skill_service.dto.capsule.CapsuleUpdateRequestDto;
+import com.capstone.skill_service.dto.capsule.*;
 import com.capstone.skill_service.dto.cluster.ClusterIdsRequestDto;
 import com.capstone.skill_service.dto.tag.TagIdsRequestDto;
 import com.capstone.skill_service.service.CapsuleService;
@@ -45,7 +43,7 @@ public class CapsuleController {
     @GetMapping()
     @Operation(summary = "Retrieve skill capsules", description = "This end point allows only admin to fetch all skill capsules")
     public ResponseEntity<ClientResponseFormatDto> fetchAllCapsules(Pageable pageable) {
-        CustomPageResponse<CapsuleResponseDto> capsules = this.capsuleService.findAll(pageable);
+        CustomPageResponse<CapsuleOnlyResponseDto> capsules = this.capsuleService.findAll(pageable);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
                 .status(true)
                 .message("Fetch all capsules")
@@ -58,7 +56,7 @@ public class CapsuleController {
     @GetMapping("/{capsuleId}")
     @Operation(summary = "Retrieve skill capsules", description = "This end point allows only admin to fetch all skill capsules")
     public ResponseEntity<ClientResponseFormatDto> retrieveSingleCapsule(@PathVariable UUID capsuleId) {
-        CapsuleResponseDto capsule = this.capsuleService.getCapsule(capsuleId);
+        CapsuleWithDetailsResponseDto capsule = this.capsuleService.getCapsuleWithDetails(capsuleId);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
                 .status(true)
                 .message("Capsule retrieved successfully")

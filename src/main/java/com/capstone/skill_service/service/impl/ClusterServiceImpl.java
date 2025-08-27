@@ -10,6 +10,7 @@ import com.capstone.skill_service.dto.cluster.ClusterUpdateRequestDto;
 import com.capstone.skill_service.dto.cluster.ClusterWithCapsuleResponseDto;
 import com.capstone.skill_service.exception.ClusterExistsException;
 import com.capstone.skill_service.exception.ClusterNotFoundException;
+import com.capstone.skill_service.mapper.AtomMapper;
 import com.capstone.skill_service.mapper.CapsuleMapper;
 import com.capstone.skill_service.mapper.ClusterMapper;
 import com.capstone.skill_service.mapper.TagMapper;
@@ -45,6 +46,7 @@ public class ClusterServiceImpl implements ClusterService {
     private final CapsuleAtomMappingRepository capsuleAtomMappingRepository;
     private final TagRepository tagRepository;
     private final ClusterMapper clusterMapper;
+    private final AtomMapper atomMapper;
 
     @Override
     public ClusterResponseDto create(ClusterRequestDto dto) {
@@ -168,57 +170,7 @@ public class ClusterServiceImpl implements ClusterService {
         ClusterEntity cluster = clusterRepository.findByIdWithCapsules(clusterId)
                 .orElseThrow(() -> new ClusterNotFoundException("Cluster not found"));
 
-        // capsules belong to the cluster
-        List<SkillCapsuleEntity> capsules = cluster.getCapsules();
-
-        if (capsules.isEmpty()) {
-            ClusterWithCapsuleResponseDto dto = clusterMapper.toWithCapsuleDto(cluster);
-            dto.setCapsules(List.of()); // return empty list in capsule field
-            return dto;
-        }
-
-        // fetch children
-        List<UUID> capsuleIds = capsules.stream().map(SkillCapsuleEntity::getId).toList();
-        List<TagEntity> tagsByCapsule = tagRepository.findTagsByCapsuleIds(capsuleIds);
-        Map<UUID, List<AtomInSequenceOrderResponseDto>> atomsByCapsule = getAtomsByCapsule(capsuleIds);
-
-        // map capsules to ResponseDto
-        List<CapsuleSummaryWithNoClusterResponseDto> capsuleResponse = mapResultToDto(capsules, tagsByCapsule,atomsByCapsule);
-
-        // build the final dto response
-        ClusterWithCapsuleResponseDto dto = clusterMapper.toWithCapsuleDto(cluster);
-        dto.setCapsules(capsuleResponse);
-
-        return dto;
-    }
-
-    public Map<UUID, List<AtomInSequenceOrderResponseDto>> getAtomsByCapsule(List<UUID> capsuleIds){
-        List<CapsuleAtomMappingEntity> mappings = capsuleAtomMappingRepository.findByCapsuleIdsWithAtoms(capsuleIds);
-
-        // group atoms by capsule
-        return mappings.stream()
-                .collect(Collectors.groupingBy(
-                        m -> m.getCapsule().getId(),
-                        LinkedHashMap::new,
-                        Collectors.mapping(capsuleMapper::toAtomDto, Collectors.toList())
-                ));
-    }
-
-    public List<CapsuleSummaryWithNoClusterResponseDto> mapResultToDto(List<SkillCapsuleEntity> capsules ,
-                                                                       List<TagEntity> tagsByCapsule,
-                                                                       Map<UUID, List<AtomInSequenceOrderResponseDto>> atomsByCapsule){
-        return capsules.stream()
-                .map(capsule -> {
-                    CapsuleSummaryWithNoClusterResponseDto dto = capsuleMapper.toNoClusterDto(capsule);
-                    //link atoms
-                    dto.setSkillAtoms(atomsByCapsule.getOrDefault(capsule.getId(), List.of()));
-                    //link tags
-                    dto.setTags(tagsByCapsule.stream()
-                            .map(tagMapper::toSummaryDto)
-                            .toList());
-
-                    return dto;
-                })
-                .toList();
+       //TODO
+        return null;
     }
 }

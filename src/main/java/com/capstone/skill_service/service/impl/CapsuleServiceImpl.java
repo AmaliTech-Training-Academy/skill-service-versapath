@@ -3,12 +3,12 @@ package com.capstone.skill_service.service.impl;
 import com.capstone.skill_service.dto.CustomPageResponse;
 import com.capstone.skill_service.dto.atom.AtomIdsRequestDto;
 import com.capstone.skill_service.dto.atom.AtomInSequenceOrderResponseDto;
-import com.capstone.skill_service.dto.capsule.CapsuleRequestDto;
-import com.capstone.skill_service.dto.capsule.CapsuleResponseDto;
-import com.capstone.skill_service.dto.capsule.CapsuleUpdateRequestDto;
+import com.capstone.skill_service.dto.capsule.*;
 import com.capstone.skill_service.dto.cluster.ClusterIdsRequestDto;
 import com.capstone.skill_service.dto.tag.TagIdsRequestDto;
+import com.capstone.skill_service.dto.tag.TagResponseDto;
 import com.capstone.skill_service.exception.*;
+import com.capstone.skill_service.mapper.AtomMapper;
 import com.capstone.skill_service.mapper.CapsuleMapper;
 import com.capstone.skill_service.mapper.ClusterMapper;
 import com.capstone.skill_service.mapper.TagMapper;
@@ -40,6 +40,7 @@ public class CapsuleServiceImpl implements CapsuleService {
     private final CapsuleMapper capsuleMapper;
     private final TagMapper tagMapper;
     private final ClusterMapper clusterMapper;
+    private final AtomMapper atomMapper;
     private final AtomRepository atomRepository;
     private final TagRepository tagRepository;
     private final ClusterRepository clusterRepository;
@@ -62,8 +63,24 @@ public class CapsuleServiceImpl implements CapsuleService {
         addClustersToCapsule(capsuleEntity, dto.getClusterIds()); // link capsule to all the clusters assigned to
 
         logger.info("Admin created skill capsule: {}", capsuleEntity.getName());
+        SkillCapsuleEntity savedCapsule = capsuleRepository.save(capsuleEntity);
 
-        return this.capsuleMapper.toDto(capsuleRepository.save(capsuleEntity));
+        // map capsule to response dto
+        return mapCapsuleToResponseDtoWithAtom(savedCapsule);
+    }
+
+    public CapsuleResponseDto mapCapsuleToResponseDtoWithAtom(SkillCapsuleEntity capsule){
+        // build atoms from mappings
+        List<AtomInSequenceOrderResponseDto> atomInSequenceOrderResponseDto = capsule.getSkillAtoms().stream()
+                .map(atomMapper::toInSequenceOrderDto)
+                .toList();
+
+        // map capsule to response dto
+        CapsuleResponseDto response = capsuleMapper.toDto(capsule);
+
+        response.setSkillAtoms(atomInSequenceOrderResponseDto); // update atomSequence in response
+
+        return response;
     }
 
     @Override
@@ -73,94 +90,21 @@ public class CapsuleServiceImpl implements CapsuleService {
 
     @Override
     @Cacheable("capsuleList")
-    public CustomPageResponse<CapsuleResponseDto> findAll(Pageable pageable) {
-        /* Fetching is done using two-step approach to void MultipleBagFetchException
-        as well as the cartesian product with pagination */
+    public CustomPageResponse<CapsuleOnlyResponseDto> findAll(Pageable pageable) {
+        Page<SkillCapsuleEntity> capsuleList = this.capsuleRepository.findAll(pageable);
+        Page<CapsuleOnlyResponseDto> capsules = capsuleList.map(this.capsuleMapper::toCapsuleOnlyDto);
 
-        Page<UUID> pageIds = capsuleRepository.findPagedIds(pageable);
+        logger.info("Tags list is fetched");
 
-        if (pageIds.isEmpty()) {
-            return CustomPageResponse.<CapsuleResponseDto>builder()
-                    .items(List.of())
-                    .page(pageable.getPageNumber())
-                    .size(pageable.getPageSize())
-                    .totalElements(0)
-                    .totalPages(0)
-                    .hasNext(false)
-                    .hasPrevious(false)
-                    .build();
-        }
-        List<UUID> capsuleIds = pageIds.getContent();
-
-        // fetch capsules by id
-        List<SkillCapsuleEntity> capsules = capsuleRepository.findByIdIn(capsuleIds);
-
-        // fetch children
-        List<TagEntity> tagsByCapsule = tagRepository.findTagsByCapsuleIds(capsuleIds);
-        List<ClusterEntity> clustersByCapsule = clusterRepository.findClustersByCapsuleIds(capsuleIds);
-        Map<UUID, List<AtomInSequenceOrderResponseDto>> atomsByCapsule = getAtomsByCapsule(capsuleIds);
-
-        // Map the result to dto
-        List<CapsuleResponseDto> capsuleResponse = mapResultToDto(capsules, tagsByCapsule,clustersByCapsule,atomsByCapsule);
-        logger.info("Capsules list is fetched");
-
-        return CustomPageResponse.<CapsuleResponseDto>builder()
-                .items(capsuleResponse)
-                .page(pageIds.getNumber())
-                .size(pageIds.getSize())
-                .totalElements(pageIds.getTotalElements())
-                .totalPages(pageIds.getTotalPages())
-                .hasNext(pageIds.hasNext())
-                .hasPrevious(pageIds.hasPrevious())
+        return CustomPageResponse.<CapsuleOnlyResponseDto>builder()
+                .items(capsules.getContent())
+                .page(capsules.getNumber())
+                .size(capsules.getSize())
+                .totalElements(capsules.getTotalElements())
+                .totalPages(capsules.getTotalPages())
+                .hasNext(capsules.hasNext())
+                .hasPrevious(capsules.hasPrevious())
                 .build();
-    }
-
-    public Map<UUID, List<AtomInSequenceOrderResponseDto>> getAtomsByCapsule(List<UUID> capsuleIds){
-        List<CapsuleAtomMappingEntity> mappings = capsuleAtomMappingRepository.findByCapsuleIdsWithAtoms(capsuleIds);
-
-        /* Each CapsuleAtomMappingEntity contains the capsule, the atom, and its sequenceOrder so in order to build
-        the list of atoms for each capsule, I've grouped them by capsule ID*/
-        return mappings.stream()
-                .collect(Collectors.groupingBy(
-                        m -> m.getCapsule().getId(),          // group by capsule id
-                        LinkedHashMap::new,                   // preserve insertion order
-                        Collectors.mapping(
-                                capsuleMapper::toAtomDto,     // map each mapping to Atom DTO
-                                Collectors.toList()
-                        )
-                ));
-    }
-
-    public List<CapsuleResponseDto> mapResultToDto(List<SkillCapsuleEntity> capsules,List<TagEntity> tagsByCapsule,
-                                                   List<ClusterEntity> clustersByCapsule,
-                                                   Map<UUID, List<AtomInSequenceOrderResponseDto>> atomsByCapsule  ){
-        return capsules.stream()
-                .map(capsule -> {
-                    CapsuleResponseDto dto = capsuleMapper.toDto(capsule);
-
-                    // link atoms
-                    dto.setSkillAtoms(
-                            atomsByCapsule.getOrDefault(capsule.getId(), List.of())
-                                    .stream()
-                                    .sorted(Comparator.comparingInt(AtomInSequenceOrderResponseDto::getSequenceOrder))
-                                    .toList()
-                    );
-
-                    // link tags
-                    dto.setTags(tagsByCapsule
-                            .stream()
-                            .map(tagMapper::toSummaryDto)
-                            .toList());
-
-                    // link cluster
-                    dto.setClusters(clustersByCapsule
-                            .stream()
-                            .map(clusterMapper::toSummaryDto)
-                            .toList());
-
-                    return dto;
-                })
-                .toList();
     }
 
     @Override
@@ -177,7 +121,10 @@ public class CapsuleServiceImpl implements CapsuleService {
 
         logger.info("Skill capsule {} retrieved", capsule.getName());
 
-        return this.capsuleMapper.toDto(capsule);
+        SkillCapsuleEntity savedCapsule = capsuleRepository.save(capsule);
+
+        // map capsule to response dto
+        return mapCapsuleToResponseDtoWithAtom(savedCapsule);
     }
 
     @Override
@@ -190,6 +137,40 @@ public class CapsuleServiceImpl implements CapsuleService {
         logger.info("Skill capsule {} deleted", capsule.getName());
 
         this.capsuleRepository.deleteById(id);
+    }
+
+    @Override
+    @Cacheable(value = "capsule", key = "#capsuleId")
+    public CapsuleWithDetailsResponseDto getCapsuleWithDetails(UUID capsuleId) {
+        // fetch capsule
+        SkillCapsuleEntity capsule = capsuleRepository.findById(capsuleId)
+                .orElseThrow(() -> new CapsuleNotFoundException("Capsule not found"));
+
+        // fet capsule with children
+        List<TagEntity> tags = tagRepository.findTagsByCapsuleId(capsuleId);
+        List<ClusterEntity> clusters = clusterRepository.findClustersByCapsuleId(capsuleId);
+
+        List<CapsuleAtomMappingEntity> mappings =
+                capsuleAtomMappingRepository.findByCapsuleIdWithAtoms(capsuleId);
+
+        // Group atoms and keep the sequence (declared in AtomInSequenceOrderResponseDto)
+        List<AtomInSequenceOrderResponseDto> atoms = mappings.stream()
+                .map(atomMapper::toInSequenceOrderDto) // map to dto expected in capsule response
+                .toList();
+
+        // Map capsule entity to response dto
+        CapsuleWithDetailsResponseDto dto = capsuleMapper.toWithDetailsDto(capsule);
+
+        // attach children
+        dto.setSkillAtoms(atoms);
+        dto.setClusters(clusters.stream()
+                .map(clusterMapper::toSummaryDto) //map to dto expected in capsule response
+                .toList());
+        dto.setTags(tags.stream()
+                .map(tagMapper::toSummaryDto) //map to dto expected in capsule response
+                .toList());
+
+        return dto;
     }
 
     @Override
@@ -244,7 +225,10 @@ public class CapsuleServiceImpl implements CapsuleService {
 
         logger.info("Skill capsule {} updated", capsule.getName());
 
-        return this.capsuleMapper.toDto(this.capsuleRepository.save(capsule));
+        SkillCapsuleEntity savedCapsule = capsuleRepository.save(capsule);
+
+        // map capsule to response dto
+        return mapCapsuleToResponseDtoWithAtom(savedCapsule);
     }
 
     @Override
@@ -258,7 +242,10 @@ public class CapsuleServiceImpl implements CapsuleService {
                 );
         capsule.setStatus(status);
 
-        return this.capsuleMapper.toDto(this.capsuleRepository.save(capsule));
+        SkillCapsuleEntity savedCapsule = capsuleRepository.save(capsule);
+
+        // map capsule to response dto
+        return mapCapsuleToResponseDtoWithAtom(savedCapsule);
     }
 
 
@@ -277,7 +264,10 @@ public class CapsuleServiceImpl implements CapsuleService {
 
         logger.info("Admin added new skill atoms to skill capsule: {}", capsuleEntity.getName());
 
-        return this.capsuleMapper.toDto(capsuleRepository.save(capsuleEntity));
+        SkillCapsuleEntity savedCapsule = capsuleRepository.save(capsuleEntity);
+
+        // map capsule to response dto
+        return mapCapsuleToResponseDtoWithAtom(savedCapsule);
     }
 
     void addAtomsToCapsule(SkillCapsuleEntity capsuleEntity, List<UUID> atomIds){
@@ -333,7 +323,10 @@ public class CapsuleServiceImpl implements CapsuleService {
         for (CapsuleAtomMappingEntity mapping : capsuleEntity.getSkillAtoms()) {
             mapping.setSequenceOrder(order++);
         }
-        return capsuleMapper.toDto(capsuleRepository.save(capsuleEntity));
+        SkillCapsuleEntity savedCapsule = capsuleRepository.save(capsuleEntity);
+
+        // map capsule to response dto
+        return mapCapsuleToResponseDtoWithAtom(savedCapsule);
     }
 
     @Override
@@ -367,7 +360,10 @@ public class CapsuleServiceImpl implements CapsuleService {
 
             existingAtomMapping.setSequenceOrder(i + 1); // update sequence order
         }
-        return capsuleMapper.toDto(capsuleRepository.save(capsuleEntity));
+        SkillCapsuleEntity savedCapsule = capsuleRepository.save(capsuleEntity);
+
+        // map capsule to response dto
+        return mapCapsuleToResponseDtoWithAtom(savedCapsule);
     }
 
     void addTagsToCapsule(SkillCapsuleEntity capsuleEntity, List<UUID> tagIds){
@@ -428,7 +424,10 @@ public class CapsuleServiceImpl implements CapsuleService {
 
         logger.info("Admin added new tags to skill capsule: {}", capsuleEntity.getName());
 
-        return this.capsuleMapper.toDto(capsuleRepository.save(capsuleEntity));
+        SkillCapsuleEntity savedCapsule = capsuleRepository.save(capsuleEntity);
+
+        // map capsule to response dto
+        return mapCapsuleToResponseDtoWithAtom(savedCapsule);
     }
 
     @Override
@@ -446,7 +445,10 @@ public class CapsuleServiceImpl implements CapsuleService {
 
         capsuleEntity.getTags().remove(tagToRemove); // remove tag from capsule
 
-        return capsuleMapper.toDto(capsuleRepository.save(capsuleEntity));
+        SkillCapsuleEntity savedCapsule = capsuleRepository.save(capsuleEntity);
+
+        // map capsule to response dto
+        return mapCapsuleToResponseDtoWithAtom(savedCapsule);
     }
 
     @Override
@@ -463,7 +465,10 @@ public class CapsuleServiceImpl implements CapsuleService {
 
         logger.info("Admin added new clusters to skill capsule: {}", capsuleEntity.getName());
 
-        return this.capsuleMapper.toDto(capsuleRepository.save(capsuleEntity));
+        SkillCapsuleEntity savedCapsule = capsuleRepository.save(capsuleEntity);
+
+        // map capsule to response dto
+        return mapCapsuleToResponseDtoWithAtom(savedCapsule);
     }
 
     @Override
@@ -481,8 +486,10 @@ public class CapsuleServiceImpl implements CapsuleService {
 
         capsuleEntity.getClusters().remove(clusterToRemove); // remove cluster from capsule
 
-        return capsuleMapper.toDto(capsuleRepository.save(capsuleEntity));
-    }
+        SkillCapsuleEntity savedCapsule = capsuleRepository.save(capsuleEntity);
 
+        // map capsule to response dto
+        return mapCapsuleToResponseDtoWithAtom(savedCapsule);
+    }
 
 }

@@ -2,9 +2,7 @@ package com.capstone.skill_service.service;
 
 import com.capstone.skill_service.dto.CustomPageResponse;
 import com.capstone.skill_service.dto.atom.AtomIdsRequestDto;
-import com.capstone.skill_service.dto.capsule.CapsuleRequestDto;
-import com.capstone.skill_service.dto.capsule.CapsuleResponseDto;
-import com.capstone.skill_service.dto.capsule.CapsuleUpdateRequestDto;
+import com.capstone.skill_service.dto.capsule.*;
 import com.capstone.skill_service.dto.cluster.ClusterIdsRequestDto;
 import com.capstone.skill_service.dto.tag.TagIdsRequestDto;
 import com.capstone.skill_service.model.SkillCapsuleEntity;
@@ -18,7 +16,7 @@ import java.util.UUID;
 public interface CapsuleService {
     CapsuleResponseDto create(CapsuleRequestDto dto);
     Optional<SkillCapsuleEntity> findByName(String name);
-    CustomPageResponse<CapsuleResponseDto> findAll(Pageable pageable);
+    CustomPageResponse<CapsuleOnlyResponseDto> findAll(Pageable pageable);
     Optional<SkillCapsuleEntity> findById(UUID id);
     CapsuleResponseDto getCapsule(UUID id);
     void deleteById(UUID id);
@@ -31,4 +29,5 @@ public interface CapsuleService {
     CapsuleResponseDto removeTagFromCapsule(UUID capsuleId, UUID tagId);
     CapsuleResponseDto assignClusterToCapsule(UUID capsuleId, ClusterIdsRequestDto dto);
     CapsuleResponseDto removeClusterFromCapsule(UUID capsuleId, UUID clusterId);
+    CapsuleWithDetailsResponseDto getCapsuleWithDetails(UUID capsuleId);
 }
