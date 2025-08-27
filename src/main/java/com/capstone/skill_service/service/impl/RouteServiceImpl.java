@@ -259,7 +259,17 @@ public class RouteServiceImpl implements RouteService {
 
     @Override
     public RouteResponseDto assignTrackToRoute(UUID routeId, TrackIdsRequestDto dto) {
-        return null;
+
+        TalentRouteEntity route = findById(routeId)
+                .orElseThrow( () -> new RouteNotFoundException("A talent route provided doesn't exist")
+                );
+
+        addTrackToRoute(route, dto.getTrackIds()); // link route to all the growth track assigned to it
+
+        logger.info("Admin added new growth track to talent route: {}", route.getName());
+
+        return this.routeMapper.toDto(routeRepository.save(route));
+
     }
 
     @Override
