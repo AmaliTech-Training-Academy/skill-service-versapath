@@ -9,6 +9,7 @@ import com.capstone.skill_service.dto.track.TrackResponseDto;
 import com.capstone.skill_service.dto.track.TrackUpdateRequestDto;
 import com.capstone.skill_service.dto.track.TrackWithCapsuleResponseDto;
 import com.capstone.skill_service.exception.*;
+import com.capstone.skill_service.mapper.AtomMapper;
 import com.capstone.skill_service.mapper.CapsuleMapper;
 import com.capstone.skill_service.mapper.TrackMapper;
 import com.capstone.skill_service.model.*;
@@ -36,6 +37,7 @@ public class TrackServiceImpl implements TrackService {
     private static final Logger logger = LoggerFactory.getLogger(TrackServiceImpl.class);
     private final CapsuleRepository capsuleRepository;
     private final CapsuleMapper capsuleMapper;
+    private final AtomMapper atomMapper;
     private final TrackRepository trackRepository;
     private final TrackMapper trackMapper;
     private final TrackCapsuleMappingRepository trackCapsuleMappingRepository;
@@ -140,51 +142,13 @@ public class TrackServiceImpl implements TrackService {
             dto.setCapsules(List.of()); // return empty list in capsule field
             return dto;
         }
+        //TODO
 
-        // fetch capsules in growth track
-        List<SkillCapsuleEntity> capsules = mappings.stream().map(TrackCapsuleMappingEntity::getCapsule).toList();
-
-        // fetch capsule children (atoms and tags for all capsules)
-        List<UUID> capsuleIds = capsules.stream().map(SkillCapsuleEntity::getId).toList();
-        Map<UUID, List<AtomInSequenceOrderResponseDto>> atomsByCapsule = getAtomsByCapsule(capsuleIds);
-
-        // map capsules to ResponseDto
-        List<CapsuleInSequenceOrderResponseDto> capsuleResponse = mapResultToDto(mappings, atomsByCapsule);
-
-        // build the final dto response
-        TrackWithCapsuleResponseDto dto = trackMapper.toWithCapsuleDto(track);
-        dto.setCapsules(capsuleResponse);
-
-        return dto;
+        return null;
     }
 
 
-    public Map<UUID, List<AtomInSequenceOrderResponseDto>> getAtomsByCapsule(List<UUID> capsuleIds){
-        List<CapsuleAtomMappingEntity> mappings = capsuleAtomMappingRepository.findByCapsuleIdsWithAtoms(capsuleIds);
 
-        // group atoms by capsule
-        return mappings.stream()
-                .collect(Collectors.groupingBy(
-                        m -> m.getCapsule().getId(),
-                        LinkedHashMap::new,
-                        Collectors.mapping(capsuleMapper::toAtomDto, Collectors.toList())
-                ));
-    }
-
-    public List<CapsuleInSequenceOrderResponseDto> mapResultToDto(List<TrackCapsuleMappingEntity> mappings ,
-                                                                  Map<UUID, List<AtomInSequenceOrderResponseDto>> atomsByCapsule){
-        return mappings.stream()
-                .map(mapping -> {
-                    SkillCapsuleEntity capsule = mapping.getCapsule();
-
-                    CapsuleInSequenceOrderResponseDto dto = capsuleMapper.toInSequenceOrderDto(mapping);
-                    dto.setSequenceOrder(mapping.getSequenceOrder()); // link the sequence order
-                    dto.setSkillAtoms(atomsByCapsule.getOrDefault(capsule.getId(), List.of()));
-
-                    return dto;
-                })
-                .toList();
-    }
 
     @Override
     public TrackResponseDto getTrack(UUID id) {

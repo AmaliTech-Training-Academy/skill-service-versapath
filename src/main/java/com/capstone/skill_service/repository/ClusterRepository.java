@@ -30,4 +30,12 @@ public interface ClusterRepository extends JpaRepository<ClusterEntity, UUID> {
     """)
     Optional<ClusterEntity> findByIdWithCapsules(@Param("id") UUID id);
 
+    @Query("""
+        SELECT cl
+        FROM ClusterEntity cl
+        JOIN cl.capsules c
+        WHERE c.id = :capsuleId
+    """)
+    List<ClusterEntity> findClustersByCapsuleId(@Param("capsuleId") UUID capsuleId);
+
 }
