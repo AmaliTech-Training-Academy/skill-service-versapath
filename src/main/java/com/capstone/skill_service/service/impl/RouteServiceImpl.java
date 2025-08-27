@@ -1,17 +1,13 @@
 package com.capstone.skill_service.service.impl;
 
 import com.capstone.skill_service.dto.CustomPageResponse;
-import com.capstone.skill_service.dto.atom.AtomInSequenceOrderResponseDto;
-import com.capstone.skill_service.dto.capsule.CapsuleInSequenceOrderResponseDto;
 import com.capstone.skill_service.dto.route.RouteRequestDto;
 import com.capstone.skill_service.dto.route.RouteResponseDto;
 import com.capstone.skill_service.dto.route.RouteUpdateRequestDto;
 import com.capstone.skill_service.dto.route.RouteWithTrackResponseDto;
 import com.capstone.skill_service.dto.track.*;
 import com.capstone.skill_service.exception.*;
-import com.capstone.skill_service.mapper.CapsuleMapper;
 import com.capstone.skill_service.mapper.RouteMapper;
-import com.capstone.skill_service.mapper.TrackMapper;
 import com.capstone.skill_service.model.*;
 import com.capstone.skill_service.repository.*;
 import com.capstone.skill_service.service.RouteService;
@@ -251,7 +247,14 @@ public class RouteServiceImpl implements RouteService {
 
     @Override
     public RouteResponseDto updateStatus(Status status, UUID id) {
-        return null;
+
+        TalentRouteEntity route = findById(id)
+                .orElseThrow( () -> new RouteNotFoundException("A track route provided doesn't exist")
+                );
+        route.setStatus(status);
+
+        return this.routeMapper.toDto(this.routeRepository.save(route));
+
     }
 
     @Override
