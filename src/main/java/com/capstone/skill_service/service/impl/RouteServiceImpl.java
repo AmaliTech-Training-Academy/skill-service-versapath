@@ -208,7 +208,45 @@ public class RouteServiceImpl implements RouteService {
 
     @Override
     public RouteResponseDto partialUpdate(RouteUpdateRequestDto dto, UUID id) {
-        return null;
+        TalentRouteEntity route = findById(id)
+                .orElseThrow( () -> new RouteNotFoundException("A talent route provided doesn't exist")
+                );
+        if(dto.getName() != null){
+            if(findByName(dto.getName()).isPresent()){
+                throw new RouteNotFoundException(
+                        String.format("A talent route with the name '%s' already exist",
+                                dto.getName()));
+            }
+            route.setName(dto.getName());
+        }
+        if(dto.getRoleName() != null){
+            if(findByRoleName(dto.getRoleName()).isPresent()){
+                throw new RouteNotFoundException(
+                        String.format("A role with the name '%s' already exist",
+                                dto.getName()));
+            }
+            route.setName(dto.getName());
+        }
+        if(dto.getDescription() != null){
+            route.setDescription(dto.getDescription());
+        }
+        if(dto.getDescription() != null){
+            route.setDescription(dto.getDescription());
+        }
+
+        if(dto.getStatus() != null){
+            route.setStatus(dto.getStatus());
+        }
+        if(dto.getGrowthTrackIds() != null){
+            addTrackToRoute(route, dto.getGrowthTrackIds());
+        }
+
+        route.setUpdatedAt(LocalDateTime.now());
+
+        logger.info("Talent route {} updated", route.getName());
+
+        return this.routeMapper.toDto(this.routeRepository.save(route));
+
     }
 
     @Override
