@@ -13,11 +13,13 @@ D:\versapath\skill-service\src\main\java\com\capstone\skill_service\dto\atom\Ato
 D:\versapath\skill-service\src\main\java\com\capstone\skill_service\dto\atom\AtomUpdateRequestDto.java
 D:\versapath\skill-service\src\main\java\com\capstone\skill_service\dto\capsule\CapsuleIdsRequestDto.java
 D:\versapath\skill-service\src\main\java\com\capstone\skill_service\dto\capsule\CapsuleInSequenceOrderResponseDto.java
+D:\versapath\skill-service\src\main\java\com\capstone\skill_service\dto\capsule\CapsuleOnlyResponseDto.java
 D:\versapath\skill-service\src\main\java\com\capstone\skill_service\dto\capsule\CapsuleRequestDto.java
 D:\versapath\skill-service\src\main\java\com\capstone\skill_service\dto\capsule\CapsuleResponseDto.java
 D:\versapath\skill-service\src\main\java\com\capstone\skill_service\dto\capsule\CapsuleSummaryResponseDto.java
 D:\versapath\skill-service\src\main\java\com\capstone\skill_service\dto\capsule\CapsuleSummaryWithNoClusterResponseDto.java
 D:\versapath\skill-service\src\main\java\com\capstone\skill_service\dto\capsule\CapsuleUpdateRequestDto.java
+D:\versapath\skill-service\src\main\java\com\capstone\skill_service\dto\capsule\CapsuleWithDetailsResponseDto.java
 D:\versapath\skill-service\src\main\java\com\capstone\skill_service\dto\ClientResponseFormatDto.java
 D:\versapath\skill-service\src\main\java\com\capstone\skill_service\dto\ClientResponseFormValidationErrorDto.java
 D:\versapath\skill-service\src\main\java\com\capstone\skill_service\dto\cluster\ClusterIdsRequestDto.java

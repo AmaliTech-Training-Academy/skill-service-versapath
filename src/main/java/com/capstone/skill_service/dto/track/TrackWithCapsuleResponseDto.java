@@ -1,8 +1,6 @@
 package com.capstone.skill_service.dto.track;
 
 import com.capstone.skill_service.dto.capsule.CapsuleInSequenceOrderResponseDto;
-import com.capstone.skill_service.dto.capsule.CapsuleResponseDto;
-import com.capstone.skill_service.dto.capsule.CapsuleSummaryWithNoClusterResponseDto;
 import com.capstone.skill_service.util.Status;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.AllArgsConstructor;

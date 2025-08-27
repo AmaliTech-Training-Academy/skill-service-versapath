@@ -1,19 +1,15 @@
 package com.capstone.skill_service.service.impl;
 
 import com.capstone.skill_service.dto.CustomPageResponse;
-import com.capstone.skill_service.dto.atom.AtomInSequenceOrderResponseDto;
 import com.capstone.skill_service.dto.capsule.CapsuleIdsRequestDto;
 import com.capstone.skill_service.dto.capsule.CapsuleInSequenceOrderResponseDto;
-import com.capstone.skill_service.dto.track.TrackRequestDto;
-import com.capstone.skill_service.dto.track.TrackResponseDto;
-import com.capstone.skill_service.dto.track.TrackUpdateRequestDto;
-import com.capstone.skill_service.dto.track.TrackWithCapsuleResponseDto;
+import com.capstone.skill_service.dto.capsule.CapsuleWithDetailsResponseDto;
+import com.capstone.skill_service.dto.track.*;
 import com.capstone.skill_service.exception.*;
-import com.capstone.skill_service.mapper.AtomMapper;
-import com.capstone.skill_service.mapper.CapsuleMapper;
 import com.capstone.skill_service.mapper.TrackMapper;
 import com.capstone.skill_service.model.*;
 import com.capstone.skill_service.repository.*;
+import com.capstone.skill_service.service.CapsuleService;
 import com.capstone.skill_service.service.TrackService;
 import com.capstone.skill_service.util.Status;
 import lombok.RequiredArgsConstructor;
@@ -29,19 +25,16 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class TrackServiceImpl implements TrackService {
     private static final Logger logger = LoggerFactory.getLogger(TrackServiceImpl.class);
     private final CapsuleRepository capsuleRepository;
-    private final CapsuleMapper capsuleMapper;
-    private final AtomMapper atomMapper;
     private final TrackRepository trackRepository;
     private final TrackMapper trackMapper;
+    private final CapsuleService capsuleService;
     private final TrackCapsuleMappingRepository trackCapsuleMappingRepository;
-    private final CapsuleAtomMappingRepository capsuleAtomMappingRepository;
 
     @Override
     public TrackResponseDto create(TrackRequestDto dto) {
@@ -142,9 +135,35 @@ public class TrackServiceImpl implements TrackService {
             dto.setCapsules(List.of()); // return empty list in capsule field
             return dto;
         }
-        //TODO
+        // fetch each capsule with its atoms
+        List<CapsuleInSequenceOrderResponseDto> capsuleInSequenceOrder=getCapsuleInSequenceOrder(mappings);
 
-        return null;
+        // build final response
+        TrackWithCapsuleResponseDto dto = trackMapper.toWithCapsuleDto(track);
+        dto.setCapsules(capsuleInSequenceOrder);
+        return dto;
+    }
+    public List<CapsuleInSequenceOrderResponseDto> getCapsuleInSequenceOrder(List<TrackCapsuleMappingEntity> mappings ){
+        return mappings.stream()
+                .map(mapping -> {
+                    SkillCapsuleEntity capsule = mapping.getCapsule();
+                    //get capsule with atom
+                    CapsuleWithDetailsResponseDto capsuleWithDetails= capsuleService.getCapsuleWithDetails(capsule.getId());
+
+                    // wrap capsule in response with sequence order dto
+                    CapsuleInSequenceOrderResponseDto capsuleInSequence = new CapsuleInSequenceOrderResponseDto();
+                    capsuleInSequence.setId(capsuleWithDetails.getId());
+                    capsuleInSequence.setName(capsuleWithDetails.getName());
+                    capsuleInSequence.setDescription(capsuleWithDetails.getDescription());
+                    capsuleInSequence.setEstimatedHours(capsuleWithDetails.getEstimatedHours());
+                    capsuleInSequence.setDifficulty(capsuleWithDetails.getDifficulty());
+                    capsuleInSequence.setProficiencyLevel(capsuleWithDetails.getProficiencyLevel());
+                    capsuleInSequence.setSequenceOrder(mapping.getSequenceOrder());
+                    capsuleInSequence.setSkillAtoms(capsuleWithDetails.getSkillAtoms());
+
+                    return capsuleInSequence;
+                })
+                .toList();
     }
 
 

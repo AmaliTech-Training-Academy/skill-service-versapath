@@ -5,6 +5,7 @@ com\capstone\skill_service\service\impl\TagServiceImpl.class
 com\capstone\skill_service\model\ClusterEntity.class
 com\capstone\skill_service\dto\atom\AtomIdsRequestDto$AtomIdsRequestDtoBuilder.class
 com\capstone\skill_service\controller\AtomController.class
+com\capstone\skill_service\dto\capsule\CapsuleWithDetailsResponseDto$CapsuleWithDetailsResponseDtoBuilder.class
 com\capstone\skill_service\mapper\RouteMapper.class
 com\capstone\skill_service\dto\capsule\CapsuleRequestDto$CapsuleRequestDtoBuilder.class
 com\capstone\skill_service\dto\cluster\ClusterWithCapsuleResponseDto.class
@@ -84,6 +85,7 @@ com\capstone\skill_service\dto\tag\TagResponseDto.class
 com\capstone\skill_service\mapper\CapsuleMapperImpl.class
 com\capstone\skill_service\dto\cluster\ClusterResponseDto.class
 com\capstone\skill_service\dto\route\RouteWithTrackResponseDto.class
+com\capstone\skill_service\dto\capsule\CapsuleOnlyResponseDto$CapsuleOnlyResponseDtoBuilder.class
 com\capstone\skill_service\controller\CapsuleController.class
 com\capstone\skill_service\dto\track\TrackRequestDto.class
 com\capstone\skill_service\controller\RouteController.class
@@ -133,6 +135,7 @@ com\capstone\skill_service\dto\track\TrackResponseDto.class
 com\capstone\skill_service\dto\atom\AtomInSequenceOrderResponseDto$AtomInSequenceOrderResponseDtoBuilder.class
 com\capstone\skill_service\dto\capsule\CapsuleInSequenceOrderResponseDto$CapsuleInSequenceOrderResponseDtoBuilder.class
 com\capstone\skill_service\service\RouteService.class
+com\capstone\skill_service\dto\capsule\CapsuleWithDetailsResponseDto.class
 com\capstone\skill_service\dto\track\TrackSummaryResponseDto.class
 com\capstone\skill_service\dto\cluster\ClusterSummaryResponseDto$ClusterSummaryResponseDtoBuilder.class
 com\capstone\skill_service\config\SwaggerConfig.class
@@ -148,6 +151,7 @@ com\capstone\skill_service\model\GrowthTrackEntity$GrowthTrackEntityBuilder.clas
 com\capstone\skill_service\exception\TrackNotFoundException.class
 com\capstone\skill_service\dto\atom\AtomResponseDto$AtomResponseDtoBuilder.class
 com\capstone\skill_service\dto\track\TrackResponseDto$TrackResponseDtoBuilder.class
+com\capstone\skill_service\dto\capsule\CapsuleOnlyResponseDto.class
 com\capstone\skill_service\dto\route\RouteUpdateRequestDto$RouteUpdateRequestDtoBuilder.class
 com\capstone\skill_service\dto\ClientResponseFormatDto$ClientResponseFormatDtoBuilder.class
 com\capstone\skill_service\mapper\ClusterMapperImpl.class
