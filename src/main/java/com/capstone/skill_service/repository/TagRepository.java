@@ -17,6 +17,13 @@ public interface TagRepository extends JpaRepository<TagEntity, UUID> {
     SELECT t
     FROM TagEntity t
     JOIN t.capsules c
+    WHERE c.id IN :capsuleIds
+""")
+    List<TagEntity> findTagsByCapsuleIds(@Param("capsuleIds") List<UUID> capsuleIds);
+    @Query("""
+    SELECT t
+    FROM TagEntity t
+    JOIN t.capsules c
     WHERE c.id = :capsuleId
 """)
     List<TagEntity> findTagsByCapsuleId(@Param("capsuleId") UUID capsuleId);

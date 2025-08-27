@@ -17,6 +17,14 @@ public interface CapsuleAtomMappingRepository extends JpaRepository<CapsuleAtomM
     SELECT cam
     FROM CapsuleAtomMappingEntity cam
     JOIN FETCH cam.atom
+    WHERE cam.capsule.id IN :capsuleIds
+    ORDER BY cam.sequenceOrder
+""")
+    List<CapsuleAtomMappingEntity> findByCapsuleIdsWithAtoms(@Param("capsuleIds") List<UUID> capsuleIds);
+    @Query("""
+    SELECT cam
+    FROM CapsuleAtomMappingEntity cam
+    JOIN FETCH cam.atom
     WHERE cam.capsule.id = :capsuleId
     ORDER BY cam.sequenceOrder
 """)
