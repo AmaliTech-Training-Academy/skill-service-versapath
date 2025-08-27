@@ -128,8 +128,8 @@ public class TrackController {
     @DeleteMapping("/removeCapsule")
     @Operation(summary = "Remove a growth atom from track", description = "This end point allows admin to remove a growth atom from track")
     public ResponseEntity<ClientResponseFormatDto> removeCapsuleFromTrack(
-            @RequestParam UUID trackId, @RequestParam UUID atomId) {
-        TrackResponseDto updatedTrack = this.trackService.removeCapsuleFromTrack(trackId, atomId);
+            @RequestParam UUID trackId, @RequestParam UUID capsuleId) {
+        TrackResponseDto updatedTrack = this.trackService.removeCapsuleFromTrack(trackId, capsuleId);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
                 .status(true)
                 .message("Capsule removed from track successfully!")
