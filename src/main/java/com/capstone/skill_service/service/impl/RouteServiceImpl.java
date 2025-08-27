@@ -197,7 +197,13 @@ public class RouteServiceImpl implements RouteService {
 
     @Override
     public void deleteById(UUID id) {
+        TalentRouteEntity route = findById(id)
+                .orElseThrow( () -> new RouteNotFoundException("A talent route provided doesn't exist")
+                );
 
+        logger.info("Talent route {} deleted", route.getName());
+
+        this.routeRepository.deleteById(id);
     }
 
     @Override
