@@ -22,12 +22,11 @@ public class RouteUpdateRequestDto {
     @Pattern(regexp = "^[A-Za-z ]+$", message = "name cannot contain numbers")
     private String name;
 
-    @NotBlank(message = "Role name is required")
     @Size(min = 3, message = "Role name must have at least 3 characters")
     @Pattern(regexp = "^[A-Za-z ]+$", message = "Role name cannot contain numbers")
     private String roleName;
 
-    List<UUID> growthIds; // list of growth track ids
+    List<UUID> growthTrackIds; // list of growth track ids
     private String description;
     private Status status;
     private LocalDateTime updatedAt;
