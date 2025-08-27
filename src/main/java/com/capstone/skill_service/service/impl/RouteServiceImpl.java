@@ -297,8 +297,35 @@ public class RouteServiceImpl implements RouteService {
         return this.routeMapper.toDto(savedTrack);
     }
 
+
     @Override
-    public RouteResponseDto reorderTracks(UUID routeId, List<UUID> orderedTrackIds) {
-        return null;
+    public RouteResponseDto reorderTracks(UUID trackId, List<UUID> orderedTrackIds) {
+        TalentRouteEntity route = findById(trackId)
+                .orElseThrow( () -> new RouteNotFoundException("A talent route provided doesn't exist")
+                );
+
+        // check whether all the incoming growth tracks exist in talent route list in DB
+        List<RouteTrackMappingEntity> existingTracks = route.getTracks(); // in database
+        List<UUID> existingTrackIds = existingTracks.stream().map(m->m.getGrowthTrack().getId()).toList();
+
+        Set<UUID> noneDuplicateOrderedTrackIds = new HashSet<>(orderedTrackIds);
+
+        if(! new HashSet<>(existingTrackIds).containsAll(orderedTrackIds) || noneDuplicateOrderedTrackIds.size() != orderedTrackIds.size()){
+            throw new InvalidTrackIdsException("Invalid growth track for this talent route");
+        }
+
+        // Update sequence order
+        for (int i = 0; i < orderedTrackIds.size(); i++) {
+            UUID capsuleId = orderedTrackIds.get(i); // incoming capsule
+
+            RouteTrackMappingEntity existingTrackMapping = existingTracks.stream()
+                    .filter(m -> m.getGrowthTrack().getId().equals(capsuleId))
+                    .findFirst()
+                    .orElseThrow(() -> new TrackNotFoundException("A growth track provided doesn't exist in talent route"));
+
+            existingTrackMapping.setSequenceOrder(i + 1); // update sequence order
+        }
+        return routeMapper.toDto(routeRepository.save(route));
+
     }
 }
