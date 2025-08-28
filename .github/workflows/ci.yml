@@ -1,4 +1,4 @@
-name: Backend CI
+name: CI skill-service-versapath
 
 on:
   pull_request:
