@@ -29,6 +29,6 @@ public class FileStorageService {
         // Save file
         Files.copy(file.getInputStream(), filePath);
 
-        return filePath.toString();
+        return fileName;
     }
 }

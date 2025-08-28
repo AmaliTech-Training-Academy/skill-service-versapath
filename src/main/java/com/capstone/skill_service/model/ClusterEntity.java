@@ -37,7 +37,7 @@ public class ClusterEntity {
     @ManyToMany(mappedBy = "clusters")
     private List<SkillCapsuleEntity> capsules = new ArrayList<>();
 
-    private String imagePath;
+    private String imageName;
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

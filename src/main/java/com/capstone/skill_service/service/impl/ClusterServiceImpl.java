@@ -66,18 +66,11 @@ public class ClusterServiceImpl implements ClusterService {
         clusterEntity.setUpdatedAt(LocalDateTime.now());
         clusterEntity.setStatus(Status.ACTIVE);
         // handle file upload
-        logger.info("Image here");
-        System.out.println("Image below");
-        System.out.println(image);
         if (image != null) {
-            System.out.println("inside");
             try {
-                String path = fileStorageService.saveFile(image);
-                clusterEntity.setImagePath(path);
-                logger.info("Image nice");
+                String imageName = fileStorageService.saveFile(image);
+                clusterEntity.setImageName(imageName);
             } catch (IOException e) {
-                logger.info("Image failed");
-                System.out.println(e.getMessage());
                 throw new FindException("Failed to store image");
             }
         }
