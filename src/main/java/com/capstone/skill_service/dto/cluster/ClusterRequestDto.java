@@ -26,7 +26,6 @@ public class ClusterRequestDto {
     private String type;
 
     private String description;
-    private MultipartFile image;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private Status status;

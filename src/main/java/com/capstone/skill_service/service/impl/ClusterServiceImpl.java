@@ -20,6 +20,7 @@ import com.capstone.skill_service.model.SkillCapsuleEntity;
 import com.capstone.skill_service.model.TagEntity;
 import com.capstone.skill_service.repository.*;
 import com.capstone.skill_service.service.ClusterService;
+import com.capstone.skill_service.service.FileStorageService;
 import com.capstone.skill_service.util.Status;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -31,7 +32,10 @@ import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.lang.module.FindException;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -47,9 +51,10 @@ public class ClusterServiceImpl implements ClusterService {
     private final TagRepository tagRepository;
     private final ClusterMapper clusterMapper;
     private final AtomMapper atomMapper;
+    private final FileStorageService fileStorageService;
 
     @Override
-    public ClusterResponseDto create(ClusterRequestDto dto) {
+    public ClusterResponseDto create(ClusterRequestDto dto, MultipartFile image) {
         if(findByName(dto.getName()).isPresent()){
             throw new ClusterExistsException(
                     String.format("A Cluster with the name '%s' already exist",
@@ -60,6 +65,22 @@ public class ClusterServiceImpl implements ClusterService {
         clusterEntity.setCreatedAt(LocalDateTime.now());
         clusterEntity.setUpdatedAt(LocalDateTime.now());
         clusterEntity.setStatus(Status.ACTIVE);
+        // handle file upload
+        logger.info("Image here");
+        System.out.println("Image below");
+        System.out.println(image);
+        if (image != null) {
+            System.out.println("inside");
+            try {
+                String path = fileStorageService.saveFile(image);
+                clusterEntity.setImagePath(path);
+                logger.info("Image nice");
+            } catch (IOException e) {
+                logger.info("Image failed");
+                System.out.println(e.getMessage());
+                throw new FindException("Failed to store image");
+            }
+        }
         logger.info("Admin created skill cluster: {}", clusterEntity.getName());
 
         return this.clusterMapper.toDto(clusterRepository.save(clusterEntity));
