@@ -18,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.UUID;
 
 @RestController
@@ -30,8 +31,8 @@ public class ClusterController {
     @PostMapping()
     @Operation(summary = "Create skill cluster", description = "This end point allows only admin to create a skill cluster")
     public ResponseEntity<ClientResponseFormatDto> createCluster(
-            @Valid @RequestBody ClusterRequestDto clusterRequestDto
-    ) {
+            @Valid @ModelAttribute @RequestBody ClusterRequestDto clusterRequestDto
+    )throws IOException {
         ClusterResponseDto savedCluster = this.clusterService.create(clusterRequestDto);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
                 .status(true)

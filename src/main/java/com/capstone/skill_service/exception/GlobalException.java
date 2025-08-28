@@ -9,6 +9,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.NoHandlerFoundException;
+
+import java.io.IOException;
 import java.nio.file.AccessDeniedException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -302,5 +304,17 @@ public class GlobalException {
                 .data(null)
                 .build();
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(FileException.class)
+    public ResponseEntity<?> handleFileException(FileException exception) {
+        ClientResponseFormatDto response = ClientResponseFormatDto.builder()
+                .status(false)
+                .message("File Error!")
+                .errors(List.of(Map.of("message", exception.getMessage())))
+                .data(null)
+                .build();
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(response);
     }
 }
