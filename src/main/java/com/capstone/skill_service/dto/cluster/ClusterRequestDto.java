@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 
@@ -25,6 +26,7 @@ public class ClusterRequestDto {
     private String type;
 
     private String description;
+    private MultipartFile image;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private Status status;

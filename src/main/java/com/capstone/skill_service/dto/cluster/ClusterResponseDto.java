@@ -24,6 +24,7 @@ public class ClusterResponseDto implements Serializable {
     private String name;
     private String type;
     private String description;
+    private String imagePath;
     private Status status;
     private LocalDateTime createdAt;
 }
