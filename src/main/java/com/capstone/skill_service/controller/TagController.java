@@ -62,7 +62,7 @@ public class TagController {
                 .status(true)
                 .message("Tag retrieved successfully")
                 .errors(null)
-                .data(tag)
+                .data(Map.of("item", tag))
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
@@ -92,7 +92,7 @@ public class TagController {
                 .status(true)
                 .message("Tag updated successfully!")
                 .errors(null)
-                .data(updatedTag)
+                .data(Map.of("item", updatedTag))
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
@@ -106,7 +106,7 @@ public class TagController {
                 .status(true)
                 .message("Tag status updated successfully!")
                 .errors(null)
-                .data(updatedTag)
+                .data(Map.of("item", updatedTag))
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
