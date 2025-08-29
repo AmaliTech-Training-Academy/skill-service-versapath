@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
-import java.io.IOException;
 import java.nio.file.AccessDeniedException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,8 +26,8 @@ public class GlobalException {
 
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
                 .status(false)
-                .message("Tag Error!")
-                .errors(List.of(Map.of("message", exception.getMessage())))
+                .message(exception.getMessage())
+                .errors(null)
                 .data(null)
                 .build();
         return new ResponseEntity<>(response, HttpStatus.CONFLICT);
@@ -40,8 +39,8 @@ public class GlobalException {
 
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
                 .status(false)
-                .message("Cluster Error!")
-                .errors(List.of(Map.of("message", exception.getMessage())))
+                .message(exception.getMessage())
+                .errors(null)
                 .data(null)
                 .build();
         return new ResponseEntity<>(response, HttpStatus.CONFLICT);
@@ -52,8 +51,8 @@ public class GlobalException {
             TagNotFoundException exception) {
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
                 .status(false)
-                .message("Tag Error!")
-                .errors(List.of(Map.of("message", exception.getMessage())))
+                .message(exception.getMessage())
+                .errors(null)
                 .data(null)
                 .build();
 
@@ -65,8 +64,8 @@ public class GlobalException {
             ClusterNotFoundException exception) {
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
                 .status(false)
-                .message("Cluster Error!")
-                .errors(List.of(Map.of("message", exception.getMessage())))
+                .message(exception.getMessage())
+                .errors(null)
                 .data(null)
                 .build();
 
@@ -79,8 +78,8 @@ public class GlobalException {
 
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
                 .status(false)
-                .message("Unexpected Exception")
-                .errors(List.of(Map.of("message", exception.getMessage())))
+                .message(exception.getMessage())
+                .errors(null)
                 .data(null)
                 .build();
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
@@ -92,8 +91,8 @@ public class GlobalException {
 
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
                 .status(false)
-                .message("Internal Server Error!")
-                .errors(List.of(Map.of("message", exception.getMessage())))
+                .message(exception.getMessage())
+                .errors(null)
                 .data(null)
                 .build();
 
@@ -105,8 +104,8 @@ public class GlobalException {
 
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
                 .status(false)
-                .message("Page/url no found")
-                .errors(List.of(Map.of("message", exception.getMessage())))
+                .message(exception.getMessage())
+                .errors(null)
                 .data(null)
                 .build();
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
@@ -116,8 +115,8 @@ public class GlobalException {
     public ResponseEntity<?> handleUnauthorized(AccessDeniedException exception) {
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
                 .status(false)
-                .message("Unauthorized Error!")
-                .errors(List.of(Map.of("message", exception.getMessage())))
+                .message(exception.getMessage())
+                .errors(null)
                 .data(null)
                 .build();
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
@@ -155,8 +154,8 @@ public class GlobalException {
             AtomNotFoundException exception) {
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
                 .status(false)
-                .message("Skill Atom Error!")
-                .errors(List.of(Map.of("message", exception.getMessage())))
+                .message(exception.getMessage())
+                .errors(null)
                 .data(null)
                 .build();
 
@@ -169,8 +168,8 @@ public class GlobalException {
 
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
                 .status(false)
-                .message("Skill Atom Error!")
-                .errors(List.of(Map.of("message", exception.getMessage())))
+                .message(exception.getMessage())
+                .errors(null)
                 .data(null)
                 .build();
         return new ResponseEntity<>(response, HttpStatus.CONFLICT);
@@ -181,8 +180,8 @@ public class GlobalException {
             CapsuleNotFoundException exception) {
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
                 .status(false)
-                .message("Skill Capsule Error!")
-                .errors(List.of(Map.of("message", exception.getMessage())))
+                .message(exception.getMessage())
+                .errors(null)
                 .data(null)
                 .build();
 
@@ -195,8 +194,8 @@ public class GlobalException {
 
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
                 .status(false)
-                .message("Skill Capsule Error!")
-                .errors(List.of(Map.of("message", exception.getMessage())))
+                .message(exception.getMessage())
+                .errors(null)
                 .data(null)
                 .build();
         return new ResponseEntity<>(response, HttpStatus.CONFLICT);
@@ -208,8 +207,8 @@ public class GlobalException {
 
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
                 .status(false)
-                .message("Assignment Error!")
-                .errors(List.of(Map.of("message", exception.getMessage())))
+                .message(exception.getMessage())
+                .errors(null)
                 .data(null)
                 .build();
         return new ResponseEntity<>(response, HttpStatus.CONFLICT);
@@ -221,8 +220,8 @@ public class GlobalException {
 
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
                 .status(false)
-                .message("Invalid skill atoms Error!")
-                .errors(List.of(Map.of("message", exception.getMessage())))
+                .message(exception.getMessage())
+                .errors(null)
                 .data(null)
                 .build();
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
@@ -233,8 +232,8 @@ public class GlobalException {
             TrackNotFoundException exception) {
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
                 .status(false)
-                .message("Growth Track Error!")
-                .errors(List.of(Map.of("message", exception.getMessage())))
+                .message(exception.getMessage())
+                .errors(null)
                 .data(null)
                 .build();
 
@@ -247,8 +246,8 @@ public class GlobalException {
 
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
                 .status(false)
-                .message("Growth Track Error!")
-                .errors(List.of(Map.of("message", exception.getMessage())))
+                .message(exception.getMessage())
+                .errors(null)
                 .data(null)
                 .build();
         return new ResponseEntity<>(response, HttpStatus.CONFLICT);
@@ -260,7 +259,7 @@ public class GlobalException {
 
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
                 .status(false)
-                .message("Talent Route Error!")
+                .message(exception.getMessage())
                 .errors(List.of(Map.of("message", exception.getMessage())))
                 .data(null)
                 .build();
@@ -272,7 +271,7 @@ public class GlobalException {
             RouteNotFoundException exception) {
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
                 .status(false)
-                .message("Talent Route Error!")
+                .message(exception.getMessage())
                 .errors(List.of(Map.of("message", exception.getMessage())))
                 .data(null)
                 .build();
@@ -286,7 +285,7 @@ public class GlobalException {
 
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
                 .status(false)
-                .message("Invalid skill capsule Error!")
+                .message(exception.getMessage())
                 .errors(List.of(Map.of("message", exception.getMessage())))
                 .data(null)
                 .build();
@@ -299,8 +298,8 @@ public class GlobalException {
 
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
                 .status(false)
-                .message("Invalid growth track Error!")
-                .errors(List.of(Map.of("message", exception.getMessage())))
+                .message(exception.getMessage())
+                .errors(null)
                 .data(null)
                 .build();
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
@@ -310,8 +309,8 @@ public class GlobalException {
     public ResponseEntity<?> handleFileException(FileException exception) {
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
                 .status(false)
-                .message("File Error!")
-                .errors(List.of(Map.of("message", exception.getMessage())))
+                .message(exception.getMessage())
+                .errors(null)
                 .data(null)
                 .build();
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
