@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -47,7 +48,7 @@ public class ClusterController {
                 .status(true)
                 .message("Cluster created successfully!")
                 .errors(null)
-                .data(savedCluster)
+                .data(Map.of("item", savedCluster))
                 .build();
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -73,7 +74,7 @@ public class ClusterController {
                 .status(true)
                 .message("Cluster retrieved successfully")
                 .errors(null)
-                .data(cluster)
+                .data(Map.of("item", cluster))
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
@@ -93,16 +94,27 @@ public class ClusterController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @PatchMapping("/{clusterId}")
+    @PatchMapping("update")
     @Operation(summary = "Update skill cluster", description = "This end point allows admin to update a skill cluster")
     public ResponseEntity<ClientResponseFormatDto> updateCluster(
-            @Valid @RequestBody ClusterUpdateRequestDto clusterRequestDto, @PathVariable UUID clusterId) {
-        ClusterResponseDto updatedCluster = this.clusterService.partialUpdate(clusterRequestDto, clusterId);
+            @RequestParam(value = "name", required = false) String name,
+            @RequestParam(value = "type", required = false) String type,
+            @RequestParam(value = "status", required = false) Status status,
+            @RequestParam(value = "description", required = false) String description,
+            @RequestParam(value = "image", required = false) MultipartFile image,
+            @RequestParam UUID clusterId) throws IOException{
+        ClusterUpdateRequestDto clusterRequestDto = ClusterUpdateRequestDto.builder()
+                .name(name)
+                .type(type)
+                .status(status)
+                .description(description)
+                .build();
+        ClusterResponseDto updatedCluster = this.clusterService.partialUpdate(clusterRequestDto, clusterId, image);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
                 .status(true)
                 .message("Cluster updated successfully!")
                 .errors(null)
-                .data(updatedCluster)
+                .data(Map.of("item", updatedCluster))
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
@@ -116,7 +128,7 @@ public class ClusterController {
                 .status(true)
                 .message("Cluster status updated successfully!")
                 .errors(null)
-                .data(updatedCluster)
+                .data(Map.of("item", updatedCluster))
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
@@ -129,7 +141,7 @@ public class ClusterController {
                 .status(true)
                 .message("Cluster retrieved successfully")
                 .errors(null)
-                .data(cluster)
+                .data(Map.of("item", cluster))
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }

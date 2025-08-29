@@ -1,6 +1,5 @@
 package com.capstone.skill_service.dto.cluster;
 
-import com.capstone.skill_service.dto.capsule.CapsuleSummaryWithNoClusterResponseDto;
 import com.capstone.skill_service.util.Status;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.AllArgsConstructor;
@@ -27,4 +26,5 @@ public class ClusterResponseDto implements Serializable {
     private String imageName;
     private Status status;
     private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }

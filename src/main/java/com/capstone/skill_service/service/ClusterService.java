@@ -20,7 +20,7 @@ public interface ClusterService {
     Optional<ClusterEntity> findById(UUID id);
     ClusterResponseDto getCluster(UUID id);
     void deleteById(UUID id);
-    ClusterResponseDto partialUpdate(ClusterUpdateRequestDto dto, UUID id);
+    ClusterResponseDto partialUpdate(ClusterUpdateRequestDto dto, UUID id, MultipartFile image);
     ClusterResponseDto updateStatus(Status status, UUID id);
     ClusterWithCapsuleResponseDto getClusterWithCapsules(UUID clusterId);
 }
