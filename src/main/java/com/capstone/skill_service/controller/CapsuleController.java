@@ -16,6 +16,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -35,7 +37,7 @@ public class CapsuleController {
                 .status(true)
                 .message("Capsule created successfully!")
                 .errors(null)
-                .data(savedCapsule)
+                .data(Map.of("item", savedCapsule))
                 .build();
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -61,7 +63,7 @@ public class CapsuleController {
                 .status(true)
                 .message("Capsule retrieved successfully")
                 .errors(null)
-                .data(capsule)
+                .data(Map.of("item", capsule))
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
@@ -90,7 +92,7 @@ public class CapsuleController {
                 .status(true)
                 .message("Capsule updated successfully!")
                 .errors(null)
-                .data(updatedCapsule)
+                .data(Map.of("item", updatedCapsule))
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
@@ -104,7 +106,7 @@ public class CapsuleController {
                 .status(true)
                 .message("Capsule status updated successfully!")
                 .errors(null)
-                .data(updatedCapsule)
+                .data(Map.of("item", updatedCapsule))
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
@@ -118,7 +120,7 @@ public class CapsuleController {
                 .status(true)
                 .message("Atoms added to capsule successfully!")
                 .errors(null)
-                .data(updatedCapsule)
+                .data(Map.of("item", updatedCapsule))
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
@@ -132,7 +134,7 @@ public class CapsuleController {
                 .status(true)
                 .message("Atom removed from capsule successfully!")
                 .errors(null)
-                .data(updatedCapsule)
+                .data(Map.of("item", updatedCapsule))
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
@@ -147,7 +149,7 @@ public class CapsuleController {
                 .status(true)
                 .message("Atoms reordered in capsule successfully!")
                 .errors(null)
-                .data(updatedCapsule)
+                .data(Map.of("item", updatedCapsule))
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
@@ -161,7 +163,7 @@ public class CapsuleController {
                 .status(true)
                 .message("Tags added to capsule successfully!")
                 .errors(null)
-                .data(updatedCapsule)
+                .data(Map.of("item", updatedCapsule))
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
@@ -175,7 +177,7 @@ public class CapsuleController {
                 .status(true)
                 .message("Tag removed from capsule successfully!")
                 .errors(null)
-                .data(updatedCapsule)
+                .data(Map.of("item", updatedCapsule))
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
@@ -189,7 +191,7 @@ public class CapsuleController {
                 .status(true)
                 .message("Clusters added to capsule successfully!")
                 .errors(null)
-                .data(updatedCapsule)
+                .data(Map.of("item", updatedCapsule))
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
@@ -203,7 +205,7 @@ public class CapsuleController {
                 .status(true)
                 .message("Cluster removed from capsule successfully!")
                 .errors(null)
-                .data(updatedCapsule)
+                .data(Map.of("item", updatedCapsule))
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }

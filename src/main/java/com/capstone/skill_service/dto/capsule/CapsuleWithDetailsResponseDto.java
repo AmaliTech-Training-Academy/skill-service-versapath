@@ -38,4 +38,5 @@ public class CapsuleWithDetailsResponseDto implements Serializable {
     List<TagSummaryResponseDto> tags;
     List<ClusterSummaryResponseDto> clusters;
     private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }
