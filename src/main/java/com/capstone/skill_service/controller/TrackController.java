@@ -18,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -37,7 +38,7 @@ public class TrackController {
                 .status(true)
                 .message("Track created successfully!")
                 .errors(null)
-                .data(savedTrack)
+                .data(Map.of("item", savedTrack))
                 .build();
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -63,7 +64,7 @@ public class TrackController {
                 .status(true)
                 .message("Track retrieved successfully")
                 .errors(null)
-                .data(track)
+                .data(Map.of("item", track))
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
@@ -92,7 +93,7 @@ public class TrackController {
                 .status(true)
                 .message("Growth Track updated successfully!")
                 .errors(null)
-                .data(updatedTrack)
+                .data(Map.of("item", updatedTrack))
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
@@ -106,7 +107,7 @@ public class TrackController {
                 .status(true)
                 .message("Growth Track status updated successfully!")
                 .errors(null)
-                .data(updatedTrack)
+                .data(Map.of("item", updatedTrack))
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
@@ -120,7 +121,7 @@ public class TrackController {
                 .status(true)
                 .message("Capsules added to a growth track successfully!")
                 .errors(null)
-                .data(updatedTrack)
+                .data(Map.of("item", updatedTrack))
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
@@ -134,7 +135,7 @@ public class TrackController {
                 .status(true)
                 .message("Capsule removed from track successfully!")
                 .errors(null)
-                .data(updatedTrack)
+                .data(Map.of("item", updatedTrack))
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
@@ -149,7 +150,7 @@ public class TrackController {
                 .status(true)
                 .message("Capsules reordered in track successfully!")
                 .errors(null)
-                .data(updatedTrack)
+                .data(Map.of("item", updatedTrack))
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
