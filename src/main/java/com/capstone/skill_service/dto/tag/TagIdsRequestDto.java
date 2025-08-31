@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 
@@ -14,5 +15,5 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 public class TagIdsRequestDto {
-    private List<UUID> tagIds;
+    private Set<UUID> tagIds;
 }

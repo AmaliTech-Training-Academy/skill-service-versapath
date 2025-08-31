@@ -6,7 +6,6 @@ import com.capstone.skill_service.dto.atom.AtomInSequenceOrderResponseDto;
 import com.capstone.skill_service.dto.capsule.*;
 import com.capstone.skill_service.dto.cluster.ClusterIdsRequestDto;
 import com.capstone.skill_service.dto.tag.TagIdsRequestDto;
-import com.capstone.skill_service.dto.tag.TagResponseDto;
 import com.capstone.skill_service.exception.*;
 import com.capstone.skill_service.mapper.AtomMapper;
 import com.capstone.skill_service.mapper.CapsuleMapper;
@@ -165,10 +164,10 @@ public class CapsuleServiceImpl implements CapsuleService {
         dto.setSkillAtoms(atoms);
         dto.setClusters(clusters.stream()
                 .map(clusterMapper::toSummaryDto) //map to dto expected in capsule response
-                .toList());
+                .collect(Collectors.toSet()));
         dto.setTags(tags.stream()
                 .map(tagMapper::toSummaryDto) //map to dto expected in capsule response
-                .toList());
+                .collect(Collectors.toSet()));
 
         return dto;
     }
@@ -366,9 +365,9 @@ public class CapsuleServiceImpl implements CapsuleService {
         return mapCapsuleToResponseDtoWithAtom(savedCapsule);
     }
 
-    void addTagsToCapsule(SkillCapsuleEntity capsuleEntity, List<UUID> tagIds){
+    void addTagsToCapsule(SkillCapsuleEntity capsuleEntity, Set<UUID> tagIds){
         if (capsuleEntity.getTags() == null) {
-            capsuleEntity.setTags(new ArrayList<>());
+            capsuleEntity.setTags(new HashSet<>());
         }
         //get tag id
         for (UUID tagId : tagIds) {
@@ -388,9 +387,9 @@ public class CapsuleServiceImpl implements CapsuleService {
 
     }
 
-    void addClustersToCapsule(SkillCapsuleEntity capsuleEntity, List<UUID> clusterIds){
+    void addClustersToCapsule(SkillCapsuleEntity capsuleEntity, Set<UUID> clusterIds){
         if (capsuleEntity.getClusters() == null) {
-            capsuleEntity.setClusters(new ArrayList<>());
+            capsuleEntity.setClusters(new HashSet<>());
         }
         //get tag id
         for (UUID clusterId : clusterIds) {

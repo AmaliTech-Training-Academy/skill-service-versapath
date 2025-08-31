@@ -44,21 +44,21 @@ public class SkillCapsuleEntity {
     @OrderBy("sequenceOrder ASC") // to always display atoms in sequence order
     private List<CapsuleAtomMappingEntity> skillAtoms = new ArrayList<>();
 
-    @ManyToMany(cascade = { CascadeType.MERGE }) // auto removing association when capsule is deleted
+    @ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.MERGE }) // auto removing association when capsule is deleted
     @JoinTable(
             name = "capsule_tags", // join table name
             joinColumns = @JoinColumn(name = "skill_capsule_id"),
             inverseJoinColumns = @JoinColumn(name = "tag_id")
     )
-    private List<TagEntity> tags = new ArrayList<>();
+    private Set<TagEntity> tags = new HashSet<>(); // to avoid duplicate
 
-    @ManyToMany(cascade = { CascadeType.MERGE }) // auto removing association when capsule is deleted
+    @ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.MERGE }) // auto removing association when capsule is deleted
     @JoinTable(
             name = "capsule_clusters", // join table name
             joinColumns = @JoinColumn(name = "skill_capsule_id"),
             inverseJoinColumns = @JoinColumn(name = "cluster_id")
     )
-    private List<ClusterEntity> clusters = new ArrayList<>();
+    private Set<ClusterEntity> clusters = new HashSet<>(); // to avoid duplicate
 
     private int moodleCourseId; // id from moodle database on course table
     private int estimatedHours;

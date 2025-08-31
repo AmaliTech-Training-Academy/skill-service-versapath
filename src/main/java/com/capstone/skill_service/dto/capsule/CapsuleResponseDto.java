@@ -15,6 +15,7 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Data
@@ -35,8 +36,8 @@ public class CapsuleResponseDto implements Serializable {
     private String objectives;
     private Status status;
     List<AtomInSequenceOrderResponseDto> skillAtoms; // list of skill atom in sequence order
-    List<TagSummaryResponseDto> tags;
-    List<ClusterSummaryResponseDto> clusters;
+    Set<TagSummaryResponseDto> tags;
+    Set<ClusterSummaryResponseDto> clusters;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

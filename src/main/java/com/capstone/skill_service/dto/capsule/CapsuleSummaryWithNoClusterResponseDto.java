@@ -15,6 +15,7 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Data
@@ -31,5 +32,5 @@ public class CapsuleSummaryWithNoClusterResponseDto implements Serializable {
     private ProficiencyLevel proficiencyLevel;
     private String description;
     List<AtomInSequenceOrderResponseDto> skillAtoms; // list of skill atom in sequence order
-    List<TagSummaryResponseDto> tags;
+    Set<TagSummaryResponseDto> tags;
 }
