@@ -13,7 +13,6 @@ import java.util.UUID;
 
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 @Builder
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public class ClusterResponseDto implements Serializable {
@@ -25,6 +24,21 @@ public class ClusterResponseDto implements Serializable {
     private String description;
     private String imageName;
     private Status status;
+    long capsulesCount;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
+    public ClusterResponseDto(UUID id, String name, String type, String description,
+                              String imageName, Status status, long capsulesCount,
+                              LocalDateTime createdAt, LocalDateTime updatedAt) {
+        this.id = id;
+        this.name = name;
+        this.type = type;
+        this.description = description;
+        this.imageName = imageName;
+        this.status = status;
+        this.capsulesCount = capsulesCount;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+    }
 }

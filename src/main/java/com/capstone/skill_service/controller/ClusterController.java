@@ -11,7 +11,6 @@ import com.capstone.skill_service.service.ClusterService;
 import com.capstone.skill_service.util.Status;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -62,19 +61,6 @@ public class ClusterController {
                 .message("Fetch all clusters")
                 .errors(null)
                 .data(clusters)
-                .build();
-        return ResponseEntity.status(HttpStatus.OK).body(response);
-    }
-
-    @GetMapping("/{clusterId}")
-    @Operation(summary = "Retrieve skill clusters by Id", description = "This end point allows only admin to fetch a skill clusters by id")
-    public ResponseEntity<ClientResponseFormatDto> retrieveSingleCluster(@PathVariable UUID clusterId) {
-        ClusterResponseDto cluster = this.clusterService.getCluster(clusterId);
-        ClientResponseFormatDto response = ClientResponseFormatDto.builder()
-                .status(true)
-                .message("Cluster retrieved successfully")
-                .errors(null)
-                .data(Map.of("item", cluster))
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
@@ -133,7 +119,7 @@ public class ClusterController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @GetMapping("/{clusterId}/capsules")
+    @GetMapping("/{clusterId}")
     @Operation(summary = "Retrieve skill clusters by Id", description = "This end point allows only admin to fetch a skill clusters by id")
     public ResponseEntity<ClientResponseFormatDto> retrieveSingleClusterWithCapsules(@PathVariable UUID clusterId) {
         ClusterWithCapsuleResponseDto cluster = this.clusterService.getClusterWithCapsules(clusterId);
