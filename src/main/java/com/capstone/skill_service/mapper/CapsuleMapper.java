@@ -1,8 +1,6 @@
 package com.capstone.skill_service.mapper;
 
-import com.capstone.skill_service.dto.atom.AtomInSequenceOrderResponseDto;
 import com.capstone.skill_service.dto.capsule.*;
-import com.capstone.skill_service.model.CapsuleAtomMappingEntity;
 import com.capstone.skill_service.model.SkillCapsuleEntity;
 import com.capstone.skill_service.model.TrackCapsuleMappingEntity;
 import org.mapstruct.Mapper;
@@ -12,9 +10,9 @@ import org.mapstruct.Mapping;
 public interface CapsuleMapper {
     CapsuleResponseDto toDto(SkillCapsuleEntity entity);
 
-    @Mapping(target = "skillAtoms", ignore = true)
-    @Mapping(target = "tags", ignore = true)
-    @Mapping(target = "clusters", ignore = true)
+    @Mapping(target = "skillAtoms", source = "skillAtoms")
+    @Mapping(target = "tags", source = "tags")
+    @Mapping(target = "clusters", source = "clusters")
     CapsuleWithDetailsResponseDto toWithDetailsDto(SkillCapsuleEntity entity);
 
     CapsuleOnlyResponseDto toCapsuleOnlyDto(SkillCapsuleEntity entity);
