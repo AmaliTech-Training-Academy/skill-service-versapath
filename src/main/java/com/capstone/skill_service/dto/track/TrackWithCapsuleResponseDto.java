@@ -29,4 +29,5 @@ public class TrackWithCapsuleResponseDto implements Serializable {
     private Status status;
     private List<CapsuleInSequenceOrderResponseDto> capsules;
     private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }

@@ -65,18 +65,22 @@ public class ClusterServiceImpl implements ClusterService {
         clusterEntity.setCreatedAt(LocalDateTime.now());
         clusterEntity.setUpdatedAt(LocalDateTime.now());
         clusterEntity.setStatus(Status.ACTIVE);
-        // handle file upload
-        if (image != null) {
-            try {
-                String imageName = fileStorageService.saveFile(image);
-                clusterEntity.setImageName(imageName);
-            } catch (IOException e) {
-                throw new FindException("Failed to store image");
-            }
+        if(image != null){
+            clusterEntity.setImageName(getImageName(image)); //upload image
         }
+
         logger.info("Admin created skill cluster: {}", clusterEntity.getName());
 
         return this.clusterMapper.toDto(clusterRepository.save(clusterEntity));
+    }
+
+    public String getImageName(MultipartFile image){
+        // handle file upload
+        try {
+            return fileStorageService.saveFile(image);
+        } catch (IOException e) {
+            throw new FindException("Failed to store image");
+        }
     }
 
     @Override
@@ -136,7 +140,7 @@ public class ClusterServiceImpl implements ClusterService {
             evict = @CacheEvict(value = "clusterList", allEntries = true), // to update the entire list
             put = @CachePut(value = "cluster", key = "#result.id") // Different cache name for individual cluster
     )
-    public ClusterResponseDto partialUpdate(ClusterUpdateRequestDto dto, UUID id) {
+    public ClusterResponseDto partialUpdate(ClusterUpdateRequestDto dto, UUID id, MultipartFile image) {
         ClusterEntity cluster = findById(id)
                 .orElseThrow( () -> new ClusterNotFoundException("A cluster provided doesn't exist")
                 );
@@ -156,6 +160,9 @@ public class ClusterServiceImpl implements ClusterService {
         }
         if(dto.getStatus() != null){
             cluster.setStatus(dto.getStatus());
+        }
+        if(image != null){
+            cluster.setImageName(getImageName(image)); //update image
         }
         cluster.setUpdatedAt(LocalDateTime.now());
 

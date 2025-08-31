@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -35,7 +36,7 @@ public class AtomController {
                 .status(true)
                 .message("Atom created successfully!")
                 .errors(null)
-                .data(savedAtom)
+                .data(Map.of("item", savedAtom))
                 .build();
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -61,7 +62,7 @@ public class AtomController {
                 .status(true)
                 .message("Atom retrieved successfully")
                 .errors(null)
-                .data(atom)
+                .data(Map.of("item", atom))
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
@@ -90,7 +91,7 @@ public class AtomController {
                 .status(true)
                 .message("Atom updated successfully!")
                 .errors(null)
-                .data(updatedAtom)
+                .data(Map.of("item", updatedAtom))
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
@@ -104,7 +105,7 @@ public class AtomController {
                 .status(true)
                 .message("Atom status updated successfully!")
                 .errors(null)
-                .data(updatedAtom)
+                .data(Map.of("item", updatedAtom))
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }

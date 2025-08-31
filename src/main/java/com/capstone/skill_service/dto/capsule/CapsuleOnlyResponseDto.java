@@ -35,4 +35,5 @@ public class CapsuleOnlyResponseDto implements Serializable {
     private String objectives;
     private Status status;
     private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }

@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -35,7 +36,7 @@ public class TagController {
                 .status(true)
                 .message("Tag created successfully!")
                 .errors(null)
-                .data(savedTag)
+                .data(Map.of("item", savedTag))
                 .build();
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -61,7 +62,7 @@ public class TagController {
                 .status(true)
                 .message("Tag retrieved successfully")
                 .errors(null)
-                .data(tag)
+                .data(Map.of("item", tag))
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
@@ -91,7 +92,7 @@ public class TagController {
                 .status(true)
                 .message("Tag updated successfully!")
                 .errors(null)
-                .data(updatedTag)
+                .data(Map.of("item", updatedTag))
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
@@ -105,7 +106,7 @@ public class TagController {
                 .status(true)
                 .message("Tag status updated successfully!")
                 .errors(null)
-                .data(updatedTag)
+                .data(Map.of("item", updatedTag))
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }

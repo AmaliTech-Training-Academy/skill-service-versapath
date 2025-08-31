@@ -26,4 +26,5 @@ public class TagResponseDto implements Serializable {
     private String description;
     private Status status;
     private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }

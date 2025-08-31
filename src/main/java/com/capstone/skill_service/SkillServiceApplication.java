@@ -14,19 +14,5 @@ public class SkillServiceApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(SkillServiceApplication.class, args);
 	}
-	//	to skip the cors policy
-	@Bean
-	public WebMvcConfigurer webMvcConfigurer(){
-		return new WebMvcConfigurer(){
-			@Override
-			public void addCorsMappings(CorsRegistry registry){
-				registry.addMapping("/**")
-						.allowedMethods("*")
-						.allowedHeaders("*")
-						.allowedOrigins("*");
-			}
-		};
-
-	}
 
 }

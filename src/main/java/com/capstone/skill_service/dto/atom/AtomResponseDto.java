@@ -25,4 +25,5 @@ public class AtomResponseDto {
     private Status status;
     private int moodleSectionId;
     private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }

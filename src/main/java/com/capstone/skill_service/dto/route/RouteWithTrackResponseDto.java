@@ -29,4 +29,5 @@ public class RouteWithTrackResponseDto implements Serializable {
     private Status status;
     private List<TrackInSequenceOrderResponseDto> tracks;
     private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }

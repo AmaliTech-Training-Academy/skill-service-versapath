@@ -18,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -37,7 +38,7 @@ public class RouteController {
                 .status(true)
                 .message("Route created successfully!")
                 .errors(null)
-                .data(savedRoute)
+                .data(Map.of("item", savedRoute))
                 .build();
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -63,7 +64,7 @@ public class RouteController {
                 .status(true)
                 .message("Route retrieved successfully")
                 .errors(null)
-                .data(route)
+                .data(Map.of("item", route))
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
@@ -92,7 +93,7 @@ public class RouteController {
                 .status(true)
                 .message("Growth Route updated successfully!")
                 .errors(null)
-                .data(updatedRoute)
+                .data(Map.of("item", updatedRoute))
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
@@ -106,7 +107,7 @@ public class RouteController {
                 .status(true)
                 .message("Growth Route status updated successfully!")
                 .errors(null)
-                .data(updatedRoute)
+                .data(Map.of("item", updatedRoute))
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
@@ -120,7 +121,7 @@ public class RouteController {
                 .status(true)
                 .message("Tracks added to a talent route successfully!")
                 .errors(null)
-                .data(updatedRoute)
+                .data(Map.of("item", updatedRoute))
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
@@ -134,7 +135,7 @@ public class RouteController {
                 .status(true)
                 .message("Track removed from route successfully!")
                 .errors(null)
-                .data(updatedRoute)
+                .data(Map.of("item", updatedRoute))
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
@@ -149,7 +150,7 @@ public class RouteController {
                 .status(true)
                 .message("Tracks reordered in route successfully!")
                 .errors(null)
-                .data(updatedRoute)
+                .data(Map.of("item", updatedRoute))
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
