@@ -8,12 +8,13 @@ import com.capstone.skill_service.dto.cluster.ClusterWithCapsuleResponseDto;
 import com.capstone.skill_service.model.ClusterEntity;
 import com.capstone.skill_service.util.Status;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Optional;
 import java.util.UUID;
 
 public interface ClusterService {
-    ClusterResponseDto create(ClusterRequestDto dto);
+    ClusterResponseDto create(ClusterRequestDto dto, MultipartFile image);
     Optional<ClusterEntity> findByName(String name);
     CustomPageResponse<ClusterResponseDto> findAll(Pageable pageable);
     Optional<ClusterEntity> findById(UUID id);

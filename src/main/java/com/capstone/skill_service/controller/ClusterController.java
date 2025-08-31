@@ -17,7 +17,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.UUID;
 
 @RestController
@@ -30,9 +32,17 @@ public class ClusterController {
     @PostMapping()
     @Operation(summary = "Create skill cluster", description = "This end point allows only admin to create a skill cluster")
     public ResponseEntity<ClientResponseFormatDto> createCluster(
-            @Valid @RequestBody ClusterRequestDto clusterRequestDto
-    ) {
-        ClusterResponseDto savedCluster = this.clusterService.create(clusterRequestDto);
+            @RequestParam("name") String name,
+            @RequestParam("type") String type,
+            @RequestParam("description") String description,
+            @RequestParam(value = "image", required = false) MultipartFile image
+    )throws IOException {
+        ClusterRequestDto clusterRequestDto = ClusterRequestDto.builder()
+                .name(name)
+                .type(type)
+                .description(description)
+                .build();
+        ClusterResponseDto savedCluster = this.clusterService.create(clusterRequestDto, image);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
                 .status(true)
                 .message("Cluster created successfully!")
