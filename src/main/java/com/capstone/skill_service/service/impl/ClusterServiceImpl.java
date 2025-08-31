@@ -237,7 +237,7 @@ public class ClusterServiceImpl implements ClusterService {
                     //link tags
                     dto.setTags(tagsByCapsule.stream()
                             .map(tagMapper::toSummaryDto)
-                            .toList());
+                            .collect(Collectors.toSet()));
 
                     return dto;
                 })

@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 
@@ -14,5 +15,5 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 public class ClusterIdsRequestDto {
-    private List<UUID> clusterIds;
+    private Set<UUID> clusterIds;
 }

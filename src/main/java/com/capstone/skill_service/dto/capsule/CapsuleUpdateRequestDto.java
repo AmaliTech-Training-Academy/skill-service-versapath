@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Data
@@ -29,8 +30,8 @@ public class CapsuleUpdateRequestDto {
     private String objectives;
     private Status status;
     List<UUID> atomIds;
-    List<UUID> tagIds;
-    List<UUID> clusterIds;
+    Set<UUID> tagIds;
+    Set<UUID> clusterIds;
     private LocalDateTime updatedAt;
 
 }
