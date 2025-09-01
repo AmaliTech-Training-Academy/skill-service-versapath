@@ -14,7 +14,10 @@ import com.capstone.skill_service.util.Status;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -99,6 +102,10 @@ public class AtomServiceImpl implements AtomService {
     }
 
     @Override
+    @Caching(
+            evict = @CacheEvict(value = "atomList", allEntries = true), // to update the entire list
+            put = @CachePut(value = "atom", key = "#result.id") // Different cache name for individual atom
+    )
     public AtomResponseDto partialUpdate(AtomUpdateRequestDto dto, UUID id) {
         SkillAtomEntity atom = findById(id)
                 .orElseThrow( () -> new AtomNotFoundException("A Skill atom provided doesn't exist")

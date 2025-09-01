@@ -4,7 +4,6 @@ server:
 spring:
   application:
     name: skill-service
-
   datasource:
     url: ${SPRING_DATASOURCE_URL}
     username: ${SPRING_DATASOURCE_USERNAME}
@@ -17,26 +16,20 @@ spring:
 
   cache:
     type: redis
-
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: true
-
   config:
     import: optional:configserver:${CONFIG_SERVER_URL}
-
-# Set spring to only create beans when needed
   main:
     lazy-initialization: true
 
-# Register to service discovery
 eureka:
   client:
     service-url:
       defaultZone: ${EUREKA_CLIENT_URL}
 
-#Actuator
 management:
   endpoints:
     web:
