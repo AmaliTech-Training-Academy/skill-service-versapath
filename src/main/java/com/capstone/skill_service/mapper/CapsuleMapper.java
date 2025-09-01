@@ -6,7 +6,7 @@ import com.capstone.skill_service.model.TrackCapsuleMappingEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = AtomMapper.class)
 public interface CapsuleMapper {
     CapsuleResponseDto toDto(SkillCapsuleEntity entity);
 

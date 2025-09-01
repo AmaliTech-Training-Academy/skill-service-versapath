@@ -176,7 +176,7 @@ public class ClusterServiceImpl implements ClusterService {
     }
 
     @Override
-    @Cacheable(value = "cluster", key = "#clusterId")
+    @Cacheable(value = "clusterWithCapsule", key = "#clusterId")
     public ClusterWithCapsuleResponseDto getClusterWithCapsules(UUID clusterId) {
         ClusterEntity cluster = clusterRepository.findByIdWithCapsules(clusterId)
                 .orElseThrow(() -> new ClusterNotFoundException("Cluster not found"));

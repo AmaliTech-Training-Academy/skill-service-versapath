@@ -63,15 +63,15 @@ public class CapsuleServiceImpl implements CapsuleService {
     }
 
     public CapsuleResponseDto mapCapsuleToResponseDtoWithAtom(SkillCapsuleEntity capsule){
-        // build atoms from mappings
-//        List<AtomInSequenceOrderResponseDto> atomInSequenceOrderResponseDto = capsule.getSkillAtoms().stream()
-//                .map(atomMapper::toInSequenceOrderDto)
-//                .toList();
+         //build atoms from mappings
+        List<AtomInSequenceOrderResponseDto> atomInSequenceOrderResponseDto = capsule.getSkillAtoms().stream()
+                .map(atomMapper::toInSequenceOrderDto)
+                .toList();
 
         // map capsule to response dto
         CapsuleResponseDto response = capsuleMapper.toDto(capsule);
 
-//        response.setSkillAtoms(atomInSequenceOrderResponseDto); // update atomSequence in response
+        response.setSkillAtoms(atomInSequenceOrderResponseDto); // update atomSequence in response
 
         return response;
     }
@@ -133,7 +133,7 @@ public class CapsuleServiceImpl implements CapsuleService {
     }
 
     @Override
-    @Cacheable(value = "capsule", key = "#capsuleId")
+    @Cacheable(value = "capsuleWithDetails", key = "#capsuleId")
     public CapsuleWithDetailsResponseDto getCapsuleWithDetails(UUID capsuleId) {
         SkillCapsuleEntity capsule = capsuleRepository.findByIdWithDetails(capsuleId)
                 .orElseThrow(() -> new CapsuleNotFoundException("Capsule not found"));
