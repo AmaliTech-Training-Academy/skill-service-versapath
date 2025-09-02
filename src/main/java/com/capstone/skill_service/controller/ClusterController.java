@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -30,6 +31,7 @@ public class ClusterController {
     private final ClusterService clusterService;
 
     @PostMapping()
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Create skill cluster", description = "This end point allows only admin to create a skill cluster")
     public ResponseEntity<ClientResponseFormatDto> createCluster(
             @RequestParam("name") String name,
@@ -66,6 +68,7 @@ public class ClusterController {
     }
 
     @DeleteMapping(name = "delete_cluster", path = "/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Delete Cluster",
             description = "The cluster is delete using its id that is passed as parameter")
     public ResponseEntity<ClientResponseFormatDto> deleteCluster(@PathVariable UUID id){
@@ -81,6 +84,7 @@ public class ClusterController {
     }
 
     @PatchMapping("update")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Update skill cluster", description = "This end point allows admin to update a skill cluster")
     public ResponseEntity<ClientResponseFormatDto> updateCluster(
             @RequestParam(value = "name", required = false) String name,
@@ -106,6 +110,7 @@ public class ClusterController {
     }
 
     @PutMapping
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Update skill cluster status", description = "This end point allows admin to update a skill cluster as a soft delete")
     public ResponseEntity<ClientResponseFormatDto> updateClusterStatus(
             @RequestParam UUID id, @RequestParam Status status) {

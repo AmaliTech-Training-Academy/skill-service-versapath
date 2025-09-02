@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -29,6 +30,7 @@ public class RouteController {
     private final RouteService routeService;
 
     @PostMapping()
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Create talent route", description = "This end point allows only admin to create a talent route")
     public ResponseEntity<ClientResponseFormatDto> createRoute(
             @Valid @RequestBody RouteRequestDto routeRequestDto
@@ -70,6 +72,7 @@ public class RouteController {
     }
 
     @DeleteMapping(name = "delete_route", path = "/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Delete Route",
             description = "The route is deleted using its id that is passed as parameter")
     public ResponseEntity<ClientResponseFormatDto> deleteRoute(@PathVariable UUID id){
@@ -85,6 +88,7 @@ public class RouteController {
     }
 
     @PatchMapping("/{routeId}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Update talent route", description = "This end point allows admin to update a talent route")
     public ResponseEntity<ClientResponseFormatDto> updateRoute(
             @Valid @RequestBody RouteUpdateRequestDto routeRequestDto, @PathVariable UUID routeId) {
@@ -99,6 +103,7 @@ public class RouteController {
     }
 
     @PutMapping
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Update talent route status", description = "This end point allows admin to update a talent route as a soft delete")
     public ResponseEntity<ClientResponseFormatDto> updateRouteStatus(
             @RequestParam UUID id, @RequestParam Status status) {
@@ -113,6 +118,7 @@ public class RouteController {
     }
 
     @PatchMapping("/assignTrack/{routeId}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Assign new skill capsule to a talent route", description = "This end point allows admin to add new skill capsule to a talent route")
     public ResponseEntity<ClientResponseFormatDto> assignTrackToRoute(
             @RequestBody TrackIdsRequestDto atomIds, @PathVariable UUID routeId) {
@@ -127,6 +133,7 @@ public class RouteController {
     }
 
     @DeleteMapping("/removeTrack")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Remove a growth track from route", description = "This end point allows admin to remove a growth track from route")
     public ResponseEntity<ClientResponseFormatDto> removeTrackFromRoute(
             @RequestParam UUID routeId, @RequestParam UUID trackId) {
@@ -141,6 +148,7 @@ public class RouteController {
     }
 
     @PutMapping("/reorderTrack/{routeId}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Reorder new skill capsule in a talent route collection", description = "This end point allows admin " +
             "to shift capsule sequence order in a talent route however they want")
     public ResponseEntity<ClientResponseFormatDto> reorderTrack(

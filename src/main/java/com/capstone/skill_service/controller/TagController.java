@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -27,6 +28,7 @@ public class TagController {
     private final TagService tagService;
 
     @PostMapping()
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Create skill tag", description = "This end point allows only admin to create a skill tag")
     public ResponseEntity<ClientResponseFormatDto> createTag(
             @Valid @RequestBody TagRequestDto tagRequestDto
@@ -68,6 +70,7 @@ public class TagController {
     }
 
     @DeleteMapping(name = "delete_tag", path = "/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Delete Tag",
             description = "The tag is delete using its id that is passed as parameter")
     public ResponseEntity<ClientResponseFormatDto> deleteTag(@PathVariable UUID id){

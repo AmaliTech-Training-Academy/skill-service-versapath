@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -29,6 +30,7 @@ public class TrackController {
     private final TrackService trackService;
 
     @PostMapping()
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Create growth track", description = "This end point allows only admin to create a growth track")
     public ResponseEntity<ClientResponseFormatDto> createTrack(
             @Valid @RequestBody TrackRequestDto trackRequestDto
@@ -70,6 +72,7 @@ public class TrackController {
     }
 
     @DeleteMapping(name = "delete_track", path = "/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Delete Track",
             description = "The track is deleted using its id that is passed as parameter")
     public ResponseEntity<ClientResponseFormatDto> deleteTrack(@PathVariable UUID id){
@@ -85,6 +88,7 @@ public class TrackController {
     }
 
     @PatchMapping("/{trackId}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Update growth track", description = "This end point allows admin to update a growth track")
     public ResponseEntity<ClientResponseFormatDto> updateTrack(
             @Valid @RequestBody TrackUpdateRequestDto trackRequestDto, @PathVariable UUID trackId) {
@@ -99,6 +103,7 @@ public class TrackController {
     }
 
     @PutMapping
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Update growth track status", description = "This end point allows admin to update a growth track as a soft delete")
     public ResponseEntity<ClientResponseFormatDto> updateTrackStatus(
             @RequestParam UUID id, @RequestParam Status status) {
@@ -113,6 +118,7 @@ public class TrackController {
     }
 
     @PatchMapping("/assignCapsule/{trackId}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Assign new skill capsule to a growth track", description = "This end point allows admin to add new skill capsule to a growth track")
     public ResponseEntity<ClientResponseFormatDto> assignCapsuleToTrack(
             @RequestBody CapsuleIdsRequestDto atomIds, @PathVariable UUID trackId) {
@@ -127,6 +133,7 @@ public class TrackController {
     }
 
     @DeleteMapping("/removeCapsule")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Remove a growth atom from track", description = "This end point allows admin to remove a growth atom from track")
     public ResponseEntity<ClientResponseFormatDto> removeCapsuleFromTrack(
             @RequestParam UUID trackId, @RequestParam UUID capsuleId) {
@@ -141,6 +148,7 @@ public class TrackController {
     }
 
     @PutMapping("/reorderCapsule/{trackId}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Reorder new skill capsule in a growth track collection", description = "This end point allows admin " +
             "to shift capsule sequence order in a growth track however they want")
     public ResponseEntity<ClientResponseFormatDto> reorderCapsule(
