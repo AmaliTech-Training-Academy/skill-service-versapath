@@ -316,4 +316,16 @@ public class GlobalException {
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
                 .body(response);
     }
+
+    @ExceptionHandler(HeaderException.class)
+    public ResponseEntity<?> handleHeaderException(HeaderException exception) {
+        ClientResponseFormatDto response = ClientResponseFormatDto.builder()
+                .status(false)
+                .message(exception.getMessage())
+                .errors(null)
+                .data(null)
+                .build();
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(response);
+    }
 }
