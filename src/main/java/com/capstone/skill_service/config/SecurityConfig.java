@@ -32,10 +32,6 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/actuator/health"
                         ).permitAll()
-                        .requestMatchers(HttpMethod.PUT, "/api/v1/dimensions").hasRole("MANAGER")
-                        .requestMatchers(HttpMethod.DELETE, "/api/v1/dimensions").hasRole("MANAGER")
-                        .requestMatchers(HttpMethod.POST, "/api/v1/dimensions").hasRole("MANAGER")
-                        .requestMatchers(HttpMethod.GET, "/api/v1/dimensions/**").hasAnyRole("MANAGER", "DEVELOPER")
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(ex -> ex

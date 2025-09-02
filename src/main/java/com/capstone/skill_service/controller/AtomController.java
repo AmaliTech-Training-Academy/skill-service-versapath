@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -27,6 +28,7 @@ public class AtomController {
     private final AtomService atomService;
 
     @PostMapping()
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Create skill atom", description = "This end point allows only admin to create a skill atom")
     public ResponseEntity<ClientResponseFormatDto> createAtom(
             @Valid @RequestBody AtomRequestDto atomRequestDto
@@ -68,6 +70,7 @@ public class AtomController {
     }
 
     @DeleteMapping(name = "delete_atom", path = "/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Delete Atom",
             description = "The atom is delete using its id that is passed as parameter")
     public ResponseEntity<ClientResponseFormatDto> deleteAtom(@PathVariable UUID id){
@@ -83,6 +86,7 @@ public class AtomController {
     }
 
     @PatchMapping("/{atomId}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Update skill atom", description = "This end point allows admin to update a skill atom")
     public ResponseEntity<ClientResponseFormatDto> updateAtom(
             @Valid @RequestBody AtomUpdateRequestDto atomRequestDto, @PathVariable UUID atomId) {
@@ -97,6 +101,7 @@ public class AtomController {
     }
 
     @PutMapping
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Update skill atom status", description = "This end point allows admin to update a skill atom as a soft delete")
     public ResponseEntity<ClientResponseFormatDto> updateAtomStatus(
             @RequestParam UUID id, @RequestParam Status status) {

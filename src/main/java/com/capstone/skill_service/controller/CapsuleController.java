@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -28,6 +29,7 @@ public class CapsuleController {
     private final CapsuleService capsuleService;
 
     @PostMapping()
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Create skill capsule", description = "This end point allows only admin to create a skill capsule")
     public ResponseEntity<ClientResponseFormatDto> createCapsule(
             @Valid @RequestBody CapsuleRequestDto capsuleRequestDto
@@ -69,6 +71,7 @@ public class CapsuleController {
     }
 
     @DeleteMapping(name = "delete_capsule", path = "/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Delete Capsule",
             description = "The capsule is delete using its id that is passed as parameter")
     public ResponseEntity<ClientResponseFormatDto> deleteCapsule(@PathVariable UUID id){
@@ -84,6 +87,7 @@ public class CapsuleController {
     }
 
     @PatchMapping("/{capsuleId}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Update skill capsule", description = "This end point allows admin to update a skill capsule")
     public ResponseEntity<ClientResponseFormatDto> updateCapsule(
             @Valid @RequestBody CapsuleUpdateRequestDto capsuleRequestDto, @PathVariable UUID capsuleId) {
@@ -98,6 +102,7 @@ public class CapsuleController {
     }
 
     @PutMapping
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Update skill capsule status", description = "This end point allows admin to update a skill capsule as a soft delete")
     public ResponseEntity<ClientResponseFormatDto> updateCapsuleStatus(
             @RequestParam UUID id, @RequestParam Status status) {
@@ -112,6 +117,7 @@ public class CapsuleController {
     }
 
     @PatchMapping("/assignAtom/{capsuleId}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Assign new skill atom to capsule", description = "This end point allows admin to add new skill atom to capsule")
     public ResponseEntity<ClientResponseFormatDto> assignAtomToCapsule(
             @RequestBody AtomIdsRequestDto atomIds, @PathVariable UUID capsuleId) {
@@ -126,6 +132,7 @@ public class CapsuleController {
     }
 
     @DeleteMapping("/removeAtom")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Remove a skill atom from capsule", description = "This end point allows admin to remove a skill atom from capsule")
     public ResponseEntity<ClientResponseFormatDto> removeAtomFromCapsule(
             @RequestParam UUID capsuleId, @RequestParam UUID atomId) {
@@ -140,6 +147,7 @@ public class CapsuleController {
     }
 
     @PutMapping("/reorderAtom/{capsuleId}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Reorder new skill atom in capsule collection", description = "This end point allows admin " +
             "to shift atom sequence order in capsule however they want")
     public ResponseEntity<ClientResponseFormatDto> reorderAtom(
@@ -155,6 +163,7 @@ public class CapsuleController {
     }
 
     @PatchMapping("/assignTag/{capsuleId}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Assign new skill tag to capsule", description = "This end point allows admin to add new skill tag to capsule")
     public ResponseEntity<ClientResponseFormatDto> assignTagToCapsule(
             @RequestBody TagIdsRequestDto tagIds, @PathVariable UUID capsuleId) {
@@ -169,6 +178,7 @@ public class CapsuleController {
     }
 
     @DeleteMapping("/removeTag")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Remove a skill tag from capsule", description = "This end point allows admin to remove a skill tag from capsule")
     public ResponseEntity<ClientResponseFormatDto> removeTagFromCapsule(
             @RequestParam UUID capsuleId, @RequestParam UUID tagId) {
@@ -183,6 +193,7 @@ public class CapsuleController {
     }
 
     @PatchMapping("/assignCluster/{capsuleId}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Assign new skill cluster to capsule", description = "This end point allows admin to add new skill cluster to capsule")
     public ResponseEntity<ClientResponseFormatDto> assignClusterToCapsule(
             @RequestBody ClusterIdsRequestDto clusterIds, @PathVariable UUID capsuleId) {
@@ -197,6 +208,7 @@ public class CapsuleController {
     }
 
     @DeleteMapping("/removeCluster")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Remove a skill cluster from capsule", description = "This end point allows admin to remove a skill cluster from capsule")
     public ResponseEntity<ClientResponseFormatDto> removeClusterFromCapsule(
             @RequestParam UUID capsuleId, @RequestParam UUID clusterId) {
