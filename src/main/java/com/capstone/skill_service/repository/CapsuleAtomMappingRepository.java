@@ -29,5 +29,13 @@ public interface CapsuleAtomMappingRepository extends JpaRepository<CapsuleAtomM
     ORDER BY cam.sequenceOrder
 """)
     List<CapsuleAtomMappingEntity> findByCapsuleIdWithAtoms(@Param("capsuleId") UUID capsuleId);
+    @Query("""
+    SELECT cam
+    FROM CapsuleAtomMappingEntity cam
+    JOIN FETCH cam.atom
+    WHERE cam.atom.id = :atomId
+    ORDER BY cam.sequenceOrder
+""")
+    List<CapsuleAtomMappingEntity> findBySkillAtomId(@Param("atomId") UUID capsuleId);
 
 }
