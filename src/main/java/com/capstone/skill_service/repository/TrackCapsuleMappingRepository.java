@@ -20,4 +20,13 @@ public interface TrackCapsuleMappingRepository extends JpaRepository<TrackCapsul
 """)
     List<TrackCapsuleMappingEntity> findByTrackIdsWithCapsules(@Param("trackId") UUID trackId);
 
+    @Query("""
+    SELECT tc
+    FROM TrackCapsuleMappingEntity tc
+    JOIN FETCH tc.capsule
+    WHERE tc.capsule = :capsuleId
+    ORDER BY tc.sequenceOrder
+""")
+    List<TrackCapsuleMappingEntity> findBySkillCapsuleId(@Param("capsuleId") UUID capsuleId);
+
 }

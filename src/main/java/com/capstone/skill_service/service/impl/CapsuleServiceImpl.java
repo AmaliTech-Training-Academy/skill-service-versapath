@@ -38,6 +38,7 @@ public class CapsuleServiceImpl implements CapsuleService {
     private final AtomRepository atomRepository;
     private final TagRepository tagRepository;
     private final ClusterRepository clusterRepository;
+    private final TrackCapsuleMappingRepository trackCapsuleMappingRepository;
 
     @Override
     public CapsuleResponseDto create(CapsuleRequestDto dto) {
@@ -121,11 +122,14 @@ public class CapsuleServiceImpl implements CapsuleService {
     }
 
     @Override
-    @CacheEvict(value = "capsuleList", key = "#id")
+    @CacheEvict(value = "capsuleList", allEntries = true)
     public void deleteById(UUID id) {
         SkillCapsuleEntity capsule = findById(id)
                 .orElseThrow( () -> new CapsuleNotFoundException("A Skill capsule provided doesn't exist")
                 );
+        // first delete all the reference
+        List<TrackCapsuleMappingEntity> mappings = trackCapsuleMappingRepository.findBySkillCapsuleId(id);
+        trackCapsuleMappingRepository.deleteAll(mappings);
 
         logger.info("Skill capsule {} deleted", capsule.getName());
 
@@ -144,7 +148,7 @@ public class CapsuleServiceImpl implements CapsuleService {
     @Override
     @Caching(
             evict = @CacheEvict(value = "capsuleList", allEntries = true), // to update the entire list
-            put = @CachePut(value = "capsule", key = "#result.id") // Different cache name for individual capsule
+            put = @CachePut(value = "capsuleWithDetails", key = "#result.id") // Different cache name for individual capsule
     )
     public CapsuleResponseDto partialUpdate(CapsuleUpdateRequestDto dto, UUID id) {
         SkillCapsuleEntity capsule = findById(id)
@@ -202,7 +206,7 @@ public class CapsuleServiceImpl implements CapsuleService {
     @Override
     @Caching(
             evict = @CacheEvict(value = "capsuleList", allEntries = true), // to update the entire list
-            put = @CachePut(value = "capsule", key = "#result.id") // Different cache name for individual capsule
+            put = @CachePut(value = "capsuleWithDetails", key = "#result.id") // Different cache name for individual capsule
     )
     public CapsuleResponseDto updateStatus(Status status, UUID id) {
         SkillCapsuleEntity capsule = findById(id)
@@ -221,7 +225,7 @@ public class CapsuleServiceImpl implements CapsuleService {
     @Override
     @Caching(
             evict = @CacheEvict(value = "capsuleList", allEntries = true), // to update the entire list
-            put = @CachePut(value = "capsule", key = "#result.id") // Different cache name for individual capsule
+            put = @CachePut(value = "capsuleWithDetails", key = "#result.id") // Different cache name for individual capsule
     )
     public CapsuleResponseDto assignAtomToCapsule(UUID capsuleId, AtomIdsRequestDto dto){
         SkillCapsuleEntity capsuleEntity = findById(capsuleId)
@@ -273,7 +277,10 @@ public class CapsuleServiceImpl implements CapsuleService {
 
     @Override
     @Transactional
-    @Caching(evict = @CacheEvict(value = "capsuleList", key = "#result.id"))
+    @Caching(
+            evict = @CacheEvict(value = "capsuleList", allEntries = true), // to update the entire list
+            put = @CachePut(value = "capsuleWithDetails", key = "#result.id") // Different cache name for individual capsule
+    )
     public CapsuleResponseDto removeAtomFromCapsule(UUID capsuleId, UUID atomId) {
         SkillCapsuleEntity capsuleEntity = findById(capsuleId)
                 .orElseThrow(() -> new CapsuleNotFoundException("A Skill capsule provided doesn't exist"));
@@ -300,7 +307,7 @@ public class CapsuleServiceImpl implements CapsuleService {
     @Override
     @Caching(
             evict = @CacheEvict(value = "capsuleList", allEntries = true), // to update the entire list
-            put = @CachePut(value = "capsule", key = "#result.id") // Different cache name for individual capsule
+            put = @CachePut(value = "capsuleWithDetails", key = "#result.id") // Different cache name for individual capsule
     )
     public CapsuleResponseDto reorderAtoms(UUID capsuleId, List<UUID> orderedAtomIds) {
         SkillCapsuleEntity capsuleEntity = findById(capsuleId)
@@ -381,7 +388,7 @@ public class CapsuleServiceImpl implements CapsuleService {
     @Override
     @Caching(
             evict = @CacheEvict(value = "capsuleList", allEntries = true), // to update the entire list
-            put = @CachePut(value = "capsule", key = "#result.id") // Different cache name for individual capsule
+            put = @CachePut(value = "capsuleWithDetails", key = "#result.id") // Different cache name for individual capsule
     )
     public CapsuleResponseDto assignTagToCapsule(UUID capsuleId, TagIdsRequestDto dto){
         SkillCapsuleEntity capsuleEntity = findById(capsuleId)
@@ -400,7 +407,10 @@ public class CapsuleServiceImpl implements CapsuleService {
 
     @Override
     @Transactional
-    @Caching(evict = @CacheEvict(value = "capsuleList", key = "#result.id"))
+    @Caching(
+            evict = @CacheEvict(value = "capsuleList", allEntries = true), // to update the entire list
+            put = @CachePut(value = "capsuleWithDetails", key = "#result.id") // Different cache name for individual capsule
+    )
     public CapsuleResponseDto removeTagFromCapsule(UUID capsuleId, UUID tagId) {
         SkillCapsuleEntity capsuleEntity = findById(capsuleId)
                 .orElseThrow(() -> new CapsuleNotFoundException("A Skill capsule provided doesn't exist"));
@@ -422,7 +432,7 @@ public class CapsuleServiceImpl implements CapsuleService {
     @Override
     @Caching(
             evict = @CacheEvict(value = "capsuleList", allEntries = true), // to update the entire list
-            put = @CachePut(value = "capsule", key = "#result.id") // Different cache name for individual capsule
+            put = @CachePut(value = "capsuleWithDetails", key = "#result.id") // Different cache name for individual capsule
     )
     public CapsuleResponseDto assignClusterToCapsule(UUID capsuleId, ClusterIdsRequestDto dto){
         SkillCapsuleEntity capsuleEntity = findById(capsuleId)
@@ -441,7 +451,10 @@ public class CapsuleServiceImpl implements CapsuleService {
 
     @Override
     @Transactional
-    @Caching(evict = @CacheEvict(value = "capsuleList", key = "#result.id"))
+    @Caching(
+            evict = @CacheEvict(value = "capsuleList", allEntries = true), // to update the entire list
+            put = @CachePut(value = "capsuleWithDetails", key = "#result.id") // Different cache name for individual capsule
+    )
     public CapsuleResponseDto removeClusterFromCapsule(UUID capsuleId, UUID clusterId) {
         SkillCapsuleEntity capsuleEntity = findById(capsuleId)
                 .orElseThrow(() -> new CapsuleNotFoundException("A Skill capsule provided doesn't exist"));
