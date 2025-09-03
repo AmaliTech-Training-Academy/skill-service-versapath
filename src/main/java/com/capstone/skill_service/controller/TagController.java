@@ -35,7 +35,7 @@ public class TagController {
     ) {
         TagResponseDto savedTag = this.tagService.create(tagRequestDto);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
-                .status(true)
+                .success(true)
                 .message("Tag created successfully!")
                 .errors(null)
                 .data(Map.of("item", savedTag))
@@ -48,7 +48,7 @@ public class TagController {
     public ResponseEntity<ClientResponseFormatDto> fetchAllTags(Pageable pageable) {
         CustomPageResponse<TagResponseDto> tags = this.tagService.findAll(pageable);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
-                .status(true)
+                .success(true)
                 .message("Fetch all tags")
                 .errors(null)
                 .data(tags)
@@ -61,7 +61,7 @@ public class TagController {
     public ResponseEntity<ClientResponseFormatDto> retrieveSingleTag(@PathVariable UUID tagId) {
         TagResponseDto tag = this.tagService.getTag(tagId);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
-                .status(true)
+                .success(true)
                 .message("Tag retrieved successfully")
                 .errors(null)
                 .data(Map.of("item", tag))
@@ -76,7 +76,7 @@ public class TagController {
     public ResponseEntity<ClientResponseFormatDto> deleteTag(@PathVariable UUID id){
         this.tagService.deleteById(id);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
-                .status(true)
+                .success(true)
                 .message("Tag deleted successfully!")
                 .errors(null)
                 .data(null)
@@ -92,7 +92,7 @@ public class TagController {
 
         TagResponseDto updatedTag = this.tagService.partialUpdate(tagRequestDto, tagId);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
-                .status(true)
+                .success(true)
                 .message("Tag updated successfully!")
                 .errors(null)
                 .data(Map.of("item", updatedTag))
@@ -106,7 +106,7 @@ public class TagController {
             @RequestParam UUID id, @RequestParam Status status) {
         TagResponseDto updatedTag = this.tagService.updateStatus(status, id);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
-                .status(true)
+                .success(true)
                 .message("Tag status updated successfully!")
                 .errors(null)
                 .data(Map.of("item", updatedTag))

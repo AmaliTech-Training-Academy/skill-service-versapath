@@ -11,8 +11,8 @@ import java.util.Map;
 @AllArgsConstructor
 @Builder
 public class ClientResponseFormatDto {
-    private Boolean status;
+    private Boolean success;
     private String message;
     private Object data;
-    private List<Map<String, String>> errors;
+    private List<String> errors;
 }

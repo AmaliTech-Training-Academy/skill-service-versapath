@@ -35,7 +35,7 @@ public class AtomController {
     ) {
         AtomResponseDto savedAtom = this.atomService.create(atomRequestDto);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
-                .status(true)
+                .success(true)
                 .message("Atom created successfully!")
                 .errors(null)
                 .data(Map.of("item", savedAtom))
@@ -48,7 +48,7 @@ public class AtomController {
     public ResponseEntity<ClientResponseFormatDto> fetchAllAtoms(Pageable pageable) {
         CustomPageResponse<AtomResponseDto> atoms = this.atomService.findAll(pageable);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
-                .status(true)
+                .success(true)
                 .message("Fetch all atoms")
                 .errors(null)
                 .data(atoms)
@@ -61,7 +61,7 @@ public class AtomController {
     public ResponseEntity<ClientResponseFormatDto> retrieveSingleAtom(@PathVariable UUID atomId) {
         AtomResponseDto atom = this.atomService.getAtom(atomId);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
-                .status(true)
+                .success(true)
                 .message("Atom retrieved successfully")
                 .errors(null)
                 .data(Map.of("item", atom))
@@ -76,7 +76,7 @@ public class AtomController {
     public ResponseEntity<ClientResponseFormatDto> deleteAtom(@PathVariable UUID id){
         this.atomService.deleteById(id);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
-                .status(true)
+                .success(true)
                 .message("Atom deleted successfully!")
                 .errors(null)
                 .data(null)
@@ -92,7 +92,7 @@ public class AtomController {
             @Valid @RequestBody AtomUpdateRequestDto atomRequestDto, @PathVariable UUID atomId) {
         AtomResponseDto updatedAtom = this.atomService.partialUpdate(atomRequestDto, atomId);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
-                .status(true)
+                .success(true)
                 .message("Atom updated successfully!")
                 .errors(null)
                 .data(Map.of("item", updatedAtom))
@@ -107,7 +107,7 @@ public class AtomController {
             @RequestParam UUID id, @RequestParam Status status) {
         AtomResponseDto updatedAtom = this.atomService.updateStatus(status, id);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
-                .status(true)
+                .success(true)
                 .message("Atom status updated successfully!")
                 .errors(null)
                 .data(Map.of("item", updatedAtom))

@@ -25,7 +25,7 @@ public class GlobalException {
             (TagExistsException exception) {
 
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
-                .status(false)
+                .success(false)
                 .message(exception.getMessage())
                 .errors(null)
                 .data(null)
@@ -38,7 +38,7 @@ public class GlobalException {
             (ClusterExistsException exception) {
 
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
-                .status(false)
+                .success(false)
                 .message(exception.getMessage())
                 .errors(null)
                 .data(null)
@@ -50,7 +50,7 @@ public class GlobalException {
     public ResponseEntity<?> handleTagNotFound(
             TagNotFoundException exception) {
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
-                .status(false)
+                .success(false)
                 .message(exception.getMessage())
                 .errors(null)
                 .data(null)
@@ -63,7 +63,7 @@ public class GlobalException {
     public ResponseEntity<?> handleClusterNotFound(
             ClusterNotFoundException exception) {
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
-                .status(false)
+                .success(false)
                 .message(exception.getMessage())
                 .errors(null)
                 .data(null)
@@ -77,7 +77,7 @@ public class GlobalException {
             (Exception exception) {
 
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
-                .status(false)
+                .success(false)
                 .message(exception.getMessage())
                 .errors(null)
                 .data(null)
@@ -90,7 +90,7 @@ public class GlobalException {
             (Exception exception) {
 
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
-                .status(false)
+                .success(false)
                 .message(exception.getMessage())
                 .errors(null)
                 .data(null)
@@ -103,7 +103,7 @@ public class GlobalException {
     public ResponseEntity<?> handle404(NoHandlerFoundException exception) {
 
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
-                .status(false)
+                .success(false)
                 .message(exception.getMessage())
                 .errors(null)
                 .data(null)
@@ -114,7 +114,7 @@ public class GlobalException {
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<?> handleUnauthorized(AccessDeniedException exception) {
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
-                .status(false)
+                .success(false)
                 .message(exception.getMessage())
                 .errors(null)
                 .data(null)
@@ -132,17 +132,19 @@ public class GlobalException {
              "email":[error1,error2]
             }
         */
+        List<String> listOfErrors = new ArrayList<>();
         ex.getBindingResult().getFieldErrors().forEach(error -> {
             String field = error.getField();
             String message = error.getDefaultMessage();
+            listOfErrors.add(message);
 
             errors.computeIfAbsent(field, key -> new ArrayList<>()).add(message);
         });
 
         ClientResponseFormValidationErrorDto response = ClientResponseFormValidationErrorDto.builder()
-                .status(false)
+                .success(false)
                 .message("Form validation Error!")
-                .errors(List.of(errors))
+                .errors(listOfErrors)
                 .data(null)
                 .build();
 
@@ -153,7 +155,7 @@ public class GlobalException {
     public ResponseEntity<?> handleAtomNotFound(
             AtomNotFoundException exception) {
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
-                .status(false)
+                .success(false)
                 .message(exception.getMessage())
                 .errors(null)
                 .data(null)
@@ -167,7 +169,7 @@ public class GlobalException {
             (AtomExistsException exception) {
 
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
-                .status(false)
+                .success(false)
                 .message(exception.getMessage())
                 .errors(null)
                 .data(null)
@@ -179,7 +181,7 @@ public class GlobalException {
     public ResponseEntity<?> handleCapsuleNotFound(
             CapsuleNotFoundException exception) {
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
-                .status(false)
+                .success(false)
                 .message(exception.getMessage())
                 .errors(null)
                 .data(null)
@@ -193,7 +195,7 @@ public class GlobalException {
             (CapsuleExistsException exception) {
 
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
-                .status(false)
+                .success(false)
                 .message(exception.getMessage())
                 .errors(null)
                 .data(null)
@@ -206,7 +208,7 @@ public class GlobalException {
             (AlreadyAssignedException exception) {
 
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
-                .status(false)
+                .success(false)
                 .message(exception.getMessage())
                 .errors(null)
                 .data(null)
@@ -219,7 +221,7 @@ public class GlobalException {
             (InvalidAtomIdsException exception) {
 
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
-                .status(false)
+                .success(false)
                 .message(exception.getMessage())
                 .errors(null)
                 .data(null)
@@ -231,7 +233,7 @@ public class GlobalException {
     public ResponseEntity<?> handleTrackNotFound(
             TrackNotFoundException exception) {
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
-                .status(false)
+                .success(false)
                 .message(exception.getMessage())
                 .errors(null)
                 .data(null)
@@ -245,7 +247,7 @@ public class GlobalException {
             (TrackExistsException exception) {
 
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
-                .status(false)
+                .success(false)
                 .message(exception.getMessage())
                 .errors(null)
                 .data(null)
@@ -258,9 +260,9 @@ public class GlobalException {
             (RouteExistsException exception) {
 
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
-                .status(false)
+                .success(false)
                 .message(exception.getMessage())
-                .errors(List.of(Map.of("message", exception.getMessage())))
+                .errors(null)
                 .data(null)
                 .build();
         return new ResponseEntity<>(response, HttpStatus.CONFLICT);
@@ -270,9 +272,9 @@ public class GlobalException {
     public ResponseEntity<?> handleRouteNotFound(
             RouteNotFoundException exception) {
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
-                .status(false)
+                .success(false)
                 .message(exception.getMessage())
-                .errors(List.of(Map.of("message", exception.getMessage())))
+                .errors(null)
                 .data(null)
                 .build();
 
@@ -284,9 +286,9 @@ public class GlobalException {
             (InvalidCapsuleIdsException exception) {
 
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
-                .status(false)
+                .success(false)
                 .message(exception.getMessage())
-                .errors(List.of(Map.of("message", exception.getMessage())))
+                .errors(null)
                 .data(null)
                 .build();
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
@@ -297,7 +299,7 @@ public class GlobalException {
             (InvalidTrackIdsException exception) {
 
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
-                .status(false)
+                .success(false)
                 .message(exception.getMessage())
                 .errors(null)
                 .data(null)
@@ -308,7 +310,7 @@ public class GlobalException {
     @ExceptionHandler(FileException.class)
     public ResponseEntity<?> handleFileException(FileException exception) {
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
-                .status(false)
+                .success(false)
                 .message(exception.getMessage())
                 .errors(null)
                 .data(null)
@@ -320,7 +322,7 @@ public class GlobalException {
     @ExceptionHandler(HeaderException.class)
     public ResponseEntity<?> handleHeaderException(HeaderException exception) {
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
-                .status(false)
+                .success(false)
                 .message(exception.getMessage())
                 .errors(null)
                 .data(null)
