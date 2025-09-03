@@ -42,6 +42,14 @@ public class ClusterEntity {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
+    // remove cluster first from mapping entity before deleting actual cluster
+    @PreRemove
+    private void removeAssociations() {
+        for (SkillCapsuleEntity capsule : capsules) {
+            capsule.getClusters().remove(this);
+        }
+    }
+
     //compare using id
     @Override
     public boolean equals(Object o) {

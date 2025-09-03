@@ -40,6 +40,14 @@ public class TagEntity {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
+    // remove tag first from mapping entity before deleting actual tag
+    @PreRemove
+    private void removeAssociations() {
+        for (SkillCapsuleEntity capsule : capsules) {
+            capsule.getTags().remove(this);
+        }
+    }
+
     //compare using id
     @Override
     public boolean equals(Object o) {
