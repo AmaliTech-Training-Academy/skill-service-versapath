@@ -7,8 +7,10 @@ import com.capstone.skill_service.dto.atom.AtomUpdateRequestDto;
 import com.capstone.skill_service.exception.AtomExistsException;
 import com.capstone.skill_service.exception.AtomNotFoundException;
 import com.capstone.skill_service.mapper.AtomMapper;
+import com.capstone.skill_service.model.CapsuleAtomMappingEntity;
 import com.capstone.skill_service.model.SkillAtomEntity;
 import com.capstone.skill_service.repository.AtomRepository;
+import com.capstone.skill_service.repository.CapsuleAtomMappingRepository;
 import com.capstone.skill_service.service.AtomService;
 import com.capstone.skill_service.util.Status;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +25,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -32,6 +35,7 @@ public class AtomServiceImpl implements AtomService {
     private static final Logger logger = LoggerFactory.getLogger(AtomServiceImpl.class);
     private final AtomRepository atomRepository;
     private final AtomMapper atomMapper;
+    private final CapsuleAtomMappingRepository capsuleAtomMappingRepository;
 
     @Override
     public AtomResponseDto create(AtomRequestDto dto) {
@@ -91,10 +95,14 @@ public class AtomServiceImpl implements AtomService {
     }
 
     @Override
+    @CacheEvict(value = "atomList",  allEntries = true)
     public void deleteById(UUID id) {
         SkillAtomEntity atom = findById(id)
                 .orElseThrow( () -> new AtomNotFoundException("A Skill atom provided doesn't exist")
                 );
+        // first delete all the reference
+        List<CapsuleAtomMappingEntity> mappings = capsuleAtomMappingRepository.findBySkillAtomId(id);
+        capsuleAtomMappingRepository.deleteAll(mappings);
 
         logger.info("Skill atom {} deleted", atom.getName());
 
