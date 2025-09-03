@@ -38,6 +38,7 @@ public class AtomServiceImpl implements AtomService {
     private final CapsuleAtomMappingRepository capsuleAtomMappingRepository;
 
     @Override
+    @CacheEvict(value = "atomList",  allEntries = true)
     public AtomResponseDto create(AtomRequestDto dto) {
         if(findByName(dto.getName()).isPresent()){
             throw new AtomExistsException(

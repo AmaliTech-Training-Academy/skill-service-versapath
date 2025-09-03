@@ -1,6 +1,7 @@
 package com.capstone.skill_service.repository;
 
 import com.capstone.skill_service.model.RouteTrackMappingEntity;
+import com.capstone.skill_service.model.TrackCapsuleMappingEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -19,5 +20,14 @@ public interface RouteTrackMappingRepository extends JpaRepository<RouteTrackMap
     ORDER BY rt.talentRoute.id, rt.sequenceOrder
 """)
     List<RouteTrackMappingEntity> findByTrackIdsWithCapsules(@Param("trackId") UUID trackId);
+
+    @Query("""
+    SELECT rt
+    FROM RouteTrackMappingEntity rt
+    JOIN FETCH rt.growthTrack
+    WHERE rt.growthTrack = :trackId
+    ORDER BY rt.sequenceOrder
+""")
+    List<RouteTrackMappingEntity> findByTrackId(@Param("trackId") UUID trackId);
 
 }
