@@ -33,6 +33,8 @@ public class SkillAtomEntity {
     @Enumerated(EnumType.STRING)
     private Status status;
 
+    private String type;
+
     private int moodleSectionId; // id from moodle database on section table
     private int estimatedHours;
     private LocalDateTime createdAt;

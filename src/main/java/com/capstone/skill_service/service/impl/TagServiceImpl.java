@@ -14,7 +14,10 @@ import com.capstone.skill_service.util.Status;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -31,6 +34,7 @@ public class TagServiceImpl implements TagService {
     private final TagMapper tagMapper;
 
     @Override
+    @CacheEvict(value = "tagList", allEntries = true)
     public TagResponseDto create(TagRequestDto dto) {
         if(findByName(dto.getName()).isPresent()){
             throw new TagExistsException(
@@ -77,6 +81,7 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
+    @CacheEvict(value = "capsuleList", allEntries = true)
     public void deleteById(UUID id) {
         TagEntity tag = findById(id)
                 .orElseThrow( () -> new TagNotFoundException("A tag provided doesn't exist")
@@ -88,6 +93,7 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
+    @Cacheable(value = "tag", key = "#id")
     public TagResponseDto getTag(UUID id) {
         TagEntity tag = findById(id)
                 .orElseThrow( () -> new TagNotFoundException("A tag provided doesn't exist")
@@ -99,6 +105,10 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
+    @Caching(
+            evict = @CacheEvict(value = "tagList", allEntries = true), // to update the entire list
+            put = @CachePut(value = "tag", key = "#result.id") // Different cache name for individual track
+    )
     public TagResponseDto partialUpdate(TagUpdateRequestDto dto, UUID id) {
         TagEntity tag = findById(id)
                 .orElseThrow( () -> new TagNotFoundException("A tag provided doesn't exist")
@@ -128,6 +138,10 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
+    @Caching(
+            evict = @CacheEvict(value = "tagList", allEntries = true), // to update the entire list
+            put = @CachePut(value = "tag", key = "#result.id") // Different cache name for individual track
+    )
     public TagResponseDto updateStatus(Status status, UUID id) {
         TagEntity tag = findById(id)
                 .orElseThrow( () -> new TagNotFoundException("A tag provided doesn't exist")

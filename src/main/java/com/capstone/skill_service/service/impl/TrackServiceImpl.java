@@ -37,8 +37,10 @@ public class TrackServiceImpl implements TrackService {
     private final CapsuleMapper capsuleMapper;
     private final CapsuleService capsuleService;
     private final TrackCapsuleMappingRepository trackCapsuleMappingRepository;
+    private final RouteTrackMappingRepository routeTrackMappingRepository;
 
     @Override
+    @CacheEvict(value = "growthTrackList",  allEntries = true)
     public TrackResponseDto create(TrackRequestDto dto) {
         if(findByName(dto.getName()).isPresent()){
             throw new TrackExistsException(
@@ -123,7 +125,7 @@ public class TrackServiceImpl implements TrackService {
     }
 
     @Override
-    @Cacheable(value = "growthTrack", key = "#trackId")
+    @Cacheable(value = "track", key = "#trackId")
     public TrackWithCapsuleResponseDto getTrackWithCapsules(UUID trackId) {
         GrowthTrackEntity track = trackRepository.findByIdWithCapsules(trackId)
                 .orElseThrow(() -> new TrackNotFoundException("A Growth Track not found"));
@@ -172,6 +174,7 @@ public class TrackServiceImpl implements TrackService {
 
 
     @Override
+    @Cacheable(value = "track", key = "#id")
     public TrackResponseDto getTrack(UUID id) {
         GrowthTrackEntity track = findById(id)
                 .orElseThrow( () -> new TrackNotFoundException("A growth track provided doesn't exist")
@@ -183,19 +186,23 @@ public class TrackServiceImpl implements TrackService {
     }
 
     @Override
+    @CacheEvict(value = "growthTrackList", allEntries = true)
     public void deleteById(UUID id) {
         GrowthTrackEntity track = findById(id)
                 .orElseThrow( () -> new TrackNotFoundException("A growth track provided doesn't exist")
                 );
+        // first delete all the reference
+        List<RouteTrackMappingEntity> mappings = routeTrackMappingRepository.findByTrackId(id);
+        routeTrackMappingRepository.deleteAll(mappings);
 
         logger.info("Growth track {} deleted", track.getName());
 
-        this.capsuleRepository.deleteById(id);
+        this.trackRepository.deleteById(id);
     }
 
     @Override
     @Caching(
-            evict = @CacheEvict(value = "trackList", allEntries = true), // to update the entire list
+            evict = @CacheEvict(value = "growthTrackList", allEntries = true), // to update the entire list
             put = @CachePut(value = "track", key = "#result.id") // Different cache name for individual track
     )
     public TrackResponseDto partialUpdate(TrackUpdateRequestDto dto, UUID id) {
@@ -235,6 +242,10 @@ public class TrackServiceImpl implements TrackService {
     }
 
     @Override
+    @Caching(
+            evict = @CacheEvict(value = "growthTrackList", allEntries = true), // to update the entire list
+            put = @CachePut(value = "track", key = "#result.id") // Different cache name for individual track
+    )
     public TrackResponseDto updateStatus(Status status, UUID id) {
         GrowthTrackEntity track = findById(id)
                 .orElseThrow( () -> new TrackNotFoundException("A growth track provided doesn't exist")
@@ -247,7 +258,7 @@ public class TrackServiceImpl implements TrackService {
 
     @Override
     @Caching(
-            evict = @CacheEvict(value = "trackList", allEntries = true), // to update the entire list
+            evict = @CacheEvict(value = "growthTrackList", allEntries = true), // to update the entire list
             put = @CachePut(value = "track", key = "#result.id") // Different cache name for individual track
     )
     public TrackResponseDto assignCapsuleToTrack(UUID trackId, CapsuleIdsRequestDto dto) {
@@ -264,6 +275,10 @@ public class TrackServiceImpl implements TrackService {
     }
 
     @Override
+    @Caching(
+            evict = @CacheEvict(value = "growthTrackList", allEntries = true), // to update the entire list
+            put = @CachePut(value = "track", key = "#result.id") // Different cache name for individual track
+    )
     public TrackResponseDto removeCapsuleFromTrack(UUID trackId, UUID capsuleId) {
         GrowthTrackEntity trackEntity = findById(trackId)
                 .orElseThrow(() -> new TrackNotFoundException("A growth track provided doesn't exist"));
@@ -288,6 +303,10 @@ public class TrackServiceImpl implements TrackService {
     }
 
     @Override
+    @Caching(
+            evict = @CacheEvict(value = "growthTrackList", allEntries = true), // to update the entire list
+            put = @CachePut(value = "track", key = "#result.id") // Different cache name for individual track
+    )
     public TrackResponseDto reorderCapsules(UUID trackId, List<UUID> orderedCapsuleIds) {
         GrowthTrackEntity trackEntity = findById(trackId)
                 .orElseThrow( () -> new TrackNotFoundException("A growth track provided doesn't exist")

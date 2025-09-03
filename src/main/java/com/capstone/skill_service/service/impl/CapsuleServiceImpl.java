@@ -41,6 +41,7 @@ public class CapsuleServiceImpl implements CapsuleService {
     private final TrackCapsuleMappingRepository trackCapsuleMappingRepository;
 
     @Override
+    @CacheEvict(value = "capsuleList",  allEntries = true)
     public CapsuleResponseDto create(CapsuleRequestDto dto) {
         if(findByName(dto.getName()).isPresent()){
             throw new CapsuleExistsException(

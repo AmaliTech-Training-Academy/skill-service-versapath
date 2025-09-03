@@ -45,6 +45,7 @@ public class ClusterServiceImpl implements ClusterService {
     private final FileStorageService fileStorageService;
 
     @Override
+    @CacheEvict(value = "clusterList",allEntries = true)
     public ClusterResponseDto create(ClusterRequestDto dto, MultipartFile image) {
         if(findByName(dto.getName()).isPresent()){
             throw new ClusterExistsException(
@@ -56,9 +57,9 @@ public class ClusterServiceImpl implements ClusterService {
         clusterEntity.setCreatedAt(LocalDateTime.now());
         clusterEntity.setUpdatedAt(LocalDateTime.now());
         clusterEntity.setStatus(Status.ACTIVE);
-        if(image != null){
+       /* if(image != null){
             clusterEntity.setImageName(getImageName(image)); //upload image
-        }
+        } */
 
         logger.info("Admin created skill cluster: {}", clusterEntity.getName());
 
@@ -103,7 +104,7 @@ public class ClusterServiceImpl implements ClusterService {
     }
 
     @Override
-    @CacheEvict(value = "clusterList", key = "#id")
+    @CacheEvict(value = "clusterList",allEntries = true)
     public void deleteById(UUID id) {
         ClusterEntity cluster = findById(id)
                 .orElseThrow( () -> new ClusterNotFoundException("A cluster provided doesn't exist")

@@ -11,6 +11,7 @@ import com.capstone.skill_service.service.ClusterService;
 import com.capstone.skill_service.util.Status;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -34,17 +35,9 @@ public class ClusterController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Create skill cluster", description = "This end point allows only admin to create a skill cluster")
     public ResponseEntity<ClientResponseFormatDto> createCluster(
-            @RequestParam("name") String name,
-            @RequestParam("type") String type,
-            @RequestParam("description") String description,
-            @RequestParam(value = "image", required = false) MultipartFile image
-    )throws IOException {
-        ClusterRequestDto clusterRequestDto = ClusterRequestDto.builder()
-                .name(name)
-                .type(type)
-                .description(description)
-                .build();
-        ClusterResponseDto savedCluster = this.clusterService.create(clusterRequestDto, image);
+            @Valid @RequestBody ClusterRequestDto clusterRequestDto
+            ) {
+        ClusterResponseDto savedCluster = this.clusterService.create(clusterRequestDto, null);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
                 .status(true)
                 .message("Cluster created successfully!")
