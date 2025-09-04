@@ -1,6 +1,5 @@
 package com.capstone.skill_service.repository;
 
-import com.capstone.skill_service.model.GrowthTrackEntity;
 import com.capstone.skill_service.model.TalentRouteEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,8 +19,9 @@ public interface RouteRepository extends JpaRepository<TalentRouteEntity, UUID> 
     @Query("""
         SELECT tr
         FROM TalentRouteEntity tr
-        LEFT JOIN FETCH tr.tracks gt
-        where tr.id = :id
+        LEFT JOIN FETCH tr.tracks mt
+        LEFT JOIN FETCH mt.growthTrack gt
+        WHERE tr.id = :id
     """)
     Optional<TalentRouteEntity> findByIdWithGrowthTracks(@Param("id") UUID id);
 

@@ -31,7 +31,7 @@ public interface TrackMapper {
     @Mapping(target = "estimatedMonths", source = "growthTrack.estimatedMonths")
     @Mapping(target = "status", source = "growthTrack.status")
     @Mapping(target = "description", source = "growthTrack.description")
-    @Mapping(target = "capsules", source = "growthTrack.skillCapsules")
+    @Mapping(target = "capsules", ignore = true)
     @Mapping(target = "sequenceOrder", source = "sequenceOrder")
     TrackInSequenceOrderResponseDto toInSequenceOrderDto(RouteTrackMappingEntity mapping);
 
