@@ -11,8 +11,8 @@ import java.util.Map;
 @AllArgsConstructor
 @Builder
 public class ClientResponseFormValidationErrorDto {
-    private Boolean status;
+    private Boolean success;
     private String message;
     private Object data;
-    private List<Map<String, List<String>>> errors;
+    private List<String> errors;
 }

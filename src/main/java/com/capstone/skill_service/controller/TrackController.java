@@ -37,7 +37,7 @@ public class TrackController {
     ) {
         TrackResponseDto savedTrack = this.trackService.create(trackRequestDto);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
-                .status(true)
+                .success(true)
                 .message("Track created successfully!")
                 .errors(null)
                 .data(Map.of("item", savedTrack))
@@ -50,7 +50,7 @@ public class TrackController {
     public ResponseEntity<ClientResponseFormatDto> fetchAllTracks(Pageable pageable) {
         CustomPageResponse<TrackResponseDto> tracks = this.trackService.findAll(pageable);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
-                .status(true)
+                .success(true)
                 .message("Fetch all growth tracks")
                 .errors(null)
                 .data(tracks)
@@ -63,7 +63,7 @@ public class TrackController {
     public ResponseEntity<ClientResponseFormatDto> retrieveSingleTrack(@PathVariable UUID trackId) {
         TrackWithCapsuleResponseDto track = this.trackService.getTrackWithCapsules(trackId);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
-                .status(true)
+                .success(true)
                 .message("Track retrieved successfully")
                 .errors(null)
                 .data(Map.of("item", track))
@@ -78,7 +78,7 @@ public class TrackController {
     public ResponseEntity<ClientResponseFormatDto> deleteTrack(@PathVariable UUID id){
         this.trackService.deleteById(id);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
-                .status(true)
+                .success(true)
                 .message("Growth Track deleted successfully!")
                 .errors(null)
                 .data(null)
@@ -94,7 +94,7 @@ public class TrackController {
             @Valid @RequestBody TrackUpdateRequestDto trackRequestDto, @PathVariable UUID trackId) {
         TrackResponseDto updatedTrack = this.trackService.partialUpdate(trackRequestDto, trackId);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
-                .status(true)
+                .success(true)
                 .message("Growth Track updated successfully!")
                 .errors(null)
                 .data(Map.of("item", updatedTrack))
@@ -109,7 +109,7 @@ public class TrackController {
             @RequestParam UUID id, @RequestParam Status status) {
         TrackResponseDto updatedTrack = this.trackService.updateStatus(status, id);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
-                .status(true)
+                .success(true)
                 .message("Growth Track status updated successfully!")
                 .errors(null)
                 .data(Map.of("item", updatedTrack))
@@ -124,7 +124,7 @@ public class TrackController {
             @RequestBody CapsuleIdsRequestDto atomIds, @PathVariable UUID trackId) {
         TrackResponseDto updatedTrack = this.trackService.assignCapsuleToTrack(trackId, atomIds);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
-                .status(true)
+                .success(true)
                 .message("Capsules added to a growth track successfully!")
                 .errors(null)
                 .data(Map.of("item", updatedTrack))
@@ -139,7 +139,7 @@ public class TrackController {
             @RequestParam UUID trackId, @RequestParam UUID capsuleId) {
         TrackResponseDto updatedTrack = this.trackService.removeCapsuleFromTrack(trackId, capsuleId);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
-                .status(true)
+                .success(true)
                 .message("Capsule removed from track successfully!")
                 .errors(null)
                 .data(Map.of("item", updatedTrack))
@@ -155,7 +155,7 @@ public class TrackController {
             @RequestBody CapsuleIdsRequestDto atomIds, @PathVariable UUID trackId) {
         TrackResponseDto updatedTrack = this.trackService.reorderCapsules(trackId, atomIds.getCapsuleIds());
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
-                .status(true)
+                .success(true)
                 .message("Capsules reordered in track successfully!")
                 .errors(null)
                 .data(Map.of("item", updatedTrack))

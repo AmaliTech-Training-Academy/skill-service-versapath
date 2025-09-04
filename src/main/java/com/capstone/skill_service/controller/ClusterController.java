@@ -39,7 +39,7 @@ public class ClusterController {
             ) {
         ClusterResponseDto savedCluster = this.clusterService.create(clusterRequestDto, null);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
-                .status(true)
+                .success(true)
                 .message("Cluster created successfully!")
                 .errors(null)
                 .data(Map.of("item", savedCluster))
@@ -52,7 +52,7 @@ public class ClusterController {
     public ResponseEntity<ClientResponseFormatDto> fetchAllClusters(Pageable pageable) {
         CustomPageResponse<ClusterResponseDto> clusters = this.clusterService.findAll(pageable);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
-                .status(true)
+                .success(true)
                 .message("Fetch all clusters")
                 .errors(null)
                 .data(clusters)
@@ -67,7 +67,7 @@ public class ClusterController {
     public ResponseEntity<ClientResponseFormatDto> deleteCluster(@PathVariable UUID id){
         this.clusterService.deleteById(id);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
-                .status(true)
+                .success(true)
                 .message("Cluster deleted successfully!")
                 .errors(null)
                 .data(null)
@@ -94,7 +94,7 @@ public class ClusterController {
                 .build();
         ClusterResponseDto updatedCluster = this.clusterService.partialUpdate(clusterRequestDto, clusterId, image);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
-                .status(true)
+                .success(true)
                 .message("Cluster updated successfully!")
                 .errors(null)
                 .data(Map.of("item", updatedCluster))
@@ -109,7 +109,7 @@ public class ClusterController {
             @RequestParam UUID id, @RequestParam Status status) {
         ClusterResponseDto updatedCluster = this.clusterService.updateStatus(status, id);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
-                .status(true)
+                .success(true)
                 .message("Cluster status updated successfully!")
                 .errors(null)
                 .data(Map.of("item", updatedCluster))
@@ -122,7 +122,7 @@ public class ClusterController {
     public ResponseEntity<ClientResponseFormatDto> retrieveSingleClusterWithCapsules(@PathVariable UUID clusterId) {
         ClusterWithCapsuleResponseDto cluster = this.clusterService.getClusterWithCapsules(clusterId);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
-                .status(true)
+                .success(true)
                 .message("Cluster retrieved successfully")
                 .errors(null)
                 .data(Map.of("item", cluster))

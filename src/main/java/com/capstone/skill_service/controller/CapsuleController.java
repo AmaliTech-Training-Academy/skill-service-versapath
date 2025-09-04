@@ -36,7 +36,7 @@ public class CapsuleController {
     ) {
         CapsuleResponseDto savedCapsule = this.capsuleService.create(capsuleRequestDto);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
-                .status(true)
+                .success(true)
                 .message("Capsule created successfully!")
                 .errors(null)
                 .data(Map.of("item", savedCapsule))
@@ -49,7 +49,7 @@ public class CapsuleController {
     public ResponseEntity<ClientResponseFormatDto> fetchAllCapsules(Pageable pageable) {
         CustomPageResponse<CapsuleOnlyResponseDto> capsules = this.capsuleService.findAll(pageable);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
-                .status(true)
+                .success(true)
                 .message("Fetch all capsules")
                 .errors(null)
                 .data(capsules)
@@ -62,7 +62,7 @@ public class CapsuleController {
     public ResponseEntity<ClientResponseFormatDto> retrieveSingleCapsule(@PathVariable UUID capsuleId) {
         CapsuleWithDetailsResponseDto capsule = this.capsuleService.getCapsuleWithDetails(capsuleId);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
-                .status(true)
+                .success(true)
                 .message("Capsule retrieved successfully")
                 .errors(null)
                 .data(Map.of("item", capsule))
@@ -77,7 +77,7 @@ public class CapsuleController {
     public ResponseEntity<ClientResponseFormatDto> deleteCapsule(@PathVariable UUID id){
         this.capsuleService.deleteById(id);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
-                .status(true)
+                .success(true)
                 .message("Capsule deleted successfully!")
                 .errors(null)
                 .data(null)
@@ -93,7 +93,7 @@ public class CapsuleController {
             @Valid @RequestBody CapsuleUpdateRequestDto capsuleRequestDto, @PathVariable UUID capsuleId) {
         CapsuleResponseDto updatedCapsule = this.capsuleService.partialUpdate(capsuleRequestDto, capsuleId);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
-                .status(true)
+                .success(true)
                 .message("Capsule updated successfully!")
                 .errors(null)
                 .data(Map.of("item", updatedCapsule))
@@ -108,7 +108,7 @@ public class CapsuleController {
             @RequestParam UUID id, @RequestParam Status status) {
         CapsuleResponseDto updatedCapsule = this.capsuleService.updateStatus(status, id);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
-                .status(true)
+                .success(true)
                 .message("Capsule status updated successfully!")
                 .errors(null)
                 .data(Map.of("item", updatedCapsule))
@@ -123,7 +123,7 @@ public class CapsuleController {
             @RequestBody AtomIdsRequestDto atomIds, @PathVariable UUID capsuleId) {
         CapsuleResponseDto updatedCapsule = this.capsuleService.assignAtomToCapsule(capsuleId, atomIds);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
-                .status(true)
+                .success(true)
                 .message("Atoms added to capsule successfully!")
                 .errors(null)
                 .data(Map.of("item", updatedCapsule))
@@ -138,7 +138,7 @@ public class CapsuleController {
             @RequestParam UUID capsuleId, @RequestParam UUID atomId) {
         CapsuleResponseDto updatedCapsule = this.capsuleService.removeAtomFromCapsule(capsuleId, atomId);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
-                .status(true)
+                .success(true)
                 .message("Atom removed from capsule successfully!")
                 .errors(null)
                 .data(Map.of("item", updatedCapsule))
@@ -154,7 +154,7 @@ public class CapsuleController {
             @RequestBody AtomIdsRequestDto atomIds, @PathVariable UUID capsuleId) {
         CapsuleResponseDto updatedCapsule = this.capsuleService.reorderAtoms(capsuleId, atomIds.getAtomIds());
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
-                .status(true)
+                .success(true)
                 .message("Atoms reordered in capsule successfully!")
                 .errors(null)
                 .data(Map.of("item", updatedCapsule))
@@ -169,7 +169,7 @@ public class CapsuleController {
             @RequestBody TagIdsRequestDto tagIds, @PathVariable UUID capsuleId) {
         CapsuleResponseDto updatedCapsule = this.capsuleService.assignTagToCapsule(capsuleId, tagIds);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
-                .status(true)
+                .success(true)
                 .message("Tags added to capsule successfully!")
                 .errors(null)
                 .data(Map.of("item", updatedCapsule))
@@ -184,7 +184,7 @@ public class CapsuleController {
             @RequestParam UUID capsuleId, @RequestParam UUID tagId) {
         CapsuleResponseDto updatedCapsule = this.capsuleService.removeTagFromCapsule(capsuleId, tagId);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
-                .status(true)
+                .success(true)
                 .message("Tag removed from capsule successfully!")
                 .errors(null)
                 .data(Map.of("item", updatedCapsule))
@@ -199,7 +199,7 @@ public class CapsuleController {
             @RequestBody ClusterIdsRequestDto clusterIds, @PathVariable UUID capsuleId) {
         CapsuleResponseDto updatedCapsule = this.capsuleService.assignClusterToCapsule(capsuleId, clusterIds);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
-                .status(true)
+                .success(true)
                 .message("Clusters added to capsule successfully!")
                 .errors(null)
                 .data(Map.of("item", updatedCapsule))
@@ -214,7 +214,7 @@ public class CapsuleController {
             @RequestParam UUID capsuleId, @RequestParam UUID clusterId) {
         CapsuleResponseDto updatedCapsule = this.capsuleService.removeClusterFromCapsule(capsuleId, clusterId);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
-                .status(true)
+                .success(true)
                 .message("Cluster removed from capsule successfully!")
                 .errors(null)
                 .data(Map.of("item", updatedCapsule))

@@ -37,7 +37,7 @@ public class RouteController {
     ) {
         RouteResponseDto savedRoute = this.routeService.create(routeRequestDto);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
-                .status(true)
+                .success(true)
                 .message("Route created successfully!")
                 .errors(null)
                 .data(Map.of("item", savedRoute))
@@ -50,7 +50,7 @@ public class RouteController {
     public ResponseEntity<ClientResponseFormatDto> fetchAllRoutes(Pageable pageable) {
         CustomPageResponse<RouteResponseDto> routes = this.routeService.findAll(pageable);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
-                .status(true)
+                .success(true)
                 .message("Fetch all talent routes")
                 .errors(null)
                 .data(routes)
@@ -63,7 +63,7 @@ public class RouteController {
     public ResponseEntity<ClientResponseFormatDto> retrieveSingleRoute(@PathVariable UUID routeId) {
         RouteWithTrackResponseDto route = this.routeService.getRouteWithTracks(routeId);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
-                .status(true)
+                .success(true)
                 .message("Route retrieved successfully")
                 .errors(null)
                 .data(Map.of("item", route))
@@ -78,7 +78,7 @@ public class RouteController {
     public ResponseEntity<ClientResponseFormatDto> deleteRoute(@PathVariable UUID id){
         this.routeService.deleteById(id);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
-                .status(true)
+                .success(true)
                 .message("Growth Route deleted successfully!")
                 .errors(null)
                 .data(null)
@@ -94,7 +94,7 @@ public class RouteController {
             @Valid @RequestBody RouteUpdateRequestDto routeRequestDto, @PathVariable UUID routeId) {
         RouteResponseDto updatedRoute = this.routeService.partialUpdate(routeRequestDto, routeId);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
-                .status(true)
+                .success(true)
                 .message("Growth Route updated successfully!")
                 .errors(null)
                 .data(Map.of("item", updatedRoute))
@@ -109,7 +109,7 @@ public class RouteController {
             @RequestParam UUID id, @RequestParam Status status) {
         RouteResponseDto updatedRoute = this.routeService.updateStatus(status, id);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
-                .status(true)
+                .success(true)
                 .message("Growth Route status updated successfully!")
                 .errors(null)
                 .data(Map.of("item", updatedRoute))
@@ -124,7 +124,7 @@ public class RouteController {
             @RequestBody TrackIdsRequestDto atomIds, @PathVariable UUID routeId) {
         RouteResponseDto updatedRoute = this.routeService.assignTrackToRoute(routeId, atomIds);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
-                .status(true)
+                .success(true)
                 .message("Tracks added to a talent route successfully!")
                 .errors(null)
                 .data(Map.of("item", updatedRoute))
@@ -139,7 +139,7 @@ public class RouteController {
             @RequestParam UUID routeId, @RequestParam UUID trackId) {
         RouteResponseDto updatedRoute = this.routeService.removeTrackFromRoute(routeId, trackId);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
-                .status(true)
+                .success(true)
                 .message("Track removed from route successfully!")
                 .errors(null)
                 .data(Map.of("item", updatedRoute))
@@ -155,7 +155,7 @@ public class RouteController {
             @RequestBody TrackIdsRequestDto atomIds, @PathVariable UUID routeId) {
         RouteResponseDto updatedRoute = this.routeService.reorderTracks(routeId, atomIds.getTrackIds());
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
-                .status(true)
+                .success(true)
                 .message("Tracks reordered in route successfully!")
                 .errors(null)
                 .data(Map.of("item", updatedRoute))
