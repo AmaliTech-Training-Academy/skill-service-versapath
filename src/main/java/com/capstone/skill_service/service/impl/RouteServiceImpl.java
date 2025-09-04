@@ -1,28 +1,36 @@
 package com.capstone.skill_service.service.impl;
 
 import com.capstone.skill_service.dto.CustomPageResponse;
+import com.capstone.skill_service.dto.atom.AtomInSequenceOrderResponseDto;
+import com.capstone.skill_service.dto.capsule.CapsuleInSequenceOrderResponseDto;
 import com.capstone.skill_service.dto.route.RouteRequestDto;
 import com.capstone.skill_service.dto.route.RouteResponseDto;
 import com.capstone.skill_service.dto.route.RouteUpdateRequestDto;
 import com.capstone.skill_service.dto.route.RouteWithTrackResponseDto;
 import com.capstone.skill_service.dto.track.*;
 import com.capstone.skill_service.exception.*;
+import com.capstone.skill_service.mapper.AtomMapper;
+import com.capstone.skill_service.mapper.CapsuleMapper;
 import com.capstone.skill_service.mapper.RouteMapper;
+import com.capstone.skill_service.mapper.TrackMapper;
 import com.capstone.skill_service.model.*;
 import com.capstone.skill_service.repository.*;
 import com.capstone.skill_service.service.RouteService;
-import com.capstone.skill_service.service.TrackService;
 import com.capstone.skill_service.util.Status;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -31,12 +39,15 @@ public class RouteServiceImpl implements RouteService {
     private final TrackRepository trackRepository;
     private final RouteRepository routeRepository;
     private final RouteMapper routeMapper;
-    private final RouteTrackMappingRepository routeTrackMappingRepository;
-    private final TrackService trackService;
-
+    private final TrackCapsuleMappingRepository trackCapsuleMappingRepository;
+    private final CapsuleMapper capsuleMapper;
+    private final TrackMapper trackMapper;
+    private final AtomMapper atomMapper;
+    private final CapsuleAtomMappingRepository capsuleAtomMappingRepository;
 
 
     @Override
+    @CacheEvict(value = "talentRouteList",  allEntries = true)
     public RouteResponseDto create(RouteRequestDto dto) {
         if(findByName(dto.getName()).isPresent()){
             throw new RouteExistsException(
@@ -150,8 +161,7 @@ public class RouteServiceImpl implements RouteService {
                 .orElseThrow(() -> new RouteNotFoundException("A Talent Route not found"));
 
         // get mappings (growth track and sequence order)
-        List<RouteTrackMappingEntity> mappings =
-                routeTrackMappingRepository.findByTrackIdsWithCapsules(routeId);
+        List<RouteTrackMappingEntity> mappings = route.getTracks();
 
         if (mappings.isEmpty()) {
             RouteWithTrackResponseDto dto = routeMapper.toWithTrackDto(route);
@@ -159,39 +169,73 @@ public class RouteServiceImpl implements RouteService {
             return dto;
         }
 
+        // fetch capsules in growth track
+        List<UUID> trackIds = mappings.stream()
+                .map(m -> m.getGrowthTrack().getId())
+                .toList();
+        // fetch each growth track with its capsule
+        Map<UUID, List<CapsuleInSequenceOrderResponseDto>> capsuleByGrowthTrack = getCapsulesByGrowthTrack(trackIds);
+
         // fetch each growth track with its capsules
-        List<TrackInSequenceOrderResponseDto> growthTrackInSequenceOrder = getGrowthTrackInSequenceOrder(mappings);
+        List<TrackInSequenceOrderResponseDto> growthTrackInSequenceOrder = getGrowthTrackInSequenceOrder(mappings, capsuleByGrowthTrack);
 
         // build final response
         RouteWithTrackResponseDto dto = routeMapper.toWithTrackDto(route);
         dto.setTracks(growthTrackInSequenceOrder);
         return dto;
     }
+    public Map<UUID, List<CapsuleInSequenceOrderResponseDto>> getCapsulesByGrowthTrack(List<UUID> trackIds){
+        List<TrackCapsuleMappingEntity> mappings = trackCapsuleMappingRepository.findByTrackIdsWithCapsules(trackIds);
 
-    public List<TrackInSequenceOrderResponseDto> getGrowthTrackInSequenceOrder(List<RouteTrackMappingEntity> mappings ){
+        // start fetching capsules' atoms
+        List<UUID> capsuleIds = mappings.stream()
+                .map(m -> m.getCapsule().getId())
+                .toList();
+        Map<UUID, List<AtomInSequenceOrderResponseDto>> atomsByCapsule = getAtomsByCapsule(capsuleIds);
+
+        // group capsule by growth track
+        return mappings.stream()
+                .collect(Collectors.groupingBy(
+                        m -> m.getGrowthTrack().getId(),
+                        LinkedHashMap::new,
+                        Collectors.mapping(
+                                m -> {
+                                    // inject atom in capsule as well
+                                    CapsuleInSequenceOrderResponseDto dto = capsuleMapper.toInSequenceOrderDto(m);
+                                    dto.setSkillAtoms(atomsByCapsule.getOrDefault(m.getCapsule().getId(), List.of()));
+                                    return dto;
+                                }, Collectors.toList())
+                ));
+    }
+
+    public Map<UUID, List<AtomInSequenceOrderResponseDto>> getAtomsByCapsule(List<UUID> capsuleIds){
+        List<CapsuleAtomMappingEntity> mappings = capsuleAtomMappingRepository.findByCapsuleIdsWithAtoms(capsuleIds);
+
+        // group atoms by capsule
+        return mappings.stream()
+                .collect(Collectors.groupingBy(
+                        m -> m.getCapsule().getId(),
+                        LinkedHashMap::new,
+                        Collectors.mapping(atomMapper::toInSequenceOrderDto, Collectors.toList())
+                ));
+    }
+
+    public List<TrackInSequenceOrderResponseDto> getGrowthTrackInSequenceOrder(List<RouteTrackMappingEntity> mappings, Map<UUID, List<CapsuleInSequenceOrderResponseDto>> capsuleByGrowthTrack  ){
         return mappings.stream()
                 .map(mapping -> {
                     GrowthTrackEntity track = mapping.getGrowthTrack();
 
-                    // get each growth track from growth track service
-                    TrackWithCapsuleResponseDto trackWithCapsules =
-                            trackService.getTrackWithCapsules(track.getId());
+                    TrackInSequenceOrderResponseDto dto = trackMapper.toInSequenceOrderDto(mapping);
+                    dto.setSequenceOrder(mapping.getSequenceOrder()); // link the sequence order
+                    dto.setCapsules(capsuleByGrowthTrack.getOrDefault(track.getId(), List.of()));
 
-                    // wrap in dto that is in routeResponseDto
-                    TrackInSequenceOrderResponseDto dto = new TrackInSequenceOrderResponseDto();
-                    dto.setId(trackWithCapsules.getId());
-                    dto.setName(trackWithCapsules.getName());
-                    dto.setDescription(trackWithCapsules.getDescription());
-                    dto.setEstimatedMonths(trackWithCapsules.getEstimatedMonths());
-                    dto.setStatus(trackWithCapsules.getStatus());
-                    dto.setCapsules(trackWithCapsules.getCapsules());
-                    dto.setSequenceOrder(mapping.getSequenceOrder());
                     return dto;
                 })
                 .toList();
     }
 
     @Override
+    @CacheEvict(value = "talentRouteList",  allEntries = true)
     public void deleteById(UUID id) {
         TalentRouteEntity route = findById(id)
                 .orElseThrow( () -> new RouteNotFoundException("A talent route provided doesn't exist")
@@ -203,6 +247,10 @@ public class RouteServiceImpl implements RouteService {
     }
 
     @Override
+    @Caching(
+            evict = @CacheEvict(value = "talentRouteList", allEntries = true), // to update the entire list
+            put = @CachePut(value = "talentRoute", key = "#result.id") // Different cache name for individual track
+    )
     public RouteResponseDto partialUpdate(RouteUpdateRequestDto dto, UUID id) {
         TalentRouteEntity route = findById(id)
                 .orElseThrow( () -> new RouteNotFoundException("A talent route provided doesn't exist")
@@ -246,6 +294,10 @@ public class RouteServiceImpl implements RouteService {
     }
 
     @Override
+    @Caching(
+            evict = @CacheEvict(value = "talentRouteList", allEntries = true), // to update the entire list
+            put = @CachePut(value = "talentRoute", key = "#result.id") // Different cache name for individual track
+    )
     public RouteResponseDto updateStatus(Status status, UUID id) {
 
         TalentRouteEntity route = findById(id)
@@ -258,6 +310,10 @@ public class RouteServiceImpl implements RouteService {
     }
 
     @Override
+    @Caching(
+            evict = @CacheEvict(value = "talentRouteList", allEntries = true), // to update the entire list
+            put = @CachePut(value = "talentRoute", key = "#result.id") // Different cache name for individual track
+    )
     public RouteResponseDto assignTrackToRoute(UUID routeId, TrackIdsRequestDto dto) {
 
         TalentRouteEntity route = findById(routeId)
@@ -273,6 +329,10 @@ public class RouteServiceImpl implements RouteService {
     }
 
     @Override
+    @Caching(
+            evict = @CacheEvict(value = "talentRouteList", allEntries = true), // to update the entire list
+            put = @CachePut(value = "talentRoute", key = "#result.id") // Different cache name for individual track
+    )
     public RouteResponseDto removeTrackFromRoute(UUID routeId, UUID trackId) {
 
         TalentRouteEntity route = findById(routeId)
@@ -299,6 +359,10 @@ public class RouteServiceImpl implements RouteService {
 
 
     @Override
+    @Caching(
+            evict = @CacheEvict(value = "talentRouteList", allEntries = true), // to update the entire list
+            put = @CachePut(value = "talentRoute", key = "#result.id") // Different cache name for individual track
+    )
     public RouteResponseDto reorderTracks(UUID trackId, List<UUID> orderedTrackIds) {
         TalentRouteEntity route = findById(trackId)
                 .orElseThrow( () -> new RouteNotFoundException("A talent route provided doesn't exist")

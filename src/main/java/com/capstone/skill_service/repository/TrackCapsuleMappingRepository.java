@@ -15,10 +15,10 @@ public interface TrackCapsuleMappingRepository extends JpaRepository<TrackCapsul
     SELECT tc
     FROM TrackCapsuleMappingEntity tc
     JOIN FETCH tc.capsule
-    WHERE tc.growthTrack.id = :trackId
-    ORDER BY tc.growthTrack.id, tc.sequenceOrder
+    WHERE tc.growthTrack.id IN :trackIds
+    ORDER BY tc.sequenceOrder
 """)
-    List<TrackCapsuleMappingEntity> findByTrackIdsWithCapsules(@Param("trackId") UUID trackId);
+    List<TrackCapsuleMappingEntity> findByTrackIdsWithCapsules(@Param("trackIds") List<UUID> trackIds);
 
     @Query("""
     SELECT tc

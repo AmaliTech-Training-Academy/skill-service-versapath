@@ -9,13 +9,13 @@ import com.capstone.skill_service.model.TalentRouteEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = TrackMapper.class)
 public interface RouteMapper {
     @Mapping(target = "tracks", source = "tracks")
     RouteResponseDto toDto(TalentRouteEntity entity);
 
     TalentRouteEntity toEntity(RouteRequestDto dto);
-    @Mapping(target = "tracks",  ignore = true)
+    @Mapping(target = "tracks",  source = "tracks")
     RouteWithTrackResponseDto toWithTrackDto(TalentRouteEntity entity);
 
     @Mapping(target = "id", source = "growthTrack.id")
