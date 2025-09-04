@@ -30,7 +30,7 @@ public interface CapsuleMapper {
     @Mapping(target = "difficulty", source = "capsule.difficulty")
     @Mapping(target = "proficiencyLevel", source = "capsule.proficiencyLevel")
     @Mapping(target = "description", source = "capsule.description")
-    @Mapping(target = "skillAtoms", source = "capsule.skillAtoms")
+    @Mapping(target = "skillAtoms", ignore = true) // to avoid N+1 caused by capsule.skillAtoms. service handles it
     @Mapping(target = "sequenceOrder", source = "sequenceOrder")
     CapsuleInSequenceOrderResponseDto toInSequenceOrderDto(TrackCapsuleMappingEntity mapping);
 

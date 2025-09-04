@@ -11,13 +11,13 @@ import com.capstone.skill_service.model.TrackCapsuleMappingEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = CapsuleMapper.class)
 public interface TrackMapper {
     @Mapping(target = "capsules", source = "skillCapsules")
     TrackResponseDto toDto(GrowthTrackEntity entity);
 
     GrowthTrackEntity toEntity(TrackRequestDto dto);
-    @Mapping(target = "capsules",  ignore = true)
+    @Mapping(target = "capsules",  source = "skillCapsules")
     TrackWithCapsuleResponseDto toWithCapsuleDto(GrowthTrackEntity entity);
 
     @Mapping(target = "id", source = "capsule.id")

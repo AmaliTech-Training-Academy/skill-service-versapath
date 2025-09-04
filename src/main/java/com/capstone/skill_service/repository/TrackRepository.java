@@ -18,12 +18,14 @@ public interface TrackRepository extends JpaRepository<GrowthTrackEntity, UUID> 
     Optional<GrowthTrackEntity> findByName(String name);
 
     @Query("""
-        SELECT gt
+        SELECT DISTINCT gt
         FROM GrowthTrackEntity gt
-        LEFT JOIN FETCH gt.skillCapsules c
-        where gt.id = :id
+        LEFT JOIN FETCH gt.skillCapsules cm
+        LEFT JOIN FETCH cm.capsule c
+        WHERE gt.id = :trackId
+        ORDER BY cm.sequenceOrder
     """)
-    Optional<GrowthTrackEntity> findByIdWithCapsules(@Param("id") UUID id);
+    Optional<GrowthTrackEntity> findByIdWithCapsules(@Param("trackId") UUID trackId);
 
     @Query("""
         SELECT gt FROM GrowthTrackEntity gt
