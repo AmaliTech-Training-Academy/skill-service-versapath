@@ -1,16 +1,16 @@
 package com.capstone.skill_service.service.impl;
 
 import com.capstone.skill_service.dto.CustomPageResponse;
+import com.capstone.skill_service.dto.atom.AtomInSequenceOrderResponseDto;
 import com.capstone.skill_service.dto.capsule.CapsuleIdsRequestDto;
 import com.capstone.skill_service.dto.capsule.CapsuleInSequenceOrderResponseDto;
-import com.capstone.skill_service.dto.capsule.CapsuleWithDetailsResponseDto;
 import com.capstone.skill_service.dto.track.*;
 import com.capstone.skill_service.exception.*;
+import com.capstone.skill_service.mapper.AtomMapper;
 import com.capstone.skill_service.mapper.CapsuleMapper;
 import com.capstone.skill_service.mapper.TrackMapper;
 import com.capstone.skill_service.model.*;
 import com.capstone.skill_service.repository.*;
-import com.capstone.skill_service.service.CapsuleService;
 import com.capstone.skill_service.service.TrackService;
 import com.capstone.skill_service.util.Status;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -34,10 +35,10 @@ public class TrackServiceImpl implements TrackService {
     private final CapsuleRepository capsuleRepository;
     private final TrackRepository trackRepository;
     private final TrackMapper trackMapper;
+    private final AtomMapper atomMapper;
     private final CapsuleMapper capsuleMapper;
-    private final CapsuleService capsuleService;
-    private final TrackCapsuleMappingRepository trackCapsuleMappingRepository;
     private final RouteTrackMappingRepository routeTrackMappingRepository;
+    private final CapsuleAtomMappingRepository capsuleAtomMappingRepository;
 
     @Override
     @CacheEvict(value = "growthTrackList",  allEntries = true)
@@ -131,47 +132,52 @@ public class TrackServiceImpl implements TrackService {
                 .orElseThrow(() -> new TrackNotFoundException("A Growth Track not found"));
 
         // get mappings (capsule and sequence order)
-        List<TrackCapsuleMappingEntity> mappings =
-                trackCapsuleMappingRepository.findByTrackIdsWithCapsules(trackId);
-
+        List<TrackCapsuleMappingEntity> mappings = track.getSkillCapsules();
         if (mappings.isEmpty()) {
             TrackWithCapsuleResponseDto dto = trackMapper.toWithCapsuleDto(track);
             dto.setCapsules(List.of()); // return empty list in capsule field
             return dto;
         }
+
+
+        // fetch capsules in growth track
+        List<UUID> capsuleIds = mappings.stream()
+                .map(m -> m.getCapsule().getId())
+                .toList();
         // fetch each capsule with its atoms
-        List<CapsuleInSequenceOrderResponseDto> capsuleInSequenceOrder=getCapsuleInSequenceOrder(mappings);
+        Map<UUID, List<AtomInSequenceOrderResponseDto>> atomsByCapsule = getAtomsByCapsule(capsuleIds);
+        List<CapsuleInSequenceOrderResponseDto> capsuleInSequenceOrder=getCapsuleInSequenceOrder(mappings,atomsByCapsule);
 
         // build final response
         TrackWithCapsuleResponseDto dto = trackMapper.toWithCapsuleDto(track);
         dto.setCapsules(capsuleInSequenceOrder);
+
         return dto;
     }
-    public List<CapsuleInSequenceOrderResponseDto> getCapsuleInSequenceOrder(List<TrackCapsuleMappingEntity> mappings ){
+    public Map<UUID, List<AtomInSequenceOrderResponseDto>> getAtomsByCapsule(List<UUID> capsuleIds){
+        List<CapsuleAtomMappingEntity> mappings = capsuleAtomMappingRepository.findByCapsuleIdsWithAtoms(capsuleIds);
+
+        // group atoms by capsule
+        return mappings.stream()
+                .collect(Collectors.groupingBy(
+                        m -> m.getCapsule().getId(),
+                        LinkedHashMap::new,
+                        Collectors.mapping(atomMapper::toInSequenceOrderDto, Collectors.toList())
+                ));
+    }
+    public List<CapsuleInSequenceOrderResponseDto> getCapsuleInSequenceOrder(List<TrackCapsuleMappingEntity> mappings, Map<UUID, List<AtomInSequenceOrderResponseDto>> atomsByCapsule ){
         return mappings.stream()
                 .map(mapping -> {
                     SkillCapsuleEntity capsule = mapping.getCapsule();
-                    //get capsule with atom
-                    CapsuleWithDetailsResponseDto capsuleWithDetails= capsuleService.getCapsuleWithDetails(capsule.getId());
 
-                    // wrap capsule in response with sequence order dto
-                    CapsuleInSequenceOrderResponseDto capsuleInSequence = new CapsuleInSequenceOrderResponseDto();
-                    capsuleInSequence.setId(capsuleWithDetails.getId());
-                    capsuleInSequence.setName(capsuleWithDetails.getName());
-                    capsuleInSequence.setDescription(capsuleWithDetails.getDescription());
-                    capsuleInSequence.setEstimatedHours(capsuleWithDetails.getEstimatedHours());
-                    capsuleInSequence.setDifficulty(capsuleWithDetails.getDifficulty());
-                    capsuleInSequence.setProficiencyLevel(capsuleWithDetails.getProficiencyLevel());
-                    capsuleInSequence.setSequenceOrder(mapping.getSequenceOrder());
-                    capsuleInSequence.setSkillAtoms(capsuleWithDetails.getSkillAtoms());
+                    CapsuleInSequenceOrderResponseDto dto = capsuleMapper.toInSequenceOrderDto(mapping);
+                    dto.setSequenceOrder(mapping.getSequenceOrder()); // link the sequence order
+                    dto.setSkillAtoms(atomsByCapsule.getOrDefault(capsule.getId(), List.of()));
 
-                    return capsuleInSequence;
+                    return dto;
                 })
                 .toList();
     }
-
-
-
 
     @Override
     @Cacheable(value = "track", key = "#id")
