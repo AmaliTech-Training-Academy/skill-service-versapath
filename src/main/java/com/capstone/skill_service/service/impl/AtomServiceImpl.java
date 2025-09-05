@@ -14,6 +14,7 @@ import com.capstone.skill_service.repository.CapsuleAtomMappingRepository;
 import com.capstone.skill_service.service.AtomService;
 import com.capstone.skill_service.util.Status;
 import lombok.RequiredArgsConstructor;
+import org.common.event.TestEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CacheEvict;
