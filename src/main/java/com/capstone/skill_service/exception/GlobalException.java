@@ -171,7 +171,7 @@ public class GlobalException {
                 .data(null)
                 .build();
 
-        return ResponseEntity.badRequest().body(response);
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
@@ -190,7 +190,7 @@ public class GlobalException {
                 .data(null)
                 .build();
 
-        return ResponseEntity.badRequest().body(response);
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(AtomNotFoundException.class)
