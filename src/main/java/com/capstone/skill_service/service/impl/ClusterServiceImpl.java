@@ -56,7 +56,10 @@ public class ClusterServiceImpl implements ClusterService {
 
         clusterEntity.setCreatedAt(LocalDateTime.now());
         clusterEntity.setUpdatedAt(LocalDateTime.now());
-        clusterEntity.setStatus(Status.ACTIVE);
+        if(dto.getStatus() == null){ // set default value
+            clusterEntity.setStatus(Status.ACTIVE);
+        }
+
        /* if(image != null){
             clusterEntity.setImageName(getImageName(image)); //upload image
         } */
