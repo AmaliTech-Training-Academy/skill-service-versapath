@@ -63,7 +63,10 @@ public class RouteServiceImpl implements RouteService {
 
         routeEntity.setCreatedAt(LocalDateTime.now());
         routeEntity.setUpdatedAt(LocalDateTime.now());
-        routeEntity.setStatus(Status.ACTIVE);
+        if(dto.getStatus() == null){ // set default value
+            routeEntity.setStatus(Status.ACTIVE);
+        }
+
         addTrackToRoute(routeEntity, dto.getTrackIds()); // link talent route to all the talent route assigned to
 
 

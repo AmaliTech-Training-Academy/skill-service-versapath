@@ -49,7 +49,10 @@ public class AtomServiceImpl implements AtomService {
 
         atomEntity.setCreatedAt(LocalDateTime.now());
         atomEntity.setUpdatedAt(LocalDateTime.now());
-        atomEntity.setStatus(Status.ACTIVE);
+        if(dto.getStatus() == null){ // set default value
+            atomEntity.setStatus(Status.ACTIVE);
+        }
+
         logger.info("Admin created skill atom: {}", atomEntity.getName());
 
         return this.atomMapper.toDto(atomRepository.save(atomEntity));

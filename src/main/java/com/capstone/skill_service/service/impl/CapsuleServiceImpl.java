@@ -52,7 +52,10 @@ public class CapsuleServiceImpl implements CapsuleService {
 
         capsuleEntity.setCreatedAt(LocalDateTime.now());
         capsuleEntity.setUpdatedAt(LocalDateTime.now());
-        capsuleEntity.setStatus(Status.ACTIVE);
+        if(dto.getStatus() == null){ // set default value
+            capsuleEntity.setStatus(Status.ACTIVE);
+        }
+
         addAtomsToCapsule(capsuleEntity, dto.getAtomIds()); // link capsule to all the atoms assigned to
         addTagsToCapsule(capsuleEntity, dto.getTagIds()); // link capsule to all the tags assigned to
         addClustersToCapsule(capsuleEntity, dto.getClusterIds()); // link capsule to all the clusters assigned to
