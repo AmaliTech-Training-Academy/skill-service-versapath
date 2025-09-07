@@ -81,7 +81,7 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    @CacheEvict(value = "capsuleList", allEntries = true)
+    @CacheEvict(value = "tagList", allEntries = true)
     public void deleteById(UUID id) {
         TagEntity tag = findById(id)
                 .orElseThrow( () -> new TagNotFoundException("A tag provided doesn't exist")

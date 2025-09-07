@@ -29,6 +29,13 @@ public class UserContextFilter extends OncePerRequestFilter {
             FilterChain filterChain
     ) throws ServletException, IOException {
 
+        String path = request.getRequestURI();
+
+        // Skip authentication for health endpoint
+        if (path.startsWith("/actuator/health")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
         // fetch  user info from header
         String userId = request.getHeader("X-User-Id");
         String userEmail = request.getHeader("X-User-Email");
