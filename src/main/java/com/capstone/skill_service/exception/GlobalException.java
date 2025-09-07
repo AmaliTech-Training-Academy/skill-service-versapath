@@ -2,19 +2,19 @@ package com.capstone.skill_service.exception;
 
 import com.capstone.skill_service.dto.ClientResponseFormValidationErrorDto;
 import com.capstone.skill_service.dto.ClientResponseFormatDto;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
 import java.nio.file.AccessDeniedException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RestControllerAdvice
 @Hidden
@@ -126,12 +126,7 @@ public class GlobalException {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<?> handleValidationErrors(MethodArgumentNotValidException ex) {
         Map<String, List<String>> errors = new HashMap<>();
-        /* group all the validation error into a respective input field
-        ex: {
-             "name":[error1,error2],
-             "email":[error1,error2]
-            }
-        */
+
         List<String> listOfErrors = new ArrayList<>();
         ex.getBindingResult().getFieldErrors().forEach(error -> {
             String field = error.getField();
@@ -145,6 +140,33 @@ public class GlobalException {
                 .success(false)
                 .message("Form validation Error!")
                 .errors(listOfErrors)
+                .data(null)
+                .build();
+
+        return ResponseEntity.badRequest().body(response);
+    }
+
+    // handle jackson deserialize exception
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<?> handleJacksonErrors(HttpMessageNotReadableException ex) {
+        Throwable cause = ex.getCause();
+        String message = "Invalid input format";
+        String fieldName = null;
+
+        if (cause instanceof InvalidFormatException invalidFormat) {
+            if (invalidFormat.getTargetType().isEnum()) { // enum exception
+                // get he field name from the path
+                if (!invalidFormat.getPath().isEmpty()) {
+                    fieldName = invalidFormat.getPath().get(0).getFieldName();
+                }
+                message = String.format("%s value is invalid", fieldName);
+            }
+        }
+
+        ClientResponseFormValidationErrorDto response = ClientResponseFormValidationErrorDto.builder()
+                .success(false)
+                .message("Form validation Error!")
+                .errors(List.of(message))
                 .data(null)
                 .build();
 

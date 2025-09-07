@@ -55,7 +55,7 @@ public class TrackServiceImpl implements TrackService {
         if(dto.getStatus() == null){ // set default value
             trackEntity.setStatus(Status.ACTIVE);
         }
-        
+
         addCapsulesToTrack(trackEntity, dto.getCapsuleIds()); // link track to all the capsules assigned to
 
 
