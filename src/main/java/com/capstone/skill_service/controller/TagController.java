@@ -28,7 +28,7 @@ public class TagController {
     private final TagService tagService;
 
     @PostMapping()
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @Operation(summary = "Create skill tag", description = "This end point allows only admin to create a skill tag")
     public ResponseEntity<ClientResponseFormatDto> createTag(
             @Valid @RequestBody TagRequestDto tagRequestDto
@@ -44,7 +44,7 @@ public class TagController {
     }
 
     @GetMapping()
-    @Operation(summary = "Retrieve skill tags", description = "This end point allows only admin to fetch all skill tags")
+    @Operation(summary = "Retrieve skill tags", description = "This end point allows any one to fetch all skill tags")
     public ResponseEntity<ClientResponseFormatDto> fetchAllTags(Pageable pageable) {
         CustomPageResponse<TagResponseDto> tags = this.tagService.findAll(pageable);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
@@ -57,7 +57,7 @@ public class TagController {
     }
 
     @GetMapping("/{tagId}")
-    @Operation(summary = "Retrieve skill tags", description = "This end point allows only admin to fetch all skill tags")
+    @Operation(summary = "Retrieve skill tags", description = "This end point allows anyone to fetch all skill tags")
     public ResponseEntity<ClientResponseFormatDto> retrieveSingleTag(@PathVariable UUID tagId) {
         TagResponseDto tag = this.tagService.getTag(tagId);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
@@ -70,9 +70,9 @@ public class TagController {
     }
 
     @DeleteMapping(name = "delete_tag", path = "/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @Operation(summary = "Delete Tag",
-            description = "The tag is delete using its id that is passed as parameter")
+            description = "The tag is deleted using its id that is passed as parameter")
     public ResponseEntity<ClientResponseFormatDto> deleteTag(@PathVariable UUID id){
         this.tagService.deleteById(id);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
@@ -101,6 +101,7 @@ public class TagController {
     }
 
     @PutMapping
+    @PreAuthorize("hasAuthority('ADMIN')")
     @Operation(summary = "Update skill tag status", description = "This end point allows admin to update a skill tag as a soft delete")
     public ResponseEntity<ClientResponseFormatDto> updateClusterStatus(
             @RequestParam UUID id, @RequestParam Status status) {

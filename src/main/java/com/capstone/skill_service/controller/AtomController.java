@@ -28,7 +28,7 @@ public class AtomController {
     private final AtomService atomService;
 
     @PostMapping()
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @Operation(summary = "Create skill atom", description = "This end point allows only admin to create a skill atom")
     public ResponseEntity<ClientResponseFormatDto> createAtom(
             @Valid @RequestBody AtomRequestDto atomRequestDto
@@ -44,7 +44,7 @@ public class AtomController {
     }
 
     @GetMapping()
-    @Operation(summary = "Retrieve skill atoms", description = "This end point allows only admin to fetch all skill atoms")
+    @Operation(summary = "Retrieve skill atoms", description = "This end point allows anyone to fetch all skill atoms")
     public ResponseEntity<ClientResponseFormatDto> fetchAllAtoms(Pageable pageable) {
         CustomPageResponse<AtomResponseDto> atoms = this.atomService.findAll(pageable);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
@@ -57,7 +57,7 @@ public class AtomController {
     }
 
     @GetMapping("/{atomId}")
-    @Operation(summary = "Retrieve skill atoms", description = "This end point allows only admin to fetch all skill atoms")
+    @Operation(summary = "Retrieve skill atoms", description = "This end point allows anyone to fetch all skill atoms")
     public ResponseEntity<ClientResponseFormatDto> retrieveSingleAtom(@PathVariable UUID atomId) {
         AtomResponseDto atom = this.atomService.getAtom(atomId);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
@@ -70,9 +70,9 @@ public class AtomController {
     }
 
     @DeleteMapping(name = "delete_atom", path = "/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @Operation(summary = "Delete Atom",
-            description = "The atom is delete using its id that is passed as parameter")
+            description = "The atom is deleted using its id that is passed as a parameter")
     public ResponseEntity<ClientResponseFormatDto> deleteAtom(@PathVariable UUID id){
         this.atomService.deleteById(id);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
@@ -86,7 +86,7 @@ public class AtomController {
     }
 
     @PatchMapping("/{atomId}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @Operation(summary = "Update skill atom", description = "This end point allows admin to update a skill atom")
     public ResponseEntity<ClientResponseFormatDto> updateAtom(
             @Valid @RequestBody AtomUpdateRequestDto atomRequestDto, @PathVariable UUID atomId) {
@@ -101,7 +101,7 @@ public class AtomController {
     }
 
     @PutMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @Operation(summary = "Update skill atom status", description = "This end point allows admin to update a skill atom as a soft delete")
     public ResponseEntity<ClientResponseFormatDto> updateAtomStatus(
             @RequestParam UUID id, @RequestParam Status status) {
