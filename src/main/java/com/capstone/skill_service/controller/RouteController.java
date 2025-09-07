@@ -30,7 +30,7 @@ public class RouteController {
     private final RouteService routeService;
 
     @PostMapping()
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @Operation(summary = "Create talent route", description = "This end point allows only admin to create a talent route")
     public ResponseEntity<ClientResponseFormatDto> createRoute(
             @Valid @RequestBody RouteRequestDto routeRequestDto
@@ -46,7 +46,7 @@ public class RouteController {
     }
 
     @GetMapping()
-    @Operation(summary = "Retrieve talent routes", description = "This end point allows only admin to fetch all talent routes")
+    @Operation(summary = "Retrieve talent routes", description = "This end point allows anyone to fetch all talent routes")
     public ResponseEntity<ClientResponseFormatDto> fetchAllRoutes(Pageable pageable) {
         CustomPageResponse<RouteResponseDto> routes = this.routeService.findAll(pageable);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
@@ -59,7 +59,7 @@ public class RouteController {
     }
 
     @GetMapping("/{routeId}")
-    @Operation(summary = "Retrieve talent routes", description = "This end point allows only admin to fetch all talent routes")
+    @Operation(summary = "Retrieve talent routes", description = "This end point allows anyone to fetch all talent routes")
     public ResponseEntity<ClientResponseFormatDto> retrieveSingleRoute(@PathVariable UUID routeId) {
         RouteWithTrackResponseDto route = this.routeService.getRouteWithTracks(routeId);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
@@ -72,7 +72,7 @@ public class RouteController {
     }
 
     @DeleteMapping(name = "delete_route", path = "/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @Operation(summary = "Delete Route",
             description = "The route is deleted using its id that is passed as parameter")
     public ResponseEntity<ClientResponseFormatDto> deleteRoute(@PathVariable UUID id){
@@ -88,14 +88,14 @@ public class RouteController {
     }
 
     @PatchMapping("/{routeId}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @Operation(summary = "Update talent route", description = "This end point allows admin to update a talent route")
     public ResponseEntity<ClientResponseFormatDto> updateRoute(
             @Valid @RequestBody RouteUpdateRequestDto routeRequestDto, @PathVariable UUID routeId) {
         RouteResponseDto updatedRoute = this.routeService.partialUpdate(routeRequestDto, routeId);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
                 .success(true)
-                .message("Growth Route updated successfully!")
+                .message("Talent route updated successfully!")
                 .errors(null)
                 .data(Map.of("item", updatedRoute))
                 .build();
@@ -103,14 +103,14 @@ public class RouteController {
     }
 
     @PutMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @Operation(summary = "Update talent route status", description = "This end point allows admin to update a talent route as a soft delete")
     public ResponseEntity<ClientResponseFormatDto> updateRouteStatus(
             @RequestParam UUID id, @RequestParam Status status) {
         RouteResponseDto updatedRoute = this.routeService.updateStatus(status, id);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
                 .success(true)
-                .message("Growth Route status updated successfully!")
+                .message("Talent Route status updated successfully!")
                 .errors(null)
                 .data(Map.of("item", updatedRoute))
                 .build();
@@ -118,8 +118,8 @@ public class RouteController {
     }
 
     @PatchMapping("/assignTrack/{routeId}")
-    @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Assign new skill capsule to a talent route", description = "This end point allows admin to add new skill capsule to a talent route")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @Operation(summary = "Assign new growth track to a talent route", description = "This end point allows admin to add new growth track to a talent route")
     public ResponseEntity<ClientResponseFormatDto> assignTrackToRoute(
             @RequestBody TrackIdsRequestDto atomIds, @PathVariable UUID routeId) {
         RouteResponseDto updatedRoute = this.routeService.assignTrackToRoute(routeId, atomIds);
@@ -133,14 +133,14 @@ public class RouteController {
     }
 
     @DeleteMapping("/removeTrack")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @Operation(summary = "Remove a growth track from route", description = "This end point allows admin to remove a growth track from route")
     public ResponseEntity<ClientResponseFormatDto> removeTrackFromRoute(
             @RequestParam UUID routeId, @RequestParam UUID trackId) {
         RouteResponseDto updatedRoute = this.routeService.removeTrackFromRoute(routeId, trackId);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
                 .success(true)
-                .message("Track removed from route successfully!")
+                .message("Growth Track removed from talent route successfully!")
                 .errors(null)
                 .data(Map.of("item", updatedRoute))
                 .build();
@@ -148,9 +148,9 @@ public class RouteController {
     }
 
     @PutMapping("/reorderTrack/{routeId}")
-    @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Reorder new skill capsule in a talent route collection", description = "This end point allows admin " +
-            "to shift capsule sequence order in a talent route however they want")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @Operation(summary = "Reorder growth track in a talent route collection", description = "This end point allows admin " +
+            "to shift growth track sequence order in a talent route however they want")
     public ResponseEntity<ClientResponseFormatDto> reorderTrack(
             @RequestBody TrackIdsRequestDto atomIds, @PathVariable UUID routeId) {
         RouteResponseDto updatedRoute = this.routeService.reorderTracks(routeId, atomIds.getTrackIds());

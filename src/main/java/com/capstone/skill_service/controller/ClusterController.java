@@ -32,7 +32,7 @@ public class ClusterController {
     private final ClusterService clusterService;
 
     @PostMapping()
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @Operation(summary = "Create skill cluster", description = "This end point allows only admin to create a skill cluster")
     public ResponseEntity<ClientResponseFormatDto> createCluster(
             @Valid @RequestBody ClusterRequestDto clusterRequestDto
@@ -48,7 +48,7 @@ public class ClusterController {
     }
 
     @GetMapping()
-    @Operation(summary = "Retrieve skill clusters", description = "This end point allows only admin to fetch all skill clusters")
+    @Operation(summary = "Retrieve skill clusters", description = "This end point allows anyone to fetch all skill clusters")
     public ResponseEntity<ClientResponseFormatDto> fetchAllClusters(Pageable pageable) {
         CustomPageResponse<ClusterResponseDto> clusters = this.clusterService.findAll(pageable);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
@@ -61,9 +61,9 @@ public class ClusterController {
     }
 
     @DeleteMapping(name = "delete_cluster", path = "/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @Operation(summary = "Delete Cluster",
-            description = "The cluster is delete using its id that is passed as parameter")
+            description = "The cluster is deleted using its id that is passed as parameter")
     public ResponseEntity<ClientResponseFormatDto> deleteCluster(@PathVariable UUID id){
         this.clusterService.deleteById(id);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
@@ -77,7 +77,7 @@ public class ClusterController {
     }
 
     @PatchMapping("update")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @Operation(summary = "Update skill cluster", description = "This end point allows admin to update a skill cluster")
     public ResponseEntity<ClientResponseFormatDto> updateCluster(
             @RequestParam(value = "name", required = false) String name,
@@ -103,7 +103,7 @@ public class ClusterController {
     }
 
     @PutMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @Operation(summary = "Update skill cluster status", description = "This end point allows admin to update a skill cluster as a soft delete")
     public ResponseEntity<ClientResponseFormatDto> updateClusterStatus(
             @RequestParam UUID id, @RequestParam Status status) {
@@ -118,7 +118,7 @@ public class ClusterController {
     }
 
     @GetMapping("/{clusterId}")
-    @Operation(summary = "Retrieve skill clusters by Id", description = "This end point allows only admin to fetch a skill clusters by id")
+    @Operation(summary = "Retrieve skill clusters by Id", description = "This end point allows anyone to fetch a skill clusters by id")
     public ResponseEntity<ClientResponseFormatDto> retrieveSingleClusterWithCapsules(@PathVariable UUID clusterId) {
         ClusterWithCapsuleResponseDto cluster = this.clusterService.getClusterWithCapsules(clusterId);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
