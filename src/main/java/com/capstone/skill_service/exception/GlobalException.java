@@ -10,6 +10,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
 import java.nio.file.AccessDeniedException;
@@ -167,6 +168,25 @@ public class GlobalException {
                 .success(false)
                 .message("Form validation Error!")
                 .errors(List.of(message))
+                .data(null)
+                .build();
+
+        return ResponseEntity.badRequest().body(response);
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<?> handleTypeMismatch(MethodArgumentTypeMismatchException ex) {
+        String fieldName = ex.getName();
+        String message="";
+        // handle UUID mismatch
+        if (ex.getRequiredType().equals(UUID.class)) {
+            message = fieldName+ " provided doesn't exist";
+        }
+
+        ClientResponseFormValidationErrorDto response = ClientResponseFormValidationErrorDto.builder()
+                .success(false)
+                .message(message)
+                .errors(null)
                 .data(null)
                 .build();
 
