@@ -60,9 +60,9 @@ public class ClusterServiceImpl implements ClusterService {
             clusterEntity.setStatus(Status.ACTIVE);
         }
 
-       /* if(image != null){
+        if(image != null){
             clusterEntity.setImageName(getImageName(image)); //upload image
-        } */
+        }
 
         logger.info("Admin created skill cluster: {}", clusterEntity.getName());
 
