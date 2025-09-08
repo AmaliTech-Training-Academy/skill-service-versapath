@@ -9,11 +9,14 @@ import com.capstone.skill_service.dto.tag.TagIdsRequestDto;
 import com.capstone.skill_service.exception.*;
 import com.capstone.skill_service.mapper.AtomMapper;
 import com.capstone.skill_service.mapper.CapsuleMapper;
+import com.capstone.skill_service.messaging.CreateSkillProducerEvent;
 import com.capstone.skill_service.model.*;
 import com.capstone.skill_service.repository.*;
 import com.capstone.skill_service.service.CapsuleService;
 import com.capstone.skill_service.util.Status;
 import lombok.RequiredArgsConstructor;
+import org.common.event.CreateSkillEvent;
+import org.common.event.SkillAtom;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CacheEvict;
@@ -39,6 +42,7 @@ public class CapsuleServiceImpl implements CapsuleService {
     private final TagRepository tagRepository;
     private final ClusterRepository clusterRepository;
     private final TrackCapsuleMappingRepository trackCapsuleMappingRepository;
+    private final CreateSkillProducerEvent createSkillProducerEvent;
 
     @Override
     @CacheEvict(value = "capsuleList",  allEntries = true)
@@ -63,8 +67,30 @@ public class CapsuleServiceImpl implements CapsuleService {
         logger.info("Admin created skill capsule: {}", capsuleEntity.getName());
         SkillCapsuleEntity savedCapsule = capsuleRepository.save(capsuleEntity);
 
+        // send an event command
+        sendEventToCreateSkillStructureOnMoodle(savedCapsule);
+
         // map capsule to response dto
         return mapCapsuleToResponseDtoWithAtom(savedCapsule);
+    }
+
+    void sendEventToCreateSkillStructureOnMoodle(SkillCapsuleEntity savedCapsule){
+        // extract capsule atom names to send to Moodle
+        List<SkillAtomEntity> atomEntities = savedCapsule.getSkillAtoms().stream()
+                .map(CapsuleAtomMappingEntity::getAtom)
+                .toList();
+
+        List<String> atomNames = new ArrayList<>();
+        for(SkillAtomEntity atom: atomEntities){
+            atomNames.add(atom.getName());
+        }
+
+        CreateSkillEvent createSkillEvent = CreateSkillEvent.builder()
+                .capsuleName(savedCapsule.getName())
+                .atoms(atomNames)
+                .build();
+
+        createSkillProducerEvent.sendCreateSkillOnMoodleCommand(createSkillEvent);
     }
 
     public CapsuleResponseDto mapCapsuleToResponseDtoWithAtom(SkillCapsuleEntity capsule){
