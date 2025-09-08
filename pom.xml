@@ -30,6 +30,13 @@
 		<java.version>21</java.version>
 		<spring-cloud.version>2025.0.0</spring-cloud.version>
 	</properties>
+<!--	common event repository-->
+	<repositories>
+		<repository>
+			<id>github</id>
+			<url>https://maven.pkg.github.com/karangwaajika/versapath-events</url>
+		</repository>
+	</repositories>
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -98,6 +105,17 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
+<!--		RabbitMQ-->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-amqp</artifactId>
+		</dependency>
+<!--		Common event-->
+		<dependency>
+			<groupId>org.common</groupId>
+			<artifactId>versapath-events</artifactId>
+			<version>1.8.9</version>
 		</dependency>
 
 		<dependency>
