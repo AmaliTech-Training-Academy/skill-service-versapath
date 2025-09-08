@@ -54,6 +54,8 @@ public class AtomServiceImpl implements AtomService {
             atomEntity.setStatus(Status.ACTIVE);
         }
 
+        TestEvent testEvent = TestEvent.builder().build();
+
         logger.info("Admin created skill atom: {}", atomEntity.getName());
 
         return this.atomMapper.toDto(atomRepository.save(atomEntity));

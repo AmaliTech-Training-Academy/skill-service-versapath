@@ -102,9 +102,9 @@
 		</dependency>
 		<!--		comment event-->
 		<dependency>
-			<groupId>org.versapath</groupId>
-			<artifactId>versapath-common-event</artifactId>
-			<version>1.0</version>
+			<groupId>org.common</groupId>
+			<artifactId>versapath-events</artifactId>
+			<version>1.8.9</version>
 		</dependency>
 <!--      security-->
 		<dependency>
@@ -116,11 +116,6 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.common</groupId>
-			<artifactId>versapath-events</artifactId>
-			<version>1.8.9</version>
 		</dependency>
 	</dependencies>
 
