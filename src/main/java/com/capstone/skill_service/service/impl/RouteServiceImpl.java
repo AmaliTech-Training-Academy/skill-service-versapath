@@ -13,11 +13,13 @@ import com.capstone.skill_service.mapper.AtomMapper;
 import com.capstone.skill_service.mapper.CapsuleMapper;
 import com.capstone.skill_service.mapper.RouteMapper;
 import com.capstone.skill_service.mapper.TrackMapper;
+import com.capstone.skill_service.messaging.PopulateSkillEvents;
 import com.capstone.skill_service.model.*;
 import com.capstone.skill_service.repository.*;
 import com.capstone.skill_service.service.RouteService;
 import com.capstone.skill_service.util.Status;
 import lombok.RequiredArgsConstructor;
+import org.common.event.TalentRouteEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CacheEvict;
@@ -44,6 +46,7 @@ public class RouteServiceImpl implements RouteService {
     private final TrackMapper trackMapper;
     private final AtomMapper atomMapper;
     private final CapsuleAtomMappingRepository capsuleAtomMappingRepository;
+    private final PopulateSkillEvents populateSkillEvents;
 
 
     @Override
@@ -69,10 +72,33 @@ public class RouteServiceImpl implements RouteService {
 
         addTrackToRoute(routeEntity, dto.getTrackIds()); // link talent route to all the talent route assigned to
 
+        TalentRouteEntity savedTalentRoute = routeRepository.save(routeEntity);
 
         logger.info("Admin created skill track: {}", routeEntity.getName());
 
-        return this.routeMapper.toDto(routeRepository.save(routeEntity));
+        //populate an event
+        populateTalentRouteEvent(savedTalentRoute);
+
+        return this.routeMapper.toDto(savedTalentRoute);
+
+    }
+
+    void populateTalentRouteEvent(TalentRouteEntity talentRoute){
+        List<Map<UUID, Integer>> listOfTrackInTalentRoute = new ArrayList<>();
+
+        for(RouteTrackMappingEntity mapping: talentRoute.getTracks()){
+            Map<UUID, Integer> growthTrackWithSequenceOrder = new HashMap<>();
+            growthTrackWithSequenceOrder.put(mapping.getGrowthTrack().getId(), mapping.getSequenceOrder());
+
+            listOfTrackInTalentRoute.add(growthTrackWithSequenceOrder);
+        }
+
+        populateSkillEvents.populateTalentRoute(TalentRouteEvent.builder()
+                .id(talentRoute.getId())
+                .name(talentRoute.getName())
+                .description(talentRoute.getDescription())
+                .growthTracks(listOfTrackInTalentRoute)
+                .build());
 
     }
 

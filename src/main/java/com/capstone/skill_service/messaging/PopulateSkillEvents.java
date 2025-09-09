@@ -1,6 +1,5 @@
 package com.capstone.skill_service.messaging;
 
-import com.capstone.skill_service.service.impl.AtomServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.common.event.GrowthTrackEvent;
 import org.common.event.SkillAtomEvent;
@@ -40,6 +39,8 @@ public class PopulateSkillEvents {
 
     public void populateTalentRoute(TalentRouteEvent talentRouteEvent){
         kafkaTalentRouteTemplate.send("talentRoute.create", talentRouteEvent);
+
+        logger.info("talent route event is populated: {}", talentRouteEvent);
     }
 
 }
