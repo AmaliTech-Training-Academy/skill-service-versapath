@@ -9,11 +9,13 @@ import com.capstone.skill_service.exception.*;
 import com.capstone.skill_service.mapper.AtomMapper;
 import com.capstone.skill_service.mapper.CapsuleMapper;
 import com.capstone.skill_service.mapper.TrackMapper;
+import com.capstone.skill_service.messaging.PopulateSkillEvents;
 import com.capstone.skill_service.model.*;
 import com.capstone.skill_service.repository.*;
 import com.capstone.skill_service.service.TrackService;
 import com.capstone.skill_service.util.Status;
 import lombok.RequiredArgsConstructor;
+import org.common.event.GrowthTrackEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CacheEvict;
@@ -39,6 +41,7 @@ public class TrackServiceImpl implements TrackService {
     private final CapsuleMapper capsuleMapper;
     private final RouteTrackMappingRepository routeTrackMappingRepository;
     private final CapsuleAtomMappingRepository capsuleAtomMappingRepository;
+    private final PopulateSkillEvents populateSkillEvents;
 
     @Override
     @CacheEvict(value = "growthTrackList",  allEntries = true)
@@ -59,9 +62,32 @@ public class TrackServiceImpl implements TrackService {
         addCapsulesToTrack(trackEntity, dto.getCapsuleIds()); // link track to all the capsules assigned to
 
 
+        GrowthTrackEntity savedTrack = trackRepository.save(trackEntity);
         logger.info("Admin created skill track: {}", trackEntity.getName());
 
+        // populate an event
+        populateGrowthTrackEvent(savedTrack);
+
         return this.trackMapper.toDto(trackRepository.save(trackEntity));
+
+    }
+
+    void populateGrowthTrackEvent(GrowthTrackEntity savedTrack){
+        List<Map<UUID, Integer>> listOfCapsulesInGrowthTrack = new ArrayList<>();
+
+        for(TrackCapsuleMappingEntity mapping: savedTrack.getSkillCapsules()){
+            Map<UUID, Integer> capsuleWithSequenceOrder = new HashMap<>();
+            capsuleWithSequenceOrder.put(mapping.getCapsule().getId(), mapping.getSequenceOrder());
+
+            listOfCapsulesInGrowthTrack.add(capsuleWithSequenceOrder);
+        }
+
+        populateSkillEvents.populateGrowthTrack(GrowthTrackEvent.builder()
+                        .id(savedTrack.getId())
+                        .name(savedTrack.getName())
+                        .description(savedTrack.getDescription())
+                        .skillCapsules(listOfCapsulesInGrowthTrack)
+                        .build());
 
     }
 
