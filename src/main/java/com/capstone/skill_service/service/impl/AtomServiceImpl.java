@@ -15,6 +15,7 @@ import com.capstone.skill_service.repository.CapsuleAtomMappingRepository;
 import com.capstone.skill_service.service.AtomService;
 import com.capstone.skill_service.util.Status;
 import lombok.RequiredArgsConstructor;
+import org.common.event.SkillAtomEvent;
 import org.common.event.TestEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,10 +56,18 @@ public class AtomServiceImpl implements AtomService {
         if(dto.getStatus() == null){ // set default value
             atomEntity.setStatus(Status.ACTIVE);
         }
+        SkillAtomEntity savedAtom = atomRepository.save(atomEntity);
 
         logger.info("Admin created skill atom: {}", atomEntity.getName());
 
-        return this.atomMapper.toDto(atomRepository.save(atomEntity));
+        //populate event
+        populateSkillEvents.populateSkillAtom(SkillAtomEvent.builder()
+                        .id(savedAtom.getId())
+                        .name(savedAtom.getName())
+                        .description(savedAtom.getDescription())
+                        .build());
+
+        return this.atomMapper.toDto(savedAtom);
     }
 
     @Override
