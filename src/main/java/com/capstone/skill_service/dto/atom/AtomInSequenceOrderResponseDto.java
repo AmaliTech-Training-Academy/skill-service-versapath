@@ -20,6 +20,8 @@ public class AtomInSequenceOrderResponseDto implements Serializable {
     private UUID id;
     private String name;
     private String description;
-    private int moodleSectionId;
+    private String contentType;
+    private int moodleModuleId;
+    private int moodlePageId;
     private int sequenceOrder;
 }
