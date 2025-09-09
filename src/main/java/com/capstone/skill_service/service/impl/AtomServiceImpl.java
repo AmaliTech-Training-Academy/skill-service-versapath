@@ -7,6 +7,7 @@ import com.capstone.skill_service.dto.atom.AtomUpdateRequestDto;
 import com.capstone.skill_service.exception.AtomExistsException;
 import com.capstone.skill_service.exception.AtomNotFoundException;
 import com.capstone.skill_service.mapper.AtomMapper;
+import com.capstone.skill_service.messaging.PopulateAtomEvent;
 import com.capstone.skill_service.model.CapsuleAtomMappingEntity;
 import com.capstone.skill_service.model.SkillAtomEntity;
 import com.capstone.skill_service.repository.AtomRepository;
@@ -14,6 +15,7 @@ import com.capstone.skill_service.repository.CapsuleAtomMappingRepository;
 import com.capstone.skill_service.service.AtomService;
 import com.capstone.skill_service.util.Status;
 import lombok.RequiredArgsConstructor;
+import org.common.event.TestEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CacheEvict;
@@ -36,6 +38,7 @@ public class AtomServiceImpl implements AtomService {
     private final AtomRepository atomRepository;
     private final AtomMapper atomMapper;
     private final CapsuleAtomMappingRepository capsuleAtomMappingRepository;
+    private final PopulateAtomEvent populateAtomEvent;
 
     @Override
     @CacheEvict(value = "atomList",  allEntries = true)
@@ -70,6 +73,13 @@ public class AtomServiceImpl implements AtomService {
         Page<AtomResponseDto> atoms = atomList.map(this.atomMapper::toDto);
 
         logger.info("Atoms list is fetched");
+        TestEvent test = TestEvent.builder()
+                .name("test")
+                .age(12)
+                .location("Kin")
+                .build();
+
+        populateAtomEvent.populateSkillAtom(test);
 
         return CustomPageResponse.<AtomResponseDto>builder()
                 .items(atoms.getContent())
