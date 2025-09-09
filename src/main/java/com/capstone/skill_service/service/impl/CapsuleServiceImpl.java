@@ -17,6 +17,7 @@ import com.capstone.skill_service.util.Status;
 import lombok.RequiredArgsConstructor;
 import org.common.event.CreateSkillEvent;
 import org.common.event.SkillAtom;
+import org.common.event.UpdateSkillEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CacheEvict;
@@ -173,6 +174,26 @@ public class CapsuleServiceImpl implements CapsuleService {
                 .orElseThrow(() -> new CapsuleNotFoundException("Capsule not found"));
 
         return capsuleMapper.toWithDetailsDto(capsule);
+    }
+
+    @Override
+    public void updateSkillWithMoodleData(UpdateSkillEvent updateSkillEvent) {
+        SkillCapsuleEntity capsuleEntity = capsuleRepository.findByName(updateSkillEvent.getName())
+                .orElseThrow(() -> new CapsuleNotFoundException("Capsule not found"));
+
+        for(SkillAtom atom: updateSkillEvent.getSkillAtoms()){
+            SkillAtomEntity atomEntity = atomRepository.findByName(atom.getName())
+                    .orElseThrow(() -> new AtomNotFoundException("Skill atom not found"));
+
+            // map atom to Moodle module id and page id
+            atomEntity.setMoodleModuleId(atom.getCourseModuleId());
+            atomEntity.setMoodlePageId(atom.getPageId());
+        }
+
+        capsuleEntity.setMoodleCourseId(updateSkillEvent.getCourseId()); // map capsule to Moodle course id
+
+        logger.info("Capsule with its atom are updated with Moodle data {}", updateSkillEvent.getName());
+
     }
 
     @Override
