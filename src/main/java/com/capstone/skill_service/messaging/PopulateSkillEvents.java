@@ -34,6 +34,8 @@ public class PopulateSkillEvents {
 
     public void populateGrowthTrack(GrowthTrackEvent growthTrackEvent){
         kafkaGrowthTrackTemplate.send("growthTrack.create", growthTrackEvent);
+
+        logger.info("growth track event is populated: {}", growthTrackEvent);
     }
 
     public void populateTalentRoute(TalentRouteEvent talentRouteEvent){
