@@ -200,7 +200,6 @@ public class CapsuleServiceImpl implements CapsuleService {
             logger.info("Capsule with its atom are updated with Moodle data {}", updateSkillEvent.getName());
 
         }
-
     }
 
     @Override
