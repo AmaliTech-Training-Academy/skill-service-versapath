@@ -13,7 +13,7 @@ public class CreateSkillProducerEvent {
     private static final Logger logger = LoggerFactory.getLogger(CreateSkillProducerEvent.class);
     private final RabbitTemplate rabbitTemplate;
     public void sendCreateSkillOnMoodleCommand(CreateSkillEvent createEvent) {
-        logger.info("Send command to create skill structure on Moodle: {}", createEvent.getCapsuleName());
+        logger.info("Send command to create skill structure on Moodle: {}", createEvent);
 
         rabbitTemplate.convertAndSend("versapath.skill.create", createEvent);
     }

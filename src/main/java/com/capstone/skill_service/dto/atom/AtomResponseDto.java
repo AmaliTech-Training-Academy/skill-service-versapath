@@ -23,7 +23,9 @@ public class AtomResponseDto {
     private String objectives;
     private int estimatedHours;
     private Status status;
-    private int moodleSectionId;
+    private String contentType;
+    private int moodleModuleId;
+    private int moodlePageId;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }
