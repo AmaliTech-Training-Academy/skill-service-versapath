@@ -7,6 +7,7 @@ import com.capstone.skill_service.dto.cluster.ClusterIdsRequestDto;
 import com.capstone.skill_service.dto.tag.TagIdsRequestDto;
 import com.capstone.skill_service.model.SkillCapsuleEntity;
 import com.capstone.skill_service.util.Status;
+import org.common.event.UpdateSkillEvent;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
@@ -30,4 +31,6 @@ public interface CapsuleService {
     CapsuleResponseDto assignClusterToCapsule(UUID capsuleId, ClusterIdsRequestDto dto);
     CapsuleResponseDto removeClusterFromCapsule(UUID capsuleId, UUID clusterId);
     CapsuleWithDetailsResponseDto getCapsuleWithDetails(UUID capsuleId);
+
+    void updateSkillWithMoodleData(UpdateSkillEvent updateSkillEvent);
 }
