@@ -30,6 +30,7 @@ public class AtomRequestDto {
     private String description;
     private String objectives;
     private Status status;
+    private String contentType;
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
