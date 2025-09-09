@@ -10,6 +10,7 @@ import com.capstone.skill_service.exception.*;
 import com.capstone.skill_service.mapper.AtomMapper;
 import com.capstone.skill_service.mapper.CapsuleMapper;
 import com.capstone.skill_service.messaging.CreateSkillProducerEvent;
+import com.capstone.skill_service.messaging.PopulateSkillEvents;
 import com.capstone.skill_service.model.*;
 import com.capstone.skill_service.repository.*;
 import com.capstone.skill_service.service.CapsuleService;
@@ -17,6 +18,7 @@ import com.capstone.skill_service.util.Status;
 import lombok.RequiredArgsConstructor;
 import org.common.event.CreateSkillEvent;
 import org.common.event.SkillAtom;
+import org.common.event.SkillCapsuleEvent;
 import org.common.event.UpdateSkillEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,6 +46,7 @@ public class CapsuleServiceImpl implements CapsuleService {
     private final ClusterRepository clusterRepository;
     private final TrackCapsuleMappingRepository trackCapsuleMappingRepository;
     private final CreateSkillProducerEvent createSkillProducerEvent;
+    private final PopulateSkillEvents populateSkillEvents;
 
     @Override
     @CacheEvict(value = "capsuleList",  allEntries = true)
@@ -70,9 +73,34 @@ public class CapsuleServiceImpl implements CapsuleService {
 
         // send an event command
         sendEventToCreateSkillStructureOnMoodle(savedCapsule);
+        populateSkillCapsuleEvent(savedCapsule);
 
         // map capsule to response dto
         return mapCapsuleToResponseDtoWithAtom(savedCapsule);
+    }
+
+    void populateSkillCapsuleEvent(SkillCapsuleEntity capsuleEntity){
+
+        List<Map<UUID, Integer>> listOfAtomsInCapsule = new ArrayList<>();
+
+        // extract atom ID and sequence order
+        for(CapsuleAtomMappingEntity mapping: capsuleEntity.getSkillAtoms()){
+            Map<UUID, Integer> atomWithSequenceOrder = new HashMap<>();
+            atomWithSequenceOrder.put(mapping.getAtom().getId(), mapping.getSequenceOrder());
+
+            listOfAtomsInCapsule.add(atomWithSequenceOrder);
+
+        }
+
+        populateSkillEvents.populateSkillCapsule(SkillCapsuleEvent.builder()
+                        .id(capsuleEntity.getId())
+                        .name(capsuleEntity.getName())
+                        .description(capsuleEntity.getDescription())
+                        .difficulty(capsuleEntity.getDifficulty())
+                        .proficiencyLevel(capsuleEntity.getProficiencyLevel().toString())
+                        .skillAtom(listOfAtomsInCapsule)
+                        .build());
+
     }
 
     void sendEventToCreateSkillStructureOnMoodle(SkillCapsuleEntity savedCapsule){

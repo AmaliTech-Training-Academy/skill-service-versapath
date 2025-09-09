@@ -28,6 +28,8 @@ public class PopulateSkillEvents {
 
     public void populateSkillCapsule(SkillCapsuleEvent capsuleEvent){
         kafkaCapsuleTemplate.send("capsule.create", capsuleEvent);
+
+        logger.info("capsule event is populated: {}", capsuleEvent);
     }
 
     public void populateGrowthTrack(GrowthTrackEvent growthTrackEvent){
