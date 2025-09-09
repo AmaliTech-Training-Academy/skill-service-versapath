@@ -35,10 +35,7 @@ public class SkillAtomEntity {
 
     private String ContentType;
 
-    @Column(nullable = false, columnDefinition = "integer default 0")
     private int moodleModuleId; // id for tracking progress
-
-    @Column(nullable = false, columnDefinition = "integer default 0")
     private int moodlePageId; // id for fetching content
 
     private int estimatedHours;

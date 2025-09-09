@@ -178,21 +178,28 @@ public class CapsuleServiceImpl implements CapsuleService {
 
     @Override
     public void updateSkillWithMoodleData(UpdateSkillEvent updateSkillEvent) {
-        SkillCapsuleEntity capsuleEntity = capsuleRepository.findByName(updateSkillEvent.getName())
-                .orElseThrow(() -> new CapsuleNotFoundException("Capsule not found"));
+        if(capsuleRepository.findByName(updateSkillEvent.getName()).isPresent()){
+            SkillCapsuleEntity capsuleEntity = capsuleRepository.findByName(updateSkillEvent.getName())
+                    .orElseThrow(() -> new CapsuleNotFoundException("Capsule not found"));
 
-        for(SkillAtom atom: updateSkillEvent.getSkillAtoms()){
-            SkillAtomEntity atomEntity = atomRepository.findByName(atom.getName())
-                    .orElseThrow(() -> new AtomNotFoundException("Skill atom not found"));
+            for(SkillAtom atom: updateSkillEvent.getSkillAtoms()){
+                SkillAtomEntity atomEntity = atomRepository.findByName(atom.getName())
+                        .orElseThrow(() -> new AtomNotFoundException("Skill atom not found"));
 
-            // map atom to Moodle module id and page id
-            atomEntity.setMoodleModuleId(atom.getCourseModuleId());
-            atomEntity.setMoodlePageId(atom.getPageId());
+                // map atom to Moodle module id and page id
+                atomEntity.setMoodleModuleId(atom.getCourseModuleId());
+                atomEntity.setMoodlePageId(atom.getPageId());
+
+                atomRepository.save(atomEntity); //save to DB
+            }
+
+            capsuleEntity.setMoodleCourseId(updateSkillEvent.getCourseId()); // map capsule to Moodle course id
+            capsuleRepository.save(capsuleEntity); // save to DB
+
+
+            logger.info("Capsule with its atom are updated with Moodle data {}", updateSkillEvent.getName());
+
         }
-
-        capsuleEntity.setMoodleCourseId(updateSkillEvent.getCourseId()); // map capsule to Moodle course id
-
-        logger.info("Capsule with its atom are updated with Moodle data {}", updateSkillEvent.getName());
 
     }
 
