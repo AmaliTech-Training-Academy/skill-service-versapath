@@ -2,6 +2,7 @@ package com.capstone.skill_service.exception;
 
 import com.capstone.skill_service.dto.ClientResponseFormValidationErrorDto;
 import com.capstone.skill_service.dto.ClientResponseFormatDto;
+import com.capstone.skill_service.util.Status;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.http.HttpStatus;
@@ -181,6 +182,19 @@ public class GlobalException {
         // handle UUID mismatch
         if (ex.getRequiredType().equals(UUID.class)) {
             message = fieldName+ " provided doesn't exist";
+
+            ClientResponseFormValidationErrorDto response = ClientResponseFormValidationErrorDto.builder()
+                    .success(false)
+                    .message(message)
+                    .errors(null)
+                    .data(null)
+                    .build();
+
+            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+        }
+
+        if (ex.getRequiredType().equals(Status.class)) {
+            message = fieldName+ " is invalid";
         }
 
         ClientResponseFormValidationErrorDto response = ClientResponseFormValidationErrorDto.builder()
@@ -190,7 +204,7 @@ public class GlobalException {
                 .data(null)
                 .build();
 
-        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(AtomNotFoundException.class)
