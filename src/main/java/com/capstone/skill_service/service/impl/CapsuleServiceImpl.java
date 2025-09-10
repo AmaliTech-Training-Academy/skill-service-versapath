@@ -63,10 +63,15 @@ public class CapsuleServiceImpl implements CapsuleService {
         if(dto.getStatus() == null){ // set default value
             capsuleEntity.setStatus(Status.ACTIVE);
         }
-
-        addAtomsToCapsule(capsuleEntity, dto.getAtomIds()); // link capsule to all the atoms assigned to
-        addTagsToCapsule(capsuleEntity, dto.getTagIds()); // link capsule to all the tags assigned to
-        addClustersToCapsule(capsuleEntity, dto.getClusterIds()); // link capsule to all the clusters assigned to
+        if(dto.getAtomIds() != null){
+            addAtomsToCapsule(capsuleEntity, dto.getAtomIds()); // link capsule to all the atoms assigned to
+        }
+        if(dto.getTagIds() != null){
+            addTagsToCapsule(capsuleEntity, dto.getTagIds()); // link capsule to all the tags assigned to
+        }
+        if(dto.getClusterIds() != null){
+            addClustersToCapsule(capsuleEntity, dto.getClusterIds()); // link capsule to all the clusters assigned to
+        }
 
         logger.info("Admin created skill capsule: {}", capsuleEntity.getName());
         SkillCapsuleEntity savedCapsule = capsuleRepository.save(capsuleEntity);

@@ -24,7 +24,7 @@ public interface TrackCapsuleMappingRepository extends JpaRepository<TrackCapsul
     SELECT tc
     FROM TrackCapsuleMappingEntity tc
     JOIN FETCH tc.capsule
-    WHERE tc.capsule = :capsuleId
+    WHERE tc.capsule.id = :capsuleId
     ORDER BY tc.sequenceOrder
 """)
     List<TrackCapsuleMappingEntity> findBySkillCapsuleId(@Param("capsuleId") UUID capsuleId);

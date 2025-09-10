@@ -25,7 +25,7 @@ public interface RouteTrackMappingRepository extends JpaRepository<RouteTrackMap
     SELECT rt
     FROM RouteTrackMappingEntity rt
     JOIN FETCH rt.growthTrack
-    WHERE rt.growthTrack = :trackId
+    WHERE rt.growthTrack.id = :trackId
     ORDER BY rt.sequenceOrder
 """)
     List<RouteTrackMappingEntity> findByTrackId(@Param("trackId") UUID trackId);
