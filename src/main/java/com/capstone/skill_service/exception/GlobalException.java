@@ -156,14 +156,19 @@ public class GlobalException {
         String fieldName = null;
 
         if (cause instanceof InvalidFormatException invalidFormat) {
+            // get he field name from the path
+            if (!invalidFormat.getPath().isEmpty()) {
+                fieldName = invalidFormat.getPath().get(0).getFieldName();
+            }
             if (invalidFormat.getTargetType().isEnum()) { // enum exception
-                // get he field name from the path
-                if (!invalidFormat.getPath().isEmpty()) {
-                    fieldName = invalidFormat.getPath().get(0).getFieldName();
-                }
                 message = String.format("%s value is invalid", fieldName);
             }
+
+            if (invalidFormat.getTargetType().equals(UUID.class)) { // enum exception
+                message = String.format("%s field contains an invalid", fieldName);
+            }
         }
+
 
         ClientResponseFormValidationErrorDto response = ClientResponseFormValidationErrorDto.builder()
                 .success(false)
