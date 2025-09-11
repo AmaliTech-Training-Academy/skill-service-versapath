@@ -22,8 +22,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -160,5 +160,34 @@ public class TagServiceImpl implements TagService {
         tag.setStatus(status);
 
         return this.tagMapper.toDto(this.tagRepository.save(tag));
+    }
+
+    @Override
+    public List<TagResponseDto> addMultipleTags(List<String> tagNames) {
+        List<String> existingNames = tagRepository.findExistingTagNames(tagNames);
+
+        if (!existingNames.isEmpty()) { // check if name exist
+            throw new TagExistsException(
+                    String.format("Skill tags already exist: %s", String.join(", ", existingNames))
+            );
+        }
+
+        // check if there is duplicate in a list
+        Set<String> duplicates = tagNames.stream()
+                .filter(name -> Collections.frequency(tagNames, name) > 1)
+                .collect(Collectors.toSet());
+
+        if (!duplicates.isEmpty()) {
+            throw new TagExistsException(
+                    String.format("Duplicate tags in list: %s", String.join(", ", duplicates))
+            );
+        }
+
+        List<TagEntity> tags = tagNames.stream()
+                .map(name -> TagEntity.builder().name(name).build())
+                .toList();
+        List<TagEntity> savedTags = tagRepository.saveAll(tags);
+
+        return savedTags.stream().map(this.tagMapper::toDto).toList();
     }
 }
