@@ -1,5 +1,7 @@
 package com.capstone.skill_service.repository;
 
+import com.capstone.skill_service.dto.capsule.CapsuleWithAtomCountResponseDto;
+import com.capstone.skill_service.dto.track.TrackOnlyResponseDto;
 import com.capstone.skill_service.model.GrowthTrackEntity;
 import com.capstone.skill_service.model.SkillCapsuleEntity;
 import org.springframework.data.domain.Page;
@@ -28,9 +30,11 @@ public interface TrackRepository extends JpaRepository<GrowthTrackEntity, UUID> 
     Optional<GrowthTrackEntity> findByIdWithCapsules(@Param("trackId") UUID trackId);
 
     @Query("""
-        SELECT gt FROM GrowthTrackEntity gt
-        LEFT JOIN FETCH gt.skillCapsules c
-        ORDER BY gt.createdAt DESC
+    SELECT new com.capstone.skill_service.dto.track.TrackOnlyResponseDto(
+        t.id,t.name,t.description,t.estimatedMonths,t.status,(SELECT COUNT(mc.growthTrack.id) FROM t.skillCapsules mc),
+        t.createdAt,t.updatedAt)
+    FROM GrowthTrackEntity t
     """)
-    Page<GrowthTrackEntity> findAllWithSkillCapsule(Pageable pageable);
+    Page<TrackOnlyResponseDto> findTrackWithCapsuleCount(Pageable pageable);
+
 }

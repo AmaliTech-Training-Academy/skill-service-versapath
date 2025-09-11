@@ -47,7 +47,7 @@ public class CapsuleController {
     @GetMapping()
     @Operation(summary = "Retrieve skill capsules", description = "This end point allows anyone to fetch all skill capsules")
     public ResponseEntity<ClientResponseFormatDto> fetchAllCapsules(Pageable pageable) {
-        CustomPageResponse<CapsuleOnlyResponseDto> capsules = this.capsuleService.findAll(pageable);
+        CustomPageResponse<CapsuleWithAtomCountResponseDto> capsules = this.capsuleService.findAll(pageable);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
                 .success(true)
                 .message("Fetch all capsules")

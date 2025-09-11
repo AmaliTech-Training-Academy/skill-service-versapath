@@ -19,7 +19,6 @@ import org.common.event.GrowthTrackEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
@@ -136,13 +135,12 @@ public class TrackServiceImpl implements TrackService {
 
     @Override
     @Cacheable("growthTrackList")
-    public CustomPageResponse<TrackResponseDto> findAll(Pageable pageable) {
-        Page<GrowthTrackEntity> growthTrackList = this.trackRepository.findAllWithSkillCapsule(pageable);
-        Page<TrackResponseDto> growthTracks = growthTrackList.map(this.trackMapper::toDto);
+    public CustomPageResponse<TrackOnlyResponseDto> findAll(Pageable pageable) {
+        Page<TrackOnlyResponseDto> growthTracks = this.trackRepository.findTrackWithCapsuleCount(pageable);
 
         logger.info("Growth tracks list is fetched");
 
-        return CustomPageResponse.<TrackResponseDto>builder()
+        return CustomPageResponse.<TrackOnlyResponseDto>builder()
                 .items(growthTracks.getContent())
                 .page(growthTracks.getNumber())
                 .size(growthTracks.getSize())
@@ -346,7 +344,7 @@ public class TrackServiceImpl implements TrackService {
         for (TrackCapsuleMappingEntity mapping : trackEntity.getSkillCapsules()) {
             mapping.setSequenceOrder(order++);
         }
-        GrowthTrackEntity savedTrack = trackRepository.save(trackEntity);
+        trackRepository.save(trackEntity);
 
     }
 

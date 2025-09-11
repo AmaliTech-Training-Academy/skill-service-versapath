@@ -2,10 +2,7 @@ package com.capstone.skill_service.service;
 
 import com.capstone.skill_service.dto.CustomPageResponse;
 import com.capstone.skill_service.dto.capsule.CapsuleIdsRequestDto;
-import com.capstone.skill_service.dto.track.TrackRequestDto;
-import com.capstone.skill_service.dto.track.TrackResponseDto;
-import com.capstone.skill_service.dto.track.TrackUpdateRequestDto;
-import com.capstone.skill_service.dto.track.TrackWithCapsuleResponseDto;
+import com.capstone.skill_service.dto.track.*;
 import com.capstone.skill_service.model.GrowthTrackEntity;
 import com.capstone.skill_service.util.Status;
 import org.springframework.data.domain.Pageable;
@@ -18,7 +15,7 @@ public interface TrackService {
     TrackResponseDto create(TrackRequestDto dto);
     Optional<GrowthTrackEntity> findByName(String name);
     Optional<GrowthTrackEntity> findById(UUID id);
-    CustomPageResponse<TrackResponseDto> findAll(Pageable pageable);
+    CustomPageResponse<TrackOnlyResponseDto> findAll(Pageable pageable);
     TrackResponseDto getTrack(UUID id);
     TrackWithCapsuleResponseDto getTrackWithCapsules(UUID trackId);
     void deleteById(UUID id);
