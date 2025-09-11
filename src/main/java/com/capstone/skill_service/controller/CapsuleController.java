@@ -136,12 +136,12 @@ public class CapsuleController {
     @Operation(summary = "Remove a skill atom from capsule", description = "This end point allows admin to remove a skill atom from capsule")
     public ResponseEntity<ClientResponseFormatDto> removeAtomFromCapsule(
             @RequestParam UUID capsuleId, @RequestParam UUID atomId) {
-        CapsuleResponseDto updatedCapsule = this.capsuleService.removeAtomFromCapsule(capsuleId, atomId);
+        this.capsuleService.removeAtomFromCapsule(capsuleId, atomId);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
                 .success(true)
                 .message("Atom removed from capsule successfully!")
                 .errors(null)
-                .data(Map.of("item", updatedCapsule))
+                .data(null)
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
@@ -182,12 +182,12 @@ public class CapsuleController {
     @Operation(summary = "Remove a skill tag from capsule", description = "This end point allows admin to remove a skill tag from capsule")
     public ResponseEntity<ClientResponseFormatDto> removeTagFromCapsule(
             @RequestParam UUID capsuleId, @RequestParam UUID tagId) {
-        CapsuleResponseDto updatedCapsule = this.capsuleService.removeTagFromCapsule(capsuleId, tagId);
+        this.capsuleService.removeTagFromCapsule(capsuleId, tagId);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
                 .success(true)
                 .message("Tag removed from capsule successfully!")
                 .errors(null)
-                .data(Map.of("item", updatedCapsule))
+                .data(null)
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
@@ -212,12 +212,12 @@ public class CapsuleController {
     @Operation(summary = "Remove a skill cluster from capsule", description = "This end point allows admin to remove a skill cluster from capsule")
     public ResponseEntity<ClientResponseFormatDto> removeClusterFromCapsule(
             @RequestParam UUID capsuleId, @RequestParam UUID clusterId) {
-        CapsuleResponseDto updatedCapsule = this.capsuleService.removeClusterFromCapsule(capsuleId, clusterId);
+        this.capsuleService.removeClusterFromCapsule(capsuleId, clusterId);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
                 .success(true)
                 .message("Cluster removed from capsule successfully!")
                 .errors(null)
-                .data(Map.of("item", updatedCapsule))
+                .data(null)
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }

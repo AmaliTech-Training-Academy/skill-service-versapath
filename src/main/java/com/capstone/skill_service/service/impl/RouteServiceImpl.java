@@ -370,7 +370,7 @@ public class RouteServiceImpl implements RouteService {
             @CacheEvict(value = "talentRoute", key = "#routeId") // evict single talent route
         }
     )
-    public RouteResponseDto removeTrackFromRoute(UUID routeId, UUID trackId) {
+    public void removeTrackFromRoute(UUID routeId, UUID trackId) {
 
         TalentRouteEntity route = findById(routeId)
                 .orElseThrow(() -> new RouteNotFoundException("A talent route provided doesn't exist"));
@@ -390,8 +390,6 @@ public class RouteServiceImpl implements RouteService {
         }
         TalentRouteEntity savedTrack = routeRepository.save(route);
 
-        // map growth track to response dto
-        return this.routeMapper.toDto(savedTrack);
     }
 
 

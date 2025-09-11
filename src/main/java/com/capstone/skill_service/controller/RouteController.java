@@ -137,12 +137,12 @@ public class RouteController {
     @Operation(summary = "Remove a growth track from route", description = "This end point allows admin to remove a growth track from route")
     public ResponseEntity<ClientResponseFormatDto> removeTrackFromRoute(
             @RequestParam UUID routeId, @RequestParam UUID trackId) {
-        RouteResponseDto updatedRoute = this.routeService.removeTrackFromRoute(routeId, trackId);
+        this.routeService.removeTrackFromRoute(routeId, trackId);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
                 .success(true)
                 .message("Growth Track removed from talent route successfully!")
                 .errors(null)
-                .data(Map.of("item", updatedRoute))
+                .data(null)
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
