@@ -225,6 +225,19 @@ public class GlobalException {
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(InvalidTimeException.class)
+    public ResponseEntity<?> handleAtomNotFound(
+            InvalidTimeException exception) {
+        ClientResponseFormValidationErrorDto response = ClientResponseFormValidationErrorDto.builder()
+                .success(false)
+                .message("Form validation Error!")
+                .errors(List.of(exception.getMessage()))
+                .data(null)
+                .build();
+
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(AtomExistsException.class)
     public ResponseEntity<?> handleAtomExists
             (AtomExistsException exception) {

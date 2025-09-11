@@ -268,6 +268,9 @@ public class CapsuleServiceImpl implements CapsuleService {
             capsule.setCategoryType(dto.getCategoryType());
         }
         if(dto.getEstimatedHours() != capsule.getEstimatedHours()){
+            if(dto.getEstimatedHours() < 0 || dto.getEstimatedHours() > 1000){
+                throw new InvalidTimeException("Estimated hours is invalid, must be between 1 and 100");
+            }
             capsule.setEstimatedHours(dto.getEstimatedHours());
         }
         if(dto.getStatus() != null){

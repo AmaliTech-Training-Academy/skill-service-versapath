@@ -58,7 +58,6 @@ public class TrackServiceImpl implements TrackService {
         if(dto.getStatus() == null){ // set default value
             trackEntity.setStatus(Status.ACTIVE);
         }
-
         addCapsulesToTrack(trackEntity, dto.getCapsuleIds()); // link track to all the capsules assigned to
 
 
@@ -260,8 +259,12 @@ public class TrackServiceImpl implements TrackService {
         }
 
         if(dto.getEstimatedMonths() != track.getEstimatedMonths()){
+            if(dto.getEstimatedMonths() < 0 || dto.getEstimatedMonths() > 1000){
+                throw new InvalidTimeException("Estimated months is invalid, must be between 1 and 100");
+            }
             track.setEstimatedMonths(dto.getEstimatedMonths());
         }
+
         if(dto.getStatus() != null){
             track.setStatus(dto.getStatus());
         }
