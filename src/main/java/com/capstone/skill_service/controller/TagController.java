@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -113,5 +114,21 @@ public class TagController {
                 .data(Map.of("item", updatedTag))
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @PostMapping("/addMultipleTags")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @Operation(summary = "Create multiple skill tags", description = "This end point allows only admin to create multiple skill tags")
+    public ResponseEntity<ClientResponseFormatDto> createMultipleTags(
+            @RequestBody List<String> tagNames
+    ) {
+        List<TagResponseDto> savedTags = this.tagService.addMultipleTags(tagNames);
+        ClientResponseFormatDto response = ClientResponseFormatDto.builder()
+                .success(true)
+                .message("Tags created successfully!")
+                .errors(null)
+                .data(Map.of("item", savedTags))
+                .build();
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 }

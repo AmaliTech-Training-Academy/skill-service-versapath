@@ -8,6 +8,7 @@ import com.capstone.skill_service.model.TagEntity;
 import com.capstone.skill_service.util.Status;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -20,4 +21,5 @@ public interface TagService {
     void deleteById(UUID id);
     TagResponseDto partialUpdate(TagUpdateRequestDto dto, UUID id);
     TagResponseDto updateStatus(Status status, UUID id);
+    List<TagResponseDto> addMultipleTags(List<String> tagName);
 }

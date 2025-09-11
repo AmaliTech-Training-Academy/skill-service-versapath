@@ -1,6 +1,7 @@
 package com.capstone.skill_service.dto.tag;
 
 import com.capstone.skill_service.util.Status;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,6 +18,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class TagResponseDto implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;

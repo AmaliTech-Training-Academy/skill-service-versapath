@@ -28,4 +28,7 @@ public interface TagRepository extends JpaRepository<TagEntity, UUID> {
 """)
     List<TagEntity> findTagsByCapsuleId(@Param("capsuleId") UUID capsuleId);
 
+    @Query("SELECT t.name FROM TagEntity t WHERE t.name IN :names")
+    List<String> findExistingTagNames(@Param("names") List<String> names);
+
 }
