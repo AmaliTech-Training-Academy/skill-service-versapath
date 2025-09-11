@@ -147,13 +147,12 @@ public class CapsuleServiceImpl implements CapsuleService {
 
     @Override
     @Cacheable("capsuleList")
-    public CustomPageResponse<CapsuleOnlyResponseDto> findAll(Pageable pageable) {
-        Page<SkillCapsuleEntity> capsuleList = this.capsuleRepository.findAll(pageable);
-        Page<CapsuleOnlyResponseDto> capsules = capsuleList.map(this.capsuleMapper::toCapsuleOnlyDto);
+    public CustomPageResponse<CapsuleWithAtomCountResponseDto> findAll(Pageable pageable) {
+        Page<CapsuleWithAtomCountResponseDto> capsules = this.capsuleRepository.findCapsuleWithAtomCount(pageable);
 
         logger.info("Capsules list is fetched");
 
-        return CustomPageResponse.<CapsuleOnlyResponseDto>builder()
+        return CustomPageResponse.<CapsuleWithAtomCountResponseDto>builder()
                 .items(capsules.getContent())
                 .page(capsules.getNumber())
                 .size(capsules.getSize())
@@ -398,7 +397,7 @@ public class CapsuleServiceImpl implements CapsuleService {
         for (CapsuleAtomMappingEntity mapping : capsuleEntity.getSkillAtoms()) {
             mapping.setSequenceOrder(order++);
         }
-        SkillCapsuleEntity savedCapsule = capsuleRepository.save(capsuleEntity);
+        capsuleRepository.save(capsuleEntity);
 
     }
 
@@ -527,7 +526,7 @@ public class CapsuleServiceImpl implements CapsuleService {
 
         capsuleEntity.getTags().remove(tagToRemove); // remove tag from capsule
 
-        SkillCapsuleEntity savedCapsule = capsuleRepository.save(capsuleEntity);
+        capsuleRepository.save(capsuleEntity);
 
     }
 
@@ -573,7 +572,7 @@ public class CapsuleServiceImpl implements CapsuleService {
 
         capsuleEntity.getClusters().remove(clusterToRemove); // remove cluster from capsule
 
-        SkillCapsuleEntity savedCapsule = capsuleRepository.save(capsuleEntity);
+        capsuleRepository.save(capsuleEntity);
 
     }
 

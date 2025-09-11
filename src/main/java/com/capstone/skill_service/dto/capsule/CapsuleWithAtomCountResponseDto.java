@@ -15,21 +15,33 @@ import java.util.UUID;
 
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
-@Builder
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
-public class CapsuleOnlyResponseDto implements Serializable {
+public class CapsuleWithAtomCountResponseDto implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
     private UUID id;
     private String name;
-    private int estimatedHours;
     private String difficulty;
     private ProficiencyLevel proficiencyLevel;
     private String categoryType;
     private String description;
     private String objectives;
+    private int estimatedHours;
     private Status status;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private long atomNumber;
+
+    public CapsuleWithAtomCountResponseDto(UUID id, String name, String difficulty, ProficiencyLevel proficiencyLevel,
+                                           String categoryType,String description, String objectives,
+                                           int estimatedHours, Status status, long atomNumber) {
+        this.id = id;
+        this.name = name;
+        this.estimatedHours = estimatedHours;
+        this.status = status;
+        this.atomNumber = atomNumber;
+        this.difficulty = difficulty;
+        this.proficiencyLevel = proficiencyLevel;
+        this.categoryType = categoryType;
+        this.description = description;
+        this.objectives = objectives;
+    }
 }

@@ -17,7 +17,7 @@ import java.util.UUID;
 public interface CapsuleService {
     CapsuleResponseDto create(CapsuleRequestDto dto);
     Optional<SkillCapsuleEntity> findByName(String name);
-    CustomPageResponse<CapsuleOnlyResponseDto> findAll(Pageable pageable);
+    CustomPageResponse<CapsuleWithAtomCountResponseDto> findAll(Pageable pageable);
     Optional<SkillCapsuleEntity> findById(UUID id);
     CapsuleResponseDto getCapsule(UUID id);
     void deleteById(UUID id);

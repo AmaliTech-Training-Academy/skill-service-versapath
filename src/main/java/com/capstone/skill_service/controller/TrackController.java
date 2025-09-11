@@ -3,10 +3,7 @@ package com.capstone.skill_service.controller;
 import com.capstone.skill_service.dto.ClientResponseFormatDto;
 import com.capstone.skill_service.dto.CustomPageResponse;
 import com.capstone.skill_service.dto.capsule.CapsuleIdsRequestDto;
-import com.capstone.skill_service.dto.track.TrackRequestDto;
-import com.capstone.skill_service.dto.track.TrackResponseDto;
-import com.capstone.skill_service.dto.track.TrackUpdateRequestDto;
-import com.capstone.skill_service.dto.track.TrackWithCapsuleResponseDto;
+import com.capstone.skill_service.dto.track.*;
 import com.capstone.skill_service.service.TrackService;
 import com.capstone.skill_service.util.Status;
 import io.swagger.v3.oas.annotations.Operation;
@@ -48,7 +45,7 @@ public class TrackController {
     @GetMapping()
     @Operation(summary = "Retrieve growth tracks", description = "This end point allows anyone to fetch all growth tracks")
     public ResponseEntity<ClientResponseFormatDto> fetchAllTracks(Pageable pageable) {
-        CustomPageResponse<TrackResponseDto> tracks = this.trackService.findAll(pageable);
+        CustomPageResponse<TrackOnlyResponseDto> tracks = this.trackService.findAll(pageable);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
                 .success(true)
                 .message("Fetch all growth tracks")

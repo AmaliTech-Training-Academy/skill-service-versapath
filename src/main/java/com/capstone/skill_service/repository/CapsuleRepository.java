@@ -1,6 +1,10 @@
 package com.capstone.skill_service.repository;
 
+import com.capstone.skill_service.dto.capsule.CapsuleOnlyResponseDto;
+import com.capstone.skill_service.dto.capsule.CapsuleWithAtomCountResponseDto;
 import com.capstone.skill_service.model.SkillCapsuleEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -46,4 +50,11 @@ public interface CapsuleRepository extends JpaRepository<SkillCapsuleEntity, UUI
 """)
     Optional<SkillCapsuleEntity> findByIdWithDetails(@Param("capsuleId") UUID capsuleId);
 
+    @Query("""
+    SELECT new com.capstone.skill_service.dto.capsule.CapsuleWithAtomCountResponseDto(
+        c.id, c.name, c.difficulty, c.proficiencyLevel, c.categoryType , c.description ,c.objectives,
+        c.estimatedHours, c.status, (SELECT COUNT(ma.capsule.id) FROM c.skillAtoms ma))
+    FROM SkillCapsuleEntity c
+    """)
+    Page<CapsuleWithAtomCountResponseDto> findCapsuleWithAtomCount(Pageable pageable);
 }
