@@ -24,8 +24,8 @@ public class CapsuleRequestDto {
     private
     String name;
 
-    @Min(value = 1, message = "Must be at least 1 hour")
-    @Max(value = 1000, message = "Must not exceed 1000 hours")
+    @Min(value = 1, message = "Estimated hours Must be at least 1 hour")
+    @Max(value = 1000, message = "Estimated hours Must not exceed 1000 hours")
     private int estimatedHours;
 
     private String difficulty;
