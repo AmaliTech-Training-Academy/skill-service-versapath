@@ -208,7 +208,6 @@ public class TrackServiceImpl implements TrackService {
     }
 
     @Override
-    @Cacheable(value = "track", key = "#id")
     public TrackResponseDto getTrack(UUID id) {
         GrowthTrackEntity track = findById(id)
                 .orElseThrow( () -> new TrackNotFoundException("A growth track provided doesn't exist")
@@ -220,7 +219,12 @@ public class TrackServiceImpl implements TrackService {
     }
 
     @Override
-    @CacheEvict(value = "growthTrackList", allEntries = true)
+    @Caching(
+        evict = {
+            @CacheEvict(value = "growthTrackList", allEntries = true), // to update the entire list
+            @CacheEvict(value = "track", key = "#id") // evict single track
+        }
+    )
     public void deleteById(UUID id) {
         GrowthTrackEntity track = findById(id)
                 .orElseThrow( () -> new TrackNotFoundException("A growth track provided doesn't exist")
@@ -236,8 +240,10 @@ public class TrackServiceImpl implements TrackService {
 
     @Override
     @Caching(
-            evict = @CacheEvict(value = "growthTrackList", allEntries = true), // to update the entire list
-            put = @CachePut(value = "track", key = "#result.id") // Different cache name for individual track
+        evict = {
+            @CacheEvict(value = "growthTrackList", allEntries = true), // to update the entire list
+            @CacheEvict(value = "track", key = "#id") // evict single track
+        }
     )
     public TrackResponseDto partialUpdate(TrackUpdateRequestDto dto, UUID id) {
         GrowthTrackEntity track = findById(id)
@@ -281,8 +287,10 @@ public class TrackServiceImpl implements TrackService {
 
     @Override
     @Caching(
-            evict = @CacheEvict(value = "growthTrackList", allEntries = true), // to update the entire list
-            put = @CachePut(value = "track", key = "#result.id") // Different cache name for individual track
+        evict = {
+            @CacheEvict(value = "growthTrackList", allEntries = true), // to update the entire list
+            @CacheEvict(value = "track", key = "#id") // evict single track
+        }
     )
     public TrackResponseDto updateStatus(Status status, UUID id) {
         GrowthTrackEntity track = findById(id)
@@ -296,8 +304,10 @@ public class TrackServiceImpl implements TrackService {
 
     @Override
     @Caching(
-            evict = @CacheEvict(value = "growthTrackList", allEntries = true), // to update the entire list
-            put = @CachePut(value = "track", key = "#result.id") // Different cache name for individual track
+        evict = {
+            @CacheEvict(value = "growthTrackList", allEntries = true), // to update the entire list
+            @CacheEvict(value = "track", key = "#trackId") // evict single track
+        }
     )
     public TrackResponseDto assignCapsuleToTrack(UUID trackId, CapsuleIdsRequestDto dto) {
         GrowthTrackEntity track = findById(trackId)
@@ -314,8 +324,10 @@ public class TrackServiceImpl implements TrackService {
 
     @Override
     @Caching(
-            evict = @CacheEvict(value = "growthTrackList", allEntries = true), // to update the entire list
-            put = @CachePut(value = "track", key = "#result.id") // Different cache name for individual track
+        evict = {
+            @CacheEvict(value = "growthTrackList", allEntries = true), // to update the entire list
+            @CacheEvict(value = "track", key = "#trackId") // evict single track
+        }
     )
     public TrackResponseDto removeCapsuleFromTrack(UUID trackId, UUID capsuleId) {
         GrowthTrackEntity trackEntity = findById(trackId)
@@ -342,8 +354,10 @@ public class TrackServiceImpl implements TrackService {
 
     @Override
     @Caching(
-            evict = @CacheEvict(value = "growthTrackList", allEntries = true), // to update the entire list
-            put = @CachePut(value = "track", key = "#result.id") // Different cache name for individual track
+        evict = {
+            @CacheEvict(value = "growthTrackList", allEntries = true), // to update the entire list
+            @CacheEvict(value = "track", key = "#trackId") // evict single track
+        }
     )
     public TrackResponseDto reorderCapsules(UUID trackId, List<UUID> orderedCapsuleIds) {
         GrowthTrackEntity trackEntity = findById(trackId)

@@ -98,6 +98,7 @@ public class AtomServiceImpl implements AtomService {
     }
 
     @Override
+    @Cacheable(value = "atom", key = "#id")
     public AtomResponseDto getAtom(UUID id) {
         SkillAtomEntity atom = findById(id)
                 .orElseThrow( () -> new AtomNotFoundException("A Skill atom provided doesn't exist")
@@ -109,7 +110,12 @@ public class AtomServiceImpl implements AtomService {
     }
 
     @Override
-    @CacheEvict(value = "atomList",  allEntries = true)
+    @Caching(
+        evict = {
+            @CacheEvict(value = "atomList", allEntries = true), // to update the entire list
+            @CacheEvict(value = "atom", key = "#result.id") // evict single atom
+        }
+    )
     public void deleteById(UUID id) {
         SkillAtomEntity atom = findById(id)
                 .orElseThrow( () -> new AtomNotFoundException("A Skill atom provided doesn't exist")
@@ -125,8 +131,11 @@ public class AtomServiceImpl implements AtomService {
 
     @Override
     @Caching(
-            evict = @CacheEvict(value = "atomList", allEntries = true), // to update the entire list
-            put = @CachePut(value = "atom", key = "#result.id") // Different cache name for individual atom
+        evict = {
+            @CacheEvict(value = "atomList", allEntries = true), // to update the entire list
+            @CacheEvict(value = "atom", key = "#result.id") // evict single atom
+
+        }
     )
     public AtomResponseDto partialUpdate(AtomUpdateRequestDto dto, UUID id) {
         SkillAtomEntity atom = findById(id)
@@ -160,6 +169,12 @@ public class AtomServiceImpl implements AtomService {
     }
 
     @Override
+    @Caching(
+        evict = {
+            @CacheEvict(value = "atomList", allEntries = true), // to update the entire list
+            @CacheEvict(value = "atom", key = "#id") // evict single atom
+        }
+    )
     public AtomResponseDto updateStatus(Status status, UUID id) {
         SkillAtomEntity atom = findById(id)
                 .orElseThrow( () -> new AtomNotFoundException("A Skill atom provided doesn't exist")
