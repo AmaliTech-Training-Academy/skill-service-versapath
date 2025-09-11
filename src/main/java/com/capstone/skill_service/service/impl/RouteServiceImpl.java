@@ -277,8 +277,10 @@ public class RouteServiceImpl implements RouteService {
 
     @Override
     @Caching(
-            evict = @CacheEvict(value = "talentRouteList", allEntries = true), // to update the entire list
-            put = @CachePut(value = "talentRoute", key = "#result.id") // Different cache name for individual track
+        evict = {
+            @CacheEvict(value = "talentRouteList", allEntries = true), // to update the entire list
+            @CacheEvict(value = "talentRoute", key = "#id") // evict single talent route
+        }
     )
     public RouteResponseDto partialUpdate(RouteUpdateRequestDto dto, UUID id) {
         TalentRouteEntity route = findById(id)
@@ -324,8 +326,10 @@ public class RouteServiceImpl implements RouteService {
 
     @Override
     @Caching(
-            evict = @CacheEvict(value = "talentRouteList", allEntries = true), // to update the entire list
-            put = @CachePut(value = "talentRoute", key = "#result.id") // Different cache name for individual track
+        evict = {
+            @CacheEvict(value = "talentRouteList", allEntries = true), // to update the entire list
+            @CacheEvict(value = "talentRoute", key = "#id") // evict single talent route
+        }
     )
     public RouteResponseDto updateStatus(Status status, UUID id) {
 
@@ -340,8 +344,10 @@ public class RouteServiceImpl implements RouteService {
 
     @Override
     @Caching(
-            evict = @CacheEvict(value = "talentRouteList", allEntries = true), // to update the entire list
-            put = @CachePut(value = "talentRoute", key = "#result.id") // Different cache name for individual track
+        evict = {
+            @CacheEvict(value = "talentRouteList", allEntries = true), // to update the entire list
+            @CacheEvict(value = "talentRoute", key = "#routeId") // evict single talent route
+        }
     )
     public RouteResponseDto assignTrackToRoute(UUID routeId, TrackIdsRequestDto dto) {
 
@@ -359,8 +365,10 @@ public class RouteServiceImpl implements RouteService {
 
     @Override
     @Caching(
-            evict = @CacheEvict(value = "talentRouteList", allEntries = true), // to update the entire list
-            put = @CachePut(value = "talentRoute", key = "#result.id") // Different cache name for individual track
+        evict = {
+            @CacheEvict(value = "talentRouteList", allEntries = true), // to update the entire list
+            @CacheEvict(value = "talentRoute", key = "#routeId") // evict single talent route
+        }
     )
     public RouteResponseDto removeTrackFromRoute(UUID routeId, UUID trackId) {
 
@@ -389,11 +397,13 @@ public class RouteServiceImpl implements RouteService {
 
     @Override
     @Caching(
-            evict = @CacheEvict(value = "talentRouteList", allEntries = true), // to update the entire list
-            put = @CachePut(value = "talentRoute", key = "#result.id") // Different cache name for individual track
+        evict = {
+            @CacheEvict(value = "talentRouteList", allEntries = true), // to update the entire list
+            @CacheEvict(value = "talentRoute", key = "#routeId") // evict single talent route
+        }
     )
-    public RouteResponseDto reorderTracks(UUID trackId, List<UUID> orderedTrackIds) {
-        TalentRouteEntity route = findById(trackId)
+    public RouteResponseDto reorderTracks(UUID routeId, List<UUID> orderedTrackIds) {
+        TalentRouteEntity route = findById(routeId)
                 .orElseThrow( () -> new RouteNotFoundException("A talent route provided doesn't exist")
                 );
 

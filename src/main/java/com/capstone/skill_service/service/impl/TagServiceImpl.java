@@ -84,7 +84,12 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    @CacheEvict(value = "tagList", allEntries = true)
+    @Caching(
+        evict = {
+            @CacheEvict(value = "tagList", allEntries = true), // to update the entire list
+            @CacheEvict(value = "tag", key = "#id") // evict single tag
+        }
+    )
     public void deleteById(UUID id) {
         TagEntity tag = findById(id)
                 .orElseThrow( () -> new TagNotFoundException("A tag provided doesn't exist")
@@ -109,8 +114,10 @@ public class TagServiceImpl implements TagService {
 
     @Override
     @Caching(
-            evict = @CacheEvict(value = "tagList", allEntries = true), // to update the entire list
-            put = @CachePut(value = "tag", key = "#result.id") // Different cache name for individual track
+        evict = {
+            @CacheEvict(value = "tagList", allEntries = true), // to update the entire list
+            @CacheEvict(value = "tag", key = "#id") // evict single tag
+        }
     )
     public TagResponseDto partialUpdate(TagUpdateRequestDto dto, UUID id) {
         TagEntity tag = findById(id)
@@ -142,8 +149,10 @@ public class TagServiceImpl implements TagService {
 
     @Override
     @Caching(
-            evict = @CacheEvict(value = "tagList", allEntries = true), // to update the entire list
-            put = @CachePut(value = "tag", key = "#result.id") // Different cache name for individual track
+        evict = {
+            @CacheEvict(value = "tagList", allEntries = true), // to update the entire list
+            @CacheEvict(value = "tag", key = "#id") // evict single tag
+        }
     )
     public TagResponseDto updateStatus(Status status, UUID id) {
         TagEntity tag = findById(id)
