@@ -413,7 +413,7 @@ public class CapsuleServiceImpl implements CapsuleService {
 
         Set<UUID> noneDuplicateOrderedAtomIds = new HashSet<>(orderedAtomIds);
 
-        if(! new HashSet<>(existingAtomIds).containsAll(orderedAtomIds) || noneDuplicateOrderedAtomIds.size() != orderedAtomIds.size()){
+        if(! new HashSet<>(existingAtomIds).containsAll(orderedAtomIds) || noneDuplicateOrderedAtomIds.size() != existingAtoms.size()){
             throw new InvalidAtomIdsException("Invalid skill atoms for this capsule");
         }
 

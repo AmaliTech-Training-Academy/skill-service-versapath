@@ -403,7 +403,7 @@ public class RouteServiceImpl implements RouteService {
 
         Set<UUID> noneDuplicateOrderedTrackIds = new HashSet<>(orderedTrackIds);
 
-        if(! new HashSet<>(existingTrackIds).containsAll(orderedTrackIds) || noneDuplicateOrderedTrackIds.size() != orderedTrackIds.size()){
+        if(! new HashSet<>(existingTrackIds).containsAll(orderedTrackIds) || noneDuplicateOrderedTrackIds.size() != existingTracks.size()){
             throw new InvalidTrackIdsException("Invalid growth track for this talent route");
         }
 

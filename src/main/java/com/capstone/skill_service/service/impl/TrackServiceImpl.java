@@ -356,7 +356,7 @@ public class TrackServiceImpl implements TrackService {
 
         Set<UUID> noneDuplicateOrderedCapsuleIds = new HashSet<>(orderedCapsuleIds);
 
-        if(! new HashSet<>(existingCapsuleIds).containsAll(orderedCapsuleIds) || noneDuplicateOrderedCapsuleIds.size() != orderedCapsuleIds.size()){
+        if(! new HashSet<>(existingCapsuleIds).containsAll(orderedCapsuleIds) || noneDuplicateOrderedCapsuleIds.size() != existingCapsules.size()){
             throw new InvalidCapsuleIdsException("Invalid skill capsule for this track");
         }
 
