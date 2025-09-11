@@ -21,7 +21,8 @@ public class CapsuleRequestDto {
     @NotBlank(message = "Name is required")
     @Size(min = 3, message = "Name must have at least 3 characters")
     @Pattern(regexp = "^[A-Za-z ]+$", message = "name cannot contain numbers")
-    private String name;
+    private
+    String name;
 
     @Min(value = 1, message = "Must be at least 1 hour")
     @Max(value = 1000, message = "Must not exceed 1000 hours")
