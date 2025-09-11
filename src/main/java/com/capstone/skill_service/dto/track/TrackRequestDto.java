@@ -21,8 +21,8 @@ public class TrackRequestDto {
     @Pattern(regexp = "^[A-Za-z ]+$", message = "name cannot contain numbers")
     private String name;
 
-    @Min(value = 1, message = "Must be at least 1 hour")
-    @Max(value = 1000, message = "Must not exceed 1000 hours")
+    @Min(value = 1, message = "Growth track Must be at least 1 month")
+    @Max(value = 1000, message = "Growth track Must not exceed 36 months")
     private int estimatedMonths;
 
     List<UUID> capsuleIds; // list of capsule ids

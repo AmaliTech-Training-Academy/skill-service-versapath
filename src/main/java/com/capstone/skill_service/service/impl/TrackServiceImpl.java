@@ -263,8 +263,8 @@ public class TrackServiceImpl implements TrackService {
         }
 
         if(dto.getEstimatedMonths() != track.getEstimatedMonths()){
-            if(dto.getEstimatedMonths() < 0 || dto.getEstimatedMonths() > 1000){
-                throw new InvalidTimeException("Estimated months is invalid, must be between 1 and 100");
+            if(dto.getEstimatedMonths() < 0 || dto.getEstimatedMonths() > 36){
+                throw new InvalidTimeException("Estimated months is invalid, must be between 1 and 36");
             }
             track.setEstimatedMonths(dto.getEstimatedMonths());
         }
