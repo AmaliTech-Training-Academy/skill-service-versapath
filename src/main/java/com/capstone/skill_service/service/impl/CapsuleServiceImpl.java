@@ -381,7 +381,7 @@ public class CapsuleServiceImpl implements CapsuleService {
             @CacheEvict(value = "capsuleWithDetails", key = "#capsuleId")  // evict single capsule details
         }
     )
-    public CapsuleResponseDto removeAtomFromCapsule(UUID capsuleId, UUID atomId) {
+    public void removeAtomFromCapsule(UUID capsuleId, UUID atomId) {
         SkillCapsuleEntity capsuleEntity = findById(capsuleId)
                 .orElseThrow(() -> new CapsuleNotFoundException("A Skill capsule provided doesn't exist"));
 
@@ -400,8 +400,6 @@ public class CapsuleServiceImpl implements CapsuleService {
         }
         SkillCapsuleEntity savedCapsule = capsuleRepository.save(capsuleEntity);
 
-        // map capsule to response dto
-        return mapCapsuleToResponseDtoWithAtom(savedCapsule);
     }
 
     @Override
@@ -517,7 +515,7 @@ public class CapsuleServiceImpl implements CapsuleService {
             @CacheEvict(value = "capsuleWithDetails", key = "#capsuleId")  // evict single capsule details
         }
     )
-    public CapsuleResponseDto removeTagFromCapsule(UUID capsuleId, UUID tagId) {
+    public void removeTagFromCapsule(UUID capsuleId, UUID tagId) {
         SkillCapsuleEntity capsuleEntity = findById(capsuleId)
                 .orElseThrow(() -> new CapsuleNotFoundException("A Skill capsule provided doesn't exist"));
 
@@ -531,8 +529,6 @@ public class CapsuleServiceImpl implements CapsuleService {
 
         SkillCapsuleEntity savedCapsule = capsuleRepository.save(capsuleEntity);
 
-        // map capsule to response dto
-        return mapCapsuleToResponseDtoWithAtom(savedCapsule);
     }
 
     @Override
@@ -565,7 +561,7 @@ public class CapsuleServiceImpl implements CapsuleService {
             @CacheEvict(value = "capsuleWithDetails", key = "#capsuleId")  // evict single capsule details
         }
     )
-    public CapsuleResponseDto removeClusterFromCapsule(UUID capsuleId, UUID clusterId) {
+    public void removeClusterFromCapsule(UUID capsuleId, UUID clusterId) {
         SkillCapsuleEntity capsuleEntity = findById(capsuleId)
                 .orElseThrow(() -> new CapsuleNotFoundException("A Skill capsule provided doesn't exist"));
 
@@ -579,8 +575,6 @@ public class CapsuleServiceImpl implements CapsuleService {
 
         SkillCapsuleEntity savedCapsule = capsuleRepository.save(capsuleEntity);
 
-        // map capsule to response dto
-        return mapCapsuleToResponseDtoWithAtom(savedCapsule);
     }
 
 }

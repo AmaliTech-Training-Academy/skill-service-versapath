@@ -24,12 +24,12 @@ public interface CapsuleService {
     CapsuleResponseDto partialUpdate(CapsuleUpdateRequestDto dto, UUID id);
     CapsuleResponseDto updateStatus(Status status, UUID id);
     CapsuleResponseDto assignAtomToCapsule(UUID capsuleId, AtomIdsRequestDto dto);
-    CapsuleResponseDto removeAtomFromCapsule(UUID capsuleId, UUID atomId);
+    void removeAtomFromCapsule(UUID capsuleId, UUID atomId);
     CapsuleResponseDto reorderAtoms(UUID capsuleId, List<UUID> orderedAtomIds);
     CapsuleResponseDto assignTagToCapsule(UUID capsuleId, TagIdsRequestDto dto);
-    CapsuleResponseDto removeTagFromCapsule(UUID capsuleId, UUID tagId);
+    void removeTagFromCapsule(UUID capsuleId, UUID tagId);
     CapsuleResponseDto assignClusterToCapsule(UUID capsuleId, ClusterIdsRequestDto dto);
-    CapsuleResponseDto removeClusterFromCapsule(UUID capsuleId, UUID clusterId);
+    void removeClusterFromCapsule(UUID capsuleId, UUID clusterId);
     CapsuleWithDetailsResponseDto getCapsuleWithDetails(UUID capsuleId);
 
     void updateSkillWithMoodleData(UpdateSkillEvent updateSkillEvent);

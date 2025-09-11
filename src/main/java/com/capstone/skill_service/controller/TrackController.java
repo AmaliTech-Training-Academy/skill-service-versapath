@@ -137,12 +137,12 @@ public class TrackController {
     @Operation(summary = "Remove a skill capsule from track", description = "This end point allows admin to remove a skill capsule from track")
     public ResponseEntity<ClientResponseFormatDto> removeCapsuleFromTrack(
             @RequestParam UUID trackId, @RequestParam UUID capsuleId) {
-        TrackResponseDto updatedTrack = this.trackService.removeCapsuleFromTrack(trackId, capsuleId);
+        this.trackService.removeCapsuleFromTrack(trackId, capsuleId);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
                 .success(true)
                 .message("Capsule removed from track successfully!")
                 .errors(null)
-                .data(Map.of("item", updatedTrack))
+                .data(null)
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }

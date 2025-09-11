@@ -25,7 +25,7 @@ public interface TrackService {
     TrackResponseDto partialUpdate(TrackUpdateRequestDto dto, UUID id);
     TrackResponseDto updateStatus(Status status, UUID id);
     TrackResponseDto assignCapsuleToTrack(UUID trackId, CapsuleIdsRequestDto dto);
-    TrackResponseDto removeCapsuleFromTrack(UUID trackId, UUID capsuleId);
+    void removeCapsuleFromTrack(UUID trackId, UUID capsuleId);
     TrackResponseDto reorderCapsules(UUID trackId, List<UUID> orderedCapsuleIds);
 
 }

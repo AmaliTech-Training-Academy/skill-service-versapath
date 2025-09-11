@@ -26,7 +26,7 @@ public interface RouteService {
     RouteResponseDto partialUpdate(RouteUpdateRequestDto dto, UUID id);
     RouteResponseDto updateStatus(Status status, UUID id);
     RouteResponseDto assignTrackToRoute(UUID routeId, TrackIdsRequestDto dto);
-    RouteResponseDto removeTrackFromRoute(UUID routeId, UUID trackId);
+    void removeTrackFromRoute(UUID routeId, UUID trackId);
     RouteResponseDto reorderTracks(UUID routeId, List<UUID> orderedTrackIds);
 
 }

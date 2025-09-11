@@ -2,6 +2,7 @@ package com.capstone.skill_service.exception;
 
 import com.capstone.skill_service.dto.ClientResponseFormValidationErrorDto;
 import com.capstone.skill_service.dto.ClientResponseFormatDto;
+import com.capstone.skill_service.util.ProficiencyLevel;
 import com.capstone.skill_service.util.Status;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import io.swagger.v3.oas.annotations.Hidden;
@@ -165,7 +166,7 @@ public class GlobalException {
             }
 
             if (invalidFormat.getTargetType().equals(UUID.class)) { // enum exception
-                message = String.format("%s field contains an invalid", fieldName);
+                message = String.format("%s field contains an invalid value", fieldName);
             }
         }
 
@@ -199,6 +200,10 @@ public class GlobalException {
         }
 
         if (ex.getRequiredType().equals(Status.class)) {
+            message = fieldName+ " is invalid";
+        }
+
+        if (ex.getRequiredType().equals(ProficiencyLevel.class)) {
             message = fieldName+ " is invalid";
         }
 

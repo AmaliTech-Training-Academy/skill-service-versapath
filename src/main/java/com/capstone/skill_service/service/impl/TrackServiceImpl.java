@@ -329,7 +329,7 @@ public class TrackServiceImpl implements TrackService {
             @CacheEvict(value = "track", key = "#trackId") // evict single track
         }
     )
-    public TrackResponseDto removeCapsuleFromTrack(UUID trackId, UUID capsuleId) {
+    public void removeCapsuleFromTrack(UUID trackId, UUID capsuleId) {
         GrowthTrackEntity trackEntity = findById(trackId)
                 .orElseThrow(() -> new TrackNotFoundException("A growth track provided doesn't exist"));
 
@@ -348,8 +348,6 @@ public class TrackServiceImpl implements TrackService {
         }
         GrowthTrackEntity savedTrack = trackRepository.save(trackEntity);
 
-        // map growth track to response dto
-        return this.trackMapper.toDto(savedTrack);
     }
 
     @Override
