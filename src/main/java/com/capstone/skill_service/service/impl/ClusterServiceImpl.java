@@ -7,8 +7,10 @@ import com.capstone.skill_service.dto.cluster.ClusterRequestDto;
 import com.capstone.skill_service.dto.cluster.ClusterResponseDto;
 import com.capstone.skill_service.dto.cluster.ClusterUpdateRequestDto;
 import com.capstone.skill_service.dto.cluster.ClusterWithCapsuleResponseDto;
+import com.capstone.skill_service.exception.ClusterException;
 import com.capstone.skill_service.exception.ClusterExistsException;
 import com.capstone.skill_service.exception.ClusterNotFoundException;
+import com.capstone.skill_service.exception.FileException;
 import com.capstone.skill_service.mapper.CapsuleMapper;
 import com.capstone.skill_service.mapper.ClusterMapper;
 import com.capstone.skill_service.model.ClusterEntity;
@@ -21,6 +23,7 @@ import com.capstone.skill_service.util.Status;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -28,6 +31,7 @@ import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.unit.DataSize;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -44,6 +48,8 @@ public class ClusterServiceImpl implements ClusterService {
     private final ClusterMapper clusterMapper;
     private final AwsFileUploadService awsFileUploadService;
     private final PreSignedUrlService preSignedUrlService;
+    @Value("${FILE_MAX_SIZE}")
+    private int maxFileSize;
 
     @Override
     @CacheEvict(value = "clusterList",allEntries = true)
@@ -61,7 +67,12 @@ public class ClusterServiceImpl implements ClusterService {
             clusterEntity.setStatus(Status.ACTIVE);
         }
 
+        if (dto.getName() == null || !dto.getName().matches("^[A-Za-z]+$")) {
+            throw new ClusterException("Cluster name must contain only letters");
+        }
+
         if(image != null){
+            validateImage(image); // validate image
             clusterEntity.setImageName(awsFileUploadService.uploadFile(image)); //upload image
         }
         ClusterEntity saved = clusterRepository.save(clusterEntity);
@@ -79,6 +90,22 @@ public class ClusterServiceImpl implements ClusterService {
         return responseDto;
     }
 
+    void validateImage(MultipartFile image){
+        long fileSize = DataSize.ofMegabytes(maxFileSize).toBytes();
+
+        if (image.isEmpty()) {
+            throw new FileException("File is empty");
+        }
+
+        if (image.getSize() > fileSize) {
+            throw new FileException("File size exceeds 10MB limit");
+        }
+
+        String contentType = image.getContentType();
+        if (!contentType.startsWith("image/")) {
+            throw new FileException("Only image files are allowed");
+        }
+    }
 
     @Override
     public Optional<ClusterEntity> findByName(String name) {

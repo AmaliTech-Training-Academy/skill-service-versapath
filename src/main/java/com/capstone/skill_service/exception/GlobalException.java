@@ -409,4 +409,17 @@ public class GlobalException {
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
                 .body(response);
     }
+
+    @ExceptionHandler(ClusterException.class)
+    public ResponseEntity<?> handleClusterExists
+            (ClusterException exception) {
+
+        ClientResponseFormatDto response = ClientResponseFormatDto.builder()
+                .success(false)
+                .message("Form validation Error!")
+                .errors(List.of(exception.getMessage()))
+                .data(null)
+                .build();
+        return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+    }
 }
