@@ -14,8 +14,9 @@ import com.capstone.skill_service.mapper.ClusterMapper;
 import com.capstone.skill_service.model.ClusterEntity;
 import com.capstone.skill_service.model.SkillCapsuleEntity;
 import com.capstone.skill_service.repository.*;
+import com.capstone.skill_service.service.AwsFileUploadService;
 import com.capstone.skill_service.service.ClusterService;
-import com.capstone.skill_service.service.FileStorageService;
+import com.capstone.skill_service.service.PreSignedUrlService;
 import com.capstone.skill_service.util.Status;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -30,7 +31,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.lang.module.FindException;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -42,11 +42,12 @@ public class ClusterServiceImpl implements ClusterService {
     private final CapsuleRepository capsuleRepository;
     private final CapsuleMapper capsuleMapper;
     private final ClusterMapper clusterMapper;
-    private final FileStorageService fileStorageService;
+    private final AwsFileUploadService awsFileUploadService;
+    private final PreSignedUrlService preSignedUrlService;
 
     @Override
     @CacheEvict(value = "clusterList",allEntries = true)
-    public ClusterResponseDto create(ClusterRequestDto dto, MultipartFile image) {
+    public ClusterResponseDto create(ClusterRequestDto dto, MultipartFile image) throws IOException{
         if(findByName(dto.getName()).isPresent()){
             throw new ClusterExistsException(
                     String.format("A Cluster with the name '%s' already exist",
@@ -61,22 +62,23 @@ public class ClusterServiceImpl implements ClusterService {
         }
 
         if(image != null){
-            clusterEntity.setImageName(getImageName(image)); //upload image
+            clusterEntity.setImageName(awsFileUploadService.uploadFile(image)); //upload image
+        }
+        ClusterEntity saved = clusterRepository.save(clusterEntity);
+
+        ClusterResponseDto responseDto = this.clusterMapper.toDto(saved);
+
+        // generate presigned url
+        if (saved.getImageName() != null) {
+            String presignedUrl = preSignedUrlService.generatePresignedUrl(saved.getImageName());
+            responseDto.setImageName(presignedUrl);
         }
 
         logger.info("Admin created skill cluster: {}", clusterEntity.getName());
 
-        return this.clusterMapper.toDto(clusterRepository.save(clusterEntity));
+        return responseDto;
     }
 
-    public String getImageName(MultipartFile image){
-        // handle file upload
-        try {
-            return fileStorageService.saveFile(image);
-        } catch (IOException e) {
-            throw new FindException("Failed to store image");
-        }
-    }
 
     @Override
     public Optional<ClusterEntity> findByName(String name) {
@@ -141,7 +143,7 @@ public class ClusterServiceImpl implements ClusterService {
             @CacheEvict(value = "clusterWithCapsule", key = "#id") // evict single cluster
         }
     )
-    public ClusterResponseDto partialUpdate(ClusterUpdateRequestDto dto, UUID id, MultipartFile image) {
+    public ClusterResponseDto partialUpdate(ClusterUpdateRequestDto dto, UUID id, MultipartFile image) throws IOException {
         ClusterEntity cluster = findById(id)
                 .orElseThrow( () -> new ClusterNotFoundException("A cluster provided doesn't exist")
                 );
@@ -163,7 +165,7 @@ public class ClusterServiceImpl implements ClusterService {
             cluster.setStatus(dto.getStatus());
         }
         if(image != null){
-            cluster.setImageName(getImageName(image)); //update image
+            cluster.setImageName(awsFileUploadService.uploadFile(image)); //update image
         }
         cluster.setUpdatedAt(LocalDateTime.now());
 
