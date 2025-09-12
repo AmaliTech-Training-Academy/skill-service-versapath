@@ -22,7 +22,7 @@ public class TrackRequestDto {
     private String name;
 
     @Min(value = 1, message = "Growth track Must be at least 1 month")
-    @Max(value = 1000, message = "Growth track Must not exceed 36 months")
+    @Max(value = 36, message = "Growth track Must not exceed 36 months")
     private int estimatedMonths;
 
     List<UUID> capsuleIds; // list of capsule ids
