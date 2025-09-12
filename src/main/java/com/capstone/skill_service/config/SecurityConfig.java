@@ -38,12 +38,27 @@ public class SecurityConfig {
                         .authenticationEntryPoint((request, response, authException) -> {
                             response.setContentType("application/json");
                             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                            response.getWriter().write("{\"error\":\"Unauthorized\",\"message\":\"JWT token is missing or invalid\"}");
+                            response.getWriter().write(
+                                    "{"
+                                    + "\"success\":false,"
+                                    + "\"message\":\"JWT token is missing or invalid\","
+                                    + "\"data\":null,"
+                                    + "\"errors\":null"
+                                    + "}"
+                            );
                         })
                         .accessDeniedHandler((request, response, accessDeniedException) -> {
                             response.setContentType("application/json");
                             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                            response.getWriter().write("{\"error\":\"Forbidden\",\"message\":\"You don't have permission to access this resource\"}");
+                            response.getWriter().write(
+                                    "{"
+                                    + "\"success\":false,"
+                                    + "\"message\":\"You don't have permission to access this resource\","
+                                    + "\"data\":null,"
+                                    + "\"errors\":null"
+                                    + "}"
+
+                            );
                         })
                 )
                 .addFilterBefore(userContextFilter, BasicAuthenticationFilter.class);
