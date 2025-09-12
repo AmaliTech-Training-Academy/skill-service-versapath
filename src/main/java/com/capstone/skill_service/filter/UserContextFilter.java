@@ -36,10 +36,6 @@ public class UserContextFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
-        if (path.startsWith("/clusters")) {
-            filterChain.doFilter(request, response);
-            return;
-        }
         // fetch  user info from header
         String userId = request.getHeader("X-User-Id");
         String userEmail = request.getHeader("X-User-Email");

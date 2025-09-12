@@ -32,7 +32,7 @@ public class ClusterController {
     private final ClusterService clusterService;
 
     @PostMapping()
-    //@PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @Operation(summary = "Create skill cluster", description = "This end point allows only admin to create a skill cluster")
     public ResponseEntity<ClientResponseFormatDto> createCluster(
             @RequestParam("name") String name,
