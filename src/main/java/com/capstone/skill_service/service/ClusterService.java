@@ -10,17 +10,18 @@ import com.capstone.skill_service.util.Status;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Optional;
 import java.util.UUID;
 
 public interface ClusterService {
-    ClusterResponseDto create(ClusterRequestDto dto, MultipartFile image);
+    ClusterResponseDto create(ClusterRequestDto dto, MultipartFile image) throws IOException;
     Optional<ClusterEntity> findByName(String name);
     CustomPageResponse<ClusterResponseDto> findAll(Pageable pageable);
     Optional<ClusterEntity> findById(UUID id);
     ClusterResponseDto getCluster(UUID id);
     void deleteById(UUID id);
-    ClusterResponseDto partialUpdate(ClusterUpdateRequestDto dto, UUID id, MultipartFile image);
+    ClusterResponseDto partialUpdate(ClusterUpdateRequestDto dto, UUID id, MultipartFile image) throws IOException;
     ClusterResponseDto updateStatus(Status status, UUID id);
     ClusterWithCapsuleResponseDto getClusterWithCapsules(UUID clusterId);
 }

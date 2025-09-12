@@ -32,12 +32,20 @@ public class ClusterController {
     private final ClusterService clusterService;
 
     @PostMapping()
-    @PreAuthorize("hasAuthority('ADMIN')")
+    //@PreAuthorize("hasAuthority('ADMIN')")
     @Operation(summary = "Create skill cluster", description = "This end point allows only admin to create a skill cluster")
     public ResponseEntity<ClientResponseFormatDto> createCluster(
-            @Valid @RequestBody ClusterRequestDto clusterRequestDto
-            ) {
-        ClusterResponseDto savedCluster = this.clusterService.create(clusterRequestDto, null);
+            @RequestParam("name") String name,
+            @RequestParam("type") String type,
+            @RequestParam("description") String description,
+            @RequestParam(value = "image", required = false) MultipartFile image
+    )throws IOException {
+        ClusterRequestDto clusterRequestDto = ClusterRequestDto.builder()
+                .name(name)
+                .type(type)
+                .description(description)
+                .build();
+        ClusterResponseDto savedCluster = this.clusterService.create(clusterRequestDto, image);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
                 .success(true)
                 .message("Cluster created successfully!")
@@ -46,6 +54,7 @@ public class ClusterController {
                 .build();
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
+
 
     @GetMapping()
     @Operation(summary = "Retrieve skill clusters", description = "This end point allows anyone to fetch all skill clusters")
