@@ -53,7 +53,7 @@ public interface CapsuleRepository extends JpaRepository<SkillCapsuleEntity, UUI
     @Query("""
     SELECT new com.capstone.skill_service.dto.capsule.CapsuleWithAtomCountResponseDto(
         c.id, c.name, c.difficulty, c.proficiencyLevel, c.categoryType , c.description ,c.objectives,
-        c.estimatedHours, c.status, (SELECT COUNT(ma.capsule.id) FROM c.skillAtoms ma))
+        c.estimatedHours, c.status, (SELECT COUNT(ma.capsule.id) FROM c.skillAtoms ma), c.createdAt, c.updatedAt)
     FROM SkillCapsuleEntity c
     """)
     Page<CapsuleWithAtomCountResponseDto> findCapsuleWithAtomCount(Pageable pageable);
