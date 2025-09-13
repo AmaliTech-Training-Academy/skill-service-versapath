@@ -35,16 +35,9 @@ public class ClusterController {
     @PreAuthorize("hasAuthority('ADMIN')")
     @Operation(summary = "Create skill cluster", description = "This end point allows only admin to create a skill cluster")
     public ResponseEntity<ClientResponseFormatDto> createCluster(
-            @RequestParam("name") String name,
-            @RequestParam("type") String type,
-            @RequestParam("description") String description,
+            @Valid @ModelAttribute ClusterRequestDto clusterRequestDto,
             @RequestParam(value = "image", required = false) MultipartFile image
     )throws IOException {
-        ClusterRequestDto clusterRequestDto = ClusterRequestDto.builder()
-                .name(name)
-                .type(type)
-                .description(description)
-                .build();
         ClusterResponseDto savedCluster = this.clusterService.create(clusterRequestDto, image);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
                 .success(true)

@@ -13,7 +13,10 @@ import com.capstone.skill_service.messaging.CreateSkillProducerEvent;
 import com.capstone.skill_service.messaging.PopulateSkillEvents;
 import com.capstone.skill_service.model.*;
 import com.capstone.skill_service.repository.*;
+import com.capstone.skill_service.service.AwsFileUploadService;
 import com.capstone.skill_service.service.CapsuleService;
+import com.capstone.skill_service.service.PreSignedUrlService;
+import com.capstone.skill_service.util.FileHelper;
 import com.capstone.skill_service.util.Status;
 import lombok.RequiredArgsConstructor;
 import org.common.event.CreateSkillEvent;
@@ -22,6 +25,7 @@ import org.common.event.SkillCapsuleEvent;
 import org.common.event.UpdateSkillEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
@@ -29,7 +33,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -46,10 +52,12 @@ public class CapsuleServiceImpl implements CapsuleService {
     private final TrackCapsuleMappingRepository trackCapsuleMappingRepository;
     private final CreateSkillProducerEvent createSkillProducerEvent;
     private final PopulateSkillEvents populateSkillEvents;
+    private final AwsFileUploadService awsFileUploadService;
+    private final PreSignedUrlService preSignedUrlService;
 
     @Override
     @CacheEvict(value = "capsuleList",  allEntries = true)
-    public CapsuleResponseDto create(CapsuleRequestDto dto) {
+    public CapsuleResponseDto create(CapsuleRequestDto dto, MultipartFile image) throws IOException {
         if(findByName(dto.getName()).isPresent()){
             throw new CapsuleExistsException(
                     String.format("A Skill Capsule with the name '%s' already exist",
@@ -64,12 +72,18 @@ public class CapsuleServiceImpl implements CapsuleService {
         }
         if(dto.getAtomIds() != null){
             addAtomsToCapsule(capsuleEntity, dto.getAtomIds()); // link capsule to all the atoms assigned to
+        }else{
+            addAtomsToCapsule(capsuleEntity, List.of());
         }
         if(dto.getTagIds() != null){
             addTagsToCapsule(capsuleEntity, dto.getTagIds()); // link capsule to all the tags assigned to
         }
         if(dto.getClusterIds() != null){
             addClustersToCapsule(capsuleEntity, dto.getClusterIds()); // link capsule to all the clusters assigned to
+        }
+        if(image != null){
+            FileHelper.validateImage(image); // validate image
+            capsuleEntity.setImage(awsFileUploadService.uploadFile(image)); //upload image
         }
 
         logger.info("Admin created skill capsule: {}", capsuleEntity.getName());
@@ -137,6 +151,7 @@ public class CapsuleServiceImpl implements CapsuleService {
 
         response.setSkillAtoms(atomInSequenceOrderResponseDto); // update atomSequence in response
 
+        FileHelper.generatePresignedUrl(capsule, response, preSignedUrlService);
         return response;
     }
 

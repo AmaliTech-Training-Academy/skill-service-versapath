@@ -29,12 +29,14 @@ public class CapsuleWithAtomCountResponseDto implements Serializable {
     private int estimatedHours;
     private Status status;
     private long atomNumber;
+    private String image;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
     public CapsuleWithAtomCountResponseDto(UUID id, String name, String difficulty, ProficiencyLevel proficiencyLevel,
                                            String categoryType,String description, String objectives,
-                                           int estimatedHours, Status status, long atomNumber, LocalDateTime createdAt, LocalDateTime updatedAt) {
+                                           int estimatedHours, Status status, long atomNumber, String image,
+                                           LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.name = name;
         this.estimatedHours = estimatedHours;
@@ -45,6 +47,7 @@ public class CapsuleWithAtomCountResponseDto implements Serializable {
         this.categoryType = categoryType;
         this.description = description;
         this.objectives = objectives;
+        this.image = image;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }

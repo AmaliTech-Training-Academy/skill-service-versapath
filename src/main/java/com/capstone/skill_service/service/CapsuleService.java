@@ -9,13 +9,15 @@ import com.capstone.skill_service.model.SkillCapsuleEntity;
 import com.capstone.skill_service.util.Status;
 import org.common.event.UpdateSkillEvent;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 public interface CapsuleService {
-    CapsuleResponseDto create(CapsuleRequestDto dto);
+    CapsuleResponseDto create(CapsuleRequestDto dto, MultipartFile image) throws IOException;
     Optional<SkillCapsuleEntity> findByName(String name);
     CustomPageResponse<CapsuleWithAtomCountResponseDto> findAll(Pageable pageable);
     Optional<SkillCapsuleEntity> findById(UUID id);

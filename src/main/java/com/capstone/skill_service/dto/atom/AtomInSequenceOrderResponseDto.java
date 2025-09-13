@@ -1,6 +1,5 @@
 package com.capstone.skill_service.dto.atom;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

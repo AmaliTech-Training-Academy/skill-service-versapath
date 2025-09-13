@@ -17,7 +17,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.UUID;
 
@@ -32,9 +34,10 @@ public class CapsuleController {
     @PreAuthorize("hasAuthority('ADMIN')")
     @Operation(summary = "Create skill capsule", description = "This end point allows only admin to create a skill capsule")
     public ResponseEntity<ClientResponseFormatDto> createCapsule(
-            @Valid @RequestBody CapsuleRequestDto capsuleRequestDto
-    ) {
-        CapsuleResponseDto savedCapsule = this.capsuleService.create(capsuleRequestDto);
+            @Valid @ModelAttribute CapsuleRequestDto capsuleRequestDto,
+            @RequestParam(value = "image", required = false) MultipartFile image
+    ) throws IOException {
+        CapsuleResponseDto savedCapsule = this.capsuleService.create(capsuleRequestDto, image);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
                 .success(true)
                 .message("Capsule created successfully!")

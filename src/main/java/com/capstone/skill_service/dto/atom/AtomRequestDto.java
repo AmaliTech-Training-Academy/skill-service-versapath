@@ -23,16 +23,13 @@ public class AtomRequestDto {
     @Pattern(regexp = "^[A-Za-z ]+$", message = "name cannot contain numbers")
     private String name;
 
-    @Min(value = 1, message = "Must be at least 1 hour")
-    @Max(value = 1000, message = "Must not exceed 1000 hours")
+    @Min(value = 1, message = "Atom must be at least 1 hour")
+    @Max(value = 1000, message = "Atom must not exceed 1000 hours")
     private int estimatedHours;
 
     private String description;
     private String objectives;
     private Status status;
     private String contentType;
-
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
 
 }
