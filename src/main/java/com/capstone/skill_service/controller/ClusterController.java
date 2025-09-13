@@ -82,19 +82,11 @@ public class ClusterController {
     @PreAuthorize("hasAuthority('ADMIN')")
     @Operation(summary = "Update skill cluster", description = "This end point allows admin to update a skill cluster")
     public ResponseEntity<ClientResponseFormatDto> updateCluster(
-            @RequestParam(value = "name", required = false) String name,
-            @RequestParam(value = "type", required = false) String type,
-            @RequestParam(value = "status", required = false) Status status,
-            @RequestParam(value = "description", required = false) String description,
-            @RequestParam(value = "image", required = false) MultipartFile image,
-            @RequestParam UUID clusterId) throws IOException{
-        ClusterUpdateRequestDto clusterRequestDto = ClusterUpdateRequestDto.builder()
-                .name(name)
-                .type(type)
-                .status(status)
-                .description(description)
-                .build();
-        ClusterResponseDto updatedCluster = this.clusterService.partialUpdate(clusterRequestDto, clusterId, image);
+            @Valid @ModelAttribute ClusterUpdateRequestDto clusterRequestDto,
+            @RequestParam(value = "image", required = false) MultipartFile image
+            ) throws IOException{
+
+        ClusterResponseDto updatedCluster = this.clusterService.partialUpdate(clusterRequestDto, image);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
                 .success(true)
                 .message("Cluster updated successfully!")

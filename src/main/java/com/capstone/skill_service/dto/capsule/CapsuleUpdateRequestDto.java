@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -21,7 +22,7 @@ public class CapsuleUpdateRequestDto {
     @Size(min = 3, message = "Name must have at least 3 characters")
     @Pattern(regexp = "^[A-Za-z ]+$", message = "name cannot contain numbers")
     private String name;
-
+    private UUID capsuleId;
     private int estimatedHours;
     private String difficulty;
     private ProficiencyLevel proficiencyLevel;
@@ -29,6 +30,7 @@ public class CapsuleUpdateRequestDto {
     private String description;
     private String objectives;
     private Status status;
+    MultipartFile image;
     List<UUID> atomIds;
     Set<UUID> tagIds;
     Set<UUID> clusterIds;

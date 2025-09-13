@@ -6,7 +6,6 @@ import com.capstone.skill_service.exception.FileException;
 import com.capstone.skill_service.model.ClusterEntity;
 import com.capstone.skill_service.model.SkillCapsuleEntity;
 import com.capstone.skill_service.service.PreSignedUrlService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.unit.DataSize;
 import org.springframework.web.multipart.MultipartFile;
@@ -50,5 +49,21 @@ public class FileHelper {
             String presignedUrl = preSignedUrlService.generatePresignedUrl(savedCluster.getImageName());
             responseDto.setImageName(presignedUrl);
         }
+    }
+
+    public static String getGeneratedPresignedUrl(ClusterEntity savedCluster,
+                                            PreSignedUrlService preSignedUrlService ){
+        if (savedCluster.getImageName() != null) {
+            return preSignedUrlService.generatePresignedUrl(savedCluster.getImageName());
+        }
+        return null;
+    }
+
+    public static String getGeneratedPresignedUrl(SkillCapsuleEntity savedCapsule,
+                                            PreSignedUrlService preSignedUrlService ){
+        if (savedCapsule.getImage() != null) {
+            return preSignedUrlService.generatePresignedUrl(savedCapsule.getImage());
+        }
+        return null;
     }
 }

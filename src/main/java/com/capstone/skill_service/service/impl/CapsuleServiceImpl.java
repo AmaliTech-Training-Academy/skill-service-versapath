@@ -25,7 +25,6 @@ import org.common.event.SkillCapsuleEvent;
 import org.common.event.UpdateSkillEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
@@ -164,7 +163,12 @@ public class CapsuleServiceImpl implements CapsuleService {
     @Cacheable("capsuleList")
     public CustomPageResponse<CapsuleWithAtomCountResponseDto> findAll(Pageable pageable) {
         Page<CapsuleWithAtomCountResponseDto> capsules = this.capsuleRepository.findCapsuleWithAtomCount(pageable);
-
+        for(CapsuleWithAtomCountResponseDto capsule: capsules){
+            // generate presigned url
+            String imageUrl = FileHelper.getGeneratedPresignedUrl(this.capsuleMapper.toEntity(capsule),
+                    preSignedUrlService);
+            capsule.setImage(imageUrl);
+        }
         logger.info("Capsules list is fetched");
 
         return CustomPageResponse.<CapsuleWithAtomCountResponseDto>builder()
@@ -219,6 +223,11 @@ public class CapsuleServiceImpl implements CapsuleService {
         SkillCapsuleEntity capsule = capsuleRepository.findByIdWithDetails(capsuleId)
                 .orElseThrow(() -> new CapsuleNotFoundException("Capsule not found"));
 
+        // generate presigned url
+        String imageUrl = FileHelper.getGeneratedPresignedUrl(capsule,
+                preSignedUrlService);
+        capsule.setImage(imageUrl);
+
         return capsuleMapper.toWithDetailsDto(capsule);
     }
 
@@ -252,11 +261,11 @@ public class CapsuleServiceImpl implements CapsuleService {
     @Caching(
         evict = {
             @CacheEvict(value = "capsuleList", allEntries = true), // refresh list
-            @CacheEvict(value = "capsuleWithDetails", key = "#id")  // evict single capsule details
+            @CacheEvict(value = "capsuleWithDetails", key = "#dto.getCapsuleId()")  // evict single capsule details
         }
     )
-    public CapsuleResponseDto partialUpdate(CapsuleUpdateRequestDto dto, UUID id) {
-        SkillCapsuleEntity capsule = findById(id)
+    public CapsuleResponseDto partialUpdate(CapsuleUpdateRequestDto dto, MultipartFile image) throws IOException {
+        SkillCapsuleEntity capsule = findById(dto.getCapsuleId())
                 .orElseThrow( () -> new CapsuleNotFoundException("A Skill capsule provided doesn't exist")
                 );
         if(dto.getName() != null){
@@ -290,6 +299,10 @@ public class CapsuleServiceImpl implements CapsuleService {
         }
         if(dto.getStatus() != null){
             capsule.setStatus(dto.getStatus());
+        }
+        if(image != null){
+            FileHelper.validateImage(image); // validate image
+            capsule.setImage(awsFileUploadService.uploadFile(image)); //upload image
         }
         if(dto.getAtomIds() != null){
             addAtomsToCapsule(capsule, dto.getAtomIds());

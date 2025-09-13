@@ -14,6 +14,7 @@ public interface CapsuleMapper {
     @Mapping(target = "tags", source = "tags")
     @Mapping(target = "clusters", source = "clusters")
     CapsuleWithDetailsResponseDto toWithDetailsDto(SkillCapsuleEntity entity);
+    SkillCapsuleEntity toEntity(CapsuleWithAtomCountResponseDto dto);
 
     CapsuleOnlyResponseDto toCapsuleOnlyDto(SkillCapsuleEntity entity);
 

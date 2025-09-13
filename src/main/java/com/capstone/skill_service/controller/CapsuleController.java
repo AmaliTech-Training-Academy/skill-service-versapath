@@ -7,6 +7,7 @@ import com.capstone.skill_service.dto.capsule.*;
 import com.capstone.skill_service.dto.cluster.ClusterIdsRequestDto;
 import com.capstone.skill_service.dto.tag.TagIdsRequestDto;
 import com.capstone.skill_service.service.CapsuleService;
+import com.capstone.skill_service.util.ProficiencyLevel;
 import com.capstone.skill_service.util.Status;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -20,7 +21,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 @RestController
@@ -89,12 +92,14 @@ public class CapsuleController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @PatchMapping("/{capsuleId}")
+    @PatchMapping()
     @PreAuthorize("hasAuthority('ADMIN')")
     @Operation(summary = "Update skill capsule", description = "This end point allows admin to update a skill capsule")
     public ResponseEntity<ClientResponseFormatDto> updateCapsule(
-            @Valid @RequestBody CapsuleUpdateRequestDto capsuleRequestDto, @PathVariable UUID capsuleId) {
-        CapsuleResponseDto updatedCapsule = this.capsuleService.partialUpdate(capsuleRequestDto, capsuleId);
+            @Valid @ModelAttribute CapsuleUpdateRequestDto capsuleRequestDto,
+            @RequestParam(value = "image", required = false) MultipartFile image)
+            throws IOException{
+        CapsuleResponseDto updatedCapsule = this.capsuleService.partialUpdate(capsuleRequestDto, image);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
                 .success(true)
                 .message("Capsule updated successfully!")

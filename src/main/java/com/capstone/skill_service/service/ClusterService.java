@@ -21,7 +21,7 @@ public interface ClusterService {
     Optional<ClusterEntity> findById(UUID id);
     ClusterResponseDto getCluster(UUID id);
     void deleteById(UUID id);
-    ClusterResponseDto partialUpdate(ClusterUpdateRequestDto dto, UUID id, MultipartFile image) throws IOException;
+    ClusterResponseDto partialUpdate(ClusterUpdateRequestDto dto, MultipartFile image) throws IOException;
     ClusterResponseDto updateStatus(Status status, UUID id);
     ClusterWithCapsuleResponseDto getClusterWithCapsules(UUID clusterId);
 }

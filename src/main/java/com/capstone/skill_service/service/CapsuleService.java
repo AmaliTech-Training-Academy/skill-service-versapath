@@ -23,7 +23,7 @@ public interface CapsuleService {
     Optional<SkillCapsuleEntity> findById(UUID id);
     CapsuleResponseDto getCapsule(UUID id);
     void deleteById(UUID id);
-    CapsuleResponseDto partialUpdate(CapsuleUpdateRequestDto dto, UUID id);
+    CapsuleResponseDto partialUpdate(CapsuleUpdateRequestDto dto, MultipartFile image) throws IOException;
     CapsuleResponseDto updateStatus(Status status, UUID id);
     CapsuleResponseDto assignAtomToCapsule(UUID capsuleId, AtomIdsRequestDto dto);
     void removeAtomFromCapsule(UUID capsuleId, UUID atomId);

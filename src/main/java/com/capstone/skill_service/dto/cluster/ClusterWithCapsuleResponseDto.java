@@ -27,6 +27,7 @@ public class ClusterWithCapsuleResponseDto implements Serializable {
     private String type;
     private String description;
     private Status status;
+    private String imageName;
     private List<CapsuleSummaryWithNoClusterResponseDto> capsules;
     private LocalDateTime createdAt;
 }

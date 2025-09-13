@@ -13,6 +13,7 @@ public interface ClusterMapper {
     ClusterResponseDto toDto(ClusterEntity entity);
     ClusterSummaryResponseDto toSummaryDto(ClusterEntity entity);
     ClusterEntity toEntity(ClusterRequestDto dto);
+    ClusterEntity toEntity(ClusterResponseDto dto);
     @Mapping(target = "capsules",  ignore = true)
     ClusterWithCapsuleResponseDto toWithCapsuleDto(ClusterEntity entity);
 
