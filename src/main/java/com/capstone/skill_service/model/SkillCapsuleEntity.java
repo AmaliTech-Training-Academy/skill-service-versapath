@@ -62,6 +62,7 @@ public class SkillCapsuleEntity {
 
     private int moodleCourseId; // id from moodle database on course table
     private int estimatedHours;
+    private String image;
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

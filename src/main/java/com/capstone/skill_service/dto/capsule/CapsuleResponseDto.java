@@ -35,6 +35,7 @@ public class CapsuleResponseDto implements Serializable {
     private String description;
     private String objectives;
     private Status status;
+    private String image;
     List<AtomInSequenceOrderResponseDto> skillAtoms; // list of skill atom in sequence order
     Set<TagSummaryResponseDto> tags;
     Set<ClusterSummaryResponseDto> clusters;

@@ -13,7 +13,10 @@ import com.capstone.skill_service.messaging.CreateSkillProducerEvent;
 import com.capstone.skill_service.messaging.PopulateSkillEvents;
 import com.capstone.skill_service.model.*;
 import com.capstone.skill_service.repository.*;
+import com.capstone.skill_service.service.AwsFileUploadService;
 import com.capstone.skill_service.service.CapsuleService;
+import com.capstone.skill_service.service.PreSignedUrlService;
+import com.capstone.skill_service.util.FileHelper;
 import com.capstone.skill_service.util.Status;
 import lombok.RequiredArgsConstructor;
 import org.common.event.CreateSkillEvent;
@@ -29,7 +32,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -46,10 +51,12 @@ public class CapsuleServiceImpl implements CapsuleService {
     private final TrackCapsuleMappingRepository trackCapsuleMappingRepository;
     private final CreateSkillProducerEvent createSkillProducerEvent;
     private final PopulateSkillEvents populateSkillEvents;
+    private final AwsFileUploadService awsFileUploadService;
+    private final PreSignedUrlService preSignedUrlService;
 
     @Override
     @CacheEvict(value = "capsuleList",  allEntries = true)
-    public CapsuleResponseDto create(CapsuleRequestDto dto) {
+    public CapsuleResponseDto create(CapsuleRequestDto dto, MultipartFile image) throws IOException {
         if(findByName(dto.getName()).isPresent()){
             throw new CapsuleExistsException(
                     String.format("A Skill Capsule with the name '%s' already exist",
@@ -64,12 +71,18 @@ public class CapsuleServiceImpl implements CapsuleService {
         }
         if(dto.getAtomIds() != null){
             addAtomsToCapsule(capsuleEntity, dto.getAtomIds()); // link capsule to all the atoms assigned to
+        }else{
+            addAtomsToCapsule(capsuleEntity, List.of());
         }
         if(dto.getTagIds() != null){
             addTagsToCapsule(capsuleEntity, dto.getTagIds()); // link capsule to all the tags assigned to
         }
         if(dto.getClusterIds() != null){
             addClustersToCapsule(capsuleEntity, dto.getClusterIds()); // link capsule to all the clusters assigned to
+        }
+        if(image != null){
+            FileHelper.validateImage(image); // validate image
+            capsuleEntity.setImage(awsFileUploadService.uploadFile(image)); //upload image
         }
 
         logger.info("Admin created skill capsule: {}", capsuleEntity.getName());
@@ -137,6 +150,7 @@ public class CapsuleServiceImpl implements CapsuleService {
 
         response.setSkillAtoms(atomInSequenceOrderResponseDto); // update atomSequence in response
 
+        FileHelper.generatePresignedUrl(capsule, response, preSignedUrlService);
         return response;
     }
 
@@ -149,7 +163,12 @@ public class CapsuleServiceImpl implements CapsuleService {
     @Cacheable("capsuleList")
     public CustomPageResponse<CapsuleWithAtomCountResponseDto> findAll(Pageable pageable) {
         Page<CapsuleWithAtomCountResponseDto> capsules = this.capsuleRepository.findCapsuleWithAtomCount(pageable);
-
+        for(CapsuleWithAtomCountResponseDto capsule: capsules){
+            // generate presigned url
+            String imageUrl = FileHelper.getGeneratedPresignedUrl(this.capsuleMapper.toEntity(capsule),
+                    preSignedUrlService);
+            capsule.setImage(imageUrl);
+        }
         logger.info("Capsules list is fetched");
 
         return CustomPageResponse.<CapsuleWithAtomCountResponseDto>builder()
@@ -204,6 +223,11 @@ public class CapsuleServiceImpl implements CapsuleService {
         SkillCapsuleEntity capsule = capsuleRepository.findByIdWithDetails(capsuleId)
                 .orElseThrow(() -> new CapsuleNotFoundException("Capsule not found"));
 
+        // generate presigned url
+        String imageUrl = FileHelper.getGeneratedPresignedUrl(capsule,
+                preSignedUrlService);
+        capsule.setImage(imageUrl);
+
         return capsuleMapper.toWithDetailsDto(capsule);
     }
 
@@ -237,11 +261,11 @@ public class CapsuleServiceImpl implements CapsuleService {
     @Caching(
         evict = {
             @CacheEvict(value = "capsuleList", allEntries = true), // refresh list
-            @CacheEvict(value = "capsuleWithDetails", key = "#id")  // evict single capsule details
+            @CacheEvict(value = "capsuleWithDetails", key = "#dto.getCapsuleId()")  // evict single capsule details
         }
     )
-    public CapsuleResponseDto partialUpdate(CapsuleUpdateRequestDto dto, UUID id) {
-        SkillCapsuleEntity capsule = findById(id)
+    public CapsuleResponseDto partialUpdate(CapsuleUpdateRequestDto dto, MultipartFile image) throws IOException {
+        SkillCapsuleEntity capsule = findById(dto.getCapsuleId())
                 .orElseThrow( () -> new CapsuleNotFoundException("A Skill capsule provided doesn't exist")
                 );
         if(dto.getName() != null){
@@ -275,6 +299,10 @@ public class CapsuleServiceImpl implements CapsuleService {
         }
         if(dto.getStatus() != null){
             capsule.setStatus(dto.getStatus());
+        }
+        if(image != null){
+            FileHelper.validateImage(image); // validate image
+            capsule.setImage(awsFileUploadService.uploadFile(image)); //upload image
         }
         if(dto.getAtomIds() != null){
             addAtomsToCapsule(capsule, dto.getAtomIds());

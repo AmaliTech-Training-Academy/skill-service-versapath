@@ -10,6 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Data
 @NoArgsConstructor
@@ -19,6 +20,7 @@ public class ClusterUpdateRequestDto {
     @Size(min = 3, message = "Name must have at least 3 characters")
     @Pattern(regexp = "^[A-Za-z ]+$", message = "name cannot contain numbers")
     private String name;
+    private UUID clusterId;
 
     @Pattern(regexp = "^[A-Za-z ]+$", message = "type cannot contain numbers")
     private String type;

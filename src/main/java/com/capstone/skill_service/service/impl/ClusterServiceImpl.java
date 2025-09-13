@@ -10,7 +10,6 @@ import com.capstone.skill_service.dto.cluster.ClusterWithCapsuleResponseDto;
 import com.capstone.skill_service.exception.ClusterException;
 import com.capstone.skill_service.exception.ClusterExistsException;
 import com.capstone.skill_service.exception.ClusterNotFoundException;
-import com.capstone.skill_service.exception.FileException;
 import com.capstone.skill_service.mapper.CapsuleMapper;
 import com.capstone.skill_service.mapper.ClusterMapper;
 import com.capstone.skill_service.model.ClusterEntity;
@@ -19,11 +18,11 @@ import com.capstone.skill_service.repository.*;
 import com.capstone.skill_service.service.AwsFileUploadService;
 import com.capstone.skill_service.service.ClusterService;
 import com.capstone.skill_service.service.PreSignedUrlService;
+import com.capstone.skill_service.util.FileHelper;
 import com.capstone.skill_service.util.Status;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -31,7 +30,6 @@ import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.util.unit.DataSize;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -48,8 +46,6 @@ public class ClusterServiceImpl implements ClusterService {
     private final ClusterMapper clusterMapper;
     private final AwsFileUploadService awsFileUploadService;
     private final PreSignedUrlService preSignedUrlService;
-    @Value("${FILE_MAX_SIZE}")
-    private int maxFileSize;
 
     @Override
     @CacheEvict(value = "clusterList",allEntries = true)
@@ -72,7 +68,7 @@ public class ClusterServiceImpl implements ClusterService {
         }
 
         if(image != null){
-            validateImage(image); // validate image
+            FileHelper.validateImage(image); // validate image
             clusterEntity.setImageName(awsFileUploadService.uploadFile(image)); //upload image
         }
         ClusterEntity saved = clusterRepository.save(clusterEntity);
@@ -80,31 +76,11 @@ public class ClusterServiceImpl implements ClusterService {
         ClusterResponseDto responseDto = this.clusterMapper.toDto(saved);
 
         // generate presigned url
-        if (saved.getImageName() != null) {
-            String presignedUrl = preSignedUrlService.generatePresignedUrl(saved.getImageName());
-            responseDto.setImageName(presignedUrl);
-        }
+        FileHelper.generatePresignedUrl(saved, responseDto, preSignedUrlService);
 
         logger.info("Admin created skill cluster: {}", clusterEntity.getName());
 
         return responseDto;
-    }
-
-    void validateImage(MultipartFile image){
-        long fileSize = DataSize.ofMegabytes(maxFileSize).toBytes();
-
-        if (image.isEmpty()) {
-            throw new FileException("File is empty");
-        }
-
-        if (image.getSize() > fileSize) {
-            throw new FileException("File size exceeds 10MB limit");
-        }
-
-        String contentType = image.getContentType();
-        if (!contentType.startsWith("image/")) {
-            throw new FileException("Only image files are allowed");
-        }
     }
 
     @Override
@@ -116,6 +92,13 @@ public class ClusterServiceImpl implements ClusterService {
     @Cacheable("clusterList")
     public CustomPageResponse<ClusterResponseDto> findAll(Pageable pageable) {
         Page<ClusterResponseDto> clusterList = this.clusterRepository.findClustersWithCapsuleCount(pageable);
+
+        for(ClusterResponseDto cluster: clusterList){
+            // generate presigned url
+            String imageUrl = FileHelper.getGeneratedPresignedUrl(this.clusterMapper.toEntity(cluster),
+                    preSignedUrlService);
+            cluster.setImageName(imageUrl);
+        }
 
         logger.info("Clusters list is fetched");
 
@@ -167,11 +150,11 @@ public class ClusterServiceImpl implements ClusterService {
     @Caching(
         evict = {
             @CacheEvict(value = "clusterList", allEntries = true), // to update the entire list
-            @CacheEvict(value = "clusterWithCapsule", key = "#id") // evict single cluster
+            @CacheEvict(value = "clusterWithCapsule", key = "#dto.getClusterId()") // evict single cluster
         }
     )
-    public ClusterResponseDto partialUpdate(ClusterUpdateRequestDto dto, UUID id, MultipartFile image) throws IOException {
-        ClusterEntity cluster = findById(id)
+    public ClusterResponseDto partialUpdate(ClusterUpdateRequestDto dto, MultipartFile image) throws IOException {
+        ClusterEntity cluster = findById(dto.getClusterId())
                 .orElseThrow( () -> new ClusterNotFoundException("A cluster provided doesn't exist")
                 );
         if(dto.getName() != null){
@@ -192,13 +175,20 @@ public class ClusterServiceImpl implements ClusterService {
             cluster.setStatus(dto.getStatus());
         }
         if(image != null){
+            FileHelper.validateImage(image); // validate image
             cluster.setImageName(awsFileUploadService.uploadFile(image)); //update image
         }
         cluster.setUpdatedAt(LocalDateTime.now());
 
+        ClusterEntity saved = this.clusterRepository.save(cluster);
+        ClusterResponseDto responseDto = this.clusterMapper.toDto(saved);
+
+        // generate presigned url
+        FileHelper.generatePresignedUrl(saved, responseDto, preSignedUrlService);
+
         logger.info("Skill cluster {} updated", cluster.getName());
 
-        return this.clusterMapper.toDto(this.clusterRepository.save(cluster));
+        return responseDto;
     }
 
     @Override
@@ -220,6 +210,10 @@ public class ClusterServiceImpl implements ClusterService {
     public ClusterWithCapsuleResponseDto getClusterWithCapsules(UUID clusterId) {
         ClusterEntity cluster = clusterRepository.findByIdWithCapsules(clusterId)
                 .orElseThrow(() -> new ClusterNotFoundException("Cluster not found"));
+
+        // generate presigned url
+        String imageUrl = FileHelper.getGeneratedPresignedUrl(cluster, preSignedUrlService);
+        cluster.setImageName(imageUrl);
 
         // capsules' ids belonging to the cluster
         List<UUID> capsuleIds = clusterRepository.findCapsuleIdsByClusterId(cluster.getId());
