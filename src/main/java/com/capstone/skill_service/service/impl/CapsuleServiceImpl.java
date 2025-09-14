@@ -32,6 +32,7 @@ import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -133,7 +134,11 @@ public class CapsuleServiceImpl implements CapsuleService {
             atomNames.add(atom.getName());
         }
 
+        // pass userId to an event so to publish error to that specific user
+        String stringUserId = SecurityContextHolder.getContext().getAuthentication().getName();
+
         CreateSkillEvent createSkillEvent = CreateSkillEvent.builder()
+                .userId(UUID.fromString(stringUserId))
                 .capsuleName(savedCapsule.getName())
                 .atoms(atomNames)
                 .build();
