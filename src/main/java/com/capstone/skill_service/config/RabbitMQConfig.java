@@ -4,11 +4,17 @@ import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class RabbitMQConfig {
+    @Value("${SKILL_CREATE_QUEUE}")
+    private String skillCreateQueue;
+
+    @Value("${SKILL_UPDATE_QUEUE}")
+    private String skillUpdateQueue;
 
     @Bean
     public Jackson2JsonMessageConverter jackson2JsonMessageConverter() {
@@ -25,6 +31,12 @@ public class RabbitMQConfig {
 
     @Bean
     public Queue createSkillQueue() {
-        return new Queue("versapath.skill.create", true);
+        return new Queue(skillCreateQueue, true);
     }
+
+    @Bean
+    public Queue updateSkillQueue() {
+        return new Queue(skillUpdateQueue, true);
+    }
+
 }

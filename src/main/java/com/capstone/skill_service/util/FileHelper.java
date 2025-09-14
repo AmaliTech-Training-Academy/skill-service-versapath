@@ -6,15 +6,12 @@ import com.capstone.skill_service.exception.FileException;
 import com.capstone.skill_service.model.ClusterEntity;
 import com.capstone.skill_service.model.SkillCapsuleEntity;
 import com.capstone.skill_service.service.PreSignedUrlService;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.unit.DataSize;
 import org.springframework.web.multipart.MultipartFile;
 
 
 public class FileHelper {
-
-    @Value("${FILE_MAX_SIZE}")
-    static private int maxFileSize=10;
+    static int maxFileSize = 10;
     private FileHelper() {} // prevent initialization
     public static void validateImage(MultipartFile image) {
         long fileSize = DataSize.ofMegabytes(maxFileSize).toBytes();
