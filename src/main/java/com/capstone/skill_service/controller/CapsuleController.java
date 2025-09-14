@@ -7,7 +7,6 @@ import com.capstone.skill_service.dto.capsule.*;
 import com.capstone.skill_service.dto.cluster.ClusterIdsRequestDto;
 import com.capstone.skill_service.dto.tag.TagIdsRequestDto;
 import com.capstone.skill_service.service.CapsuleService;
-import com.capstone.skill_service.util.ProficiencyLevel;
 import com.capstone.skill_service.util.Status;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -15,15 +14,14 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 @RestController
@@ -33,11 +31,11 @@ import java.util.UUID;
 public class CapsuleController {
     private final CapsuleService capsuleService;
 
-    @PostMapping()
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasAuthority('ADMIN')")
     @Operation(summary = "Create skill capsule", description = "This end point allows only admin to create a skill capsule")
     public ResponseEntity<ClientResponseFormatDto> createCapsule(
-            @Valid @ModelAttribute CapsuleRequestDto capsuleRequestDto,
+            @Valid @RequestPart("capsule") CapsuleRequestDto capsuleRequestDto,
             @RequestParam(value = "image", required = false) MultipartFile image
     ) throws IOException {
         CapsuleResponseDto savedCapsule = this.capsuleService.create(capsuleRequestDto, image);
@@ -92,11 +90,11 @@ public class CapsuleController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @PatchMapping()
+    @PatchMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasAuthority('ADMIN')")
     @Operation(summary = "Update skill capsule", description = "This end point allows admin to update a skill capsule")
     public ResponseEntity<ClientResponseFormatDto> updateCapsule(
-            @Valid @ModelAttribute CapsuleUpdateRequestDto capsuleRequestDto,
+            @Valid @RequestPart("capsule") CapsuleUpdateRequestDto capsuleRequestDto,
             @RequestParam(value = "image", required = false) MultipartFile image)
             throws IOException{
         CapsuleResponseDto updatedCapsule = this.capsuleService.partialUpdate(capsuleRequestDto, image);
@@ -109,6 +107,7 @@ public class CapsuleController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PutMapping
     @PreAuthorize("hasAuthority('ADMIN')")
     @Operation(summary = "Update skill capsule status", description = "This end point allows admin to update a skill capsule as a soft delete")
