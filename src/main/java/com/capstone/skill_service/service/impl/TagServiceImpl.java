@@ -78,6 +78,24 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
+    public CustomPageResponse<TagResponseDto> filterTags(String name, Pageable pageable) {
+        Page<TagEntity> tagList  = this.tagRepository.findByNameContainingIgnoreCase(name, pageable);
+        Page<TagResponseDto> tags = tagList.map(this.tagMapper::toDto);
+
+        logger.info("Tags list is filtered");
+
+        return CustomPageResponse.<TagResponseDto>builder()
+                .items(tags.getContent())
+                .page(tags.getNumber())
+                .size(tags.getSize())
+                .totalElements(tags.getTotalElements())
+                .totalPages(tags.getTotalPages())
+                .hasNext(tags.hasNext())
+                .hasPrevious(tags.hasPrevious())
+                .build();
+    }
+
+    @Override
     public Optional<TagEntity> findById(UUID id) {
         return this.tagRepository.findById(id);
     }

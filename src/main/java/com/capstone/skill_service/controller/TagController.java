@@ -11,7 +11,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -51,6 +53,24 @@ public class TagController {
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
                 .success(true)
                 .message("Fetch all tags")
+                .errors(null)
+                .data(tags)
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @GetMapping("/filter")
+    @Operation(summary = "Filter skill tags", description = "This end point allows any one to fetch all skill tags")
+    public ResponseEntity<ClientResponseFormatDto> filterTags(
+            @RequestParam(required = false) String name,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        CustomPageResponse<TagResponseDto> tags = this.tagService.filterTags(name, pageable);
+        ClientResponseFormatDto response = ClientResponseFormatDto.builder()
+                .success(true)
+                .message("Filter tags")
                 .errors(null)
                 .data(tags)
                 .build();
