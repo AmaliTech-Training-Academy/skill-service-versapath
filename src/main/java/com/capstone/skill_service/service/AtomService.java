@@ -20,4 +20,5 @@ public interface AtomService {
     void deleteById(UUID id);
     AtomResponseDto partialUpdate(AtomUpdateRequestDto dto, UUID id);
     AtomResponseDto updateStatus(Status status, UUID id);
+    CustomPageResponse<AtomResponseDto> filterAtoms(String name, Pageable pageable);
 }

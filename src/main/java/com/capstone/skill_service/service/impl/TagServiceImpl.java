@@ -84,7 +84,7 @@ public class TagServiceImpl implements TagService {
     @Override
     public CustomPageResponse<TagResponseDto> filterTags(String name, Pageable pageable) {
         Page<TagEntity> tagList = null;
-        // if name isn't provide fetch 20 first items
+        // if name isn't provided fetch 20 first items
         if(name==null || name.trim().isEmpty()){
             tagList = this.tagRepository.findAll(PageRequest.of(0, 20));
         }else{
