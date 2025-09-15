@@ -1,6 +1,7 @@
 package com.capstone.skill_service.service.impl;
 
 import com.capstone.skill_service.dto.CustomPageResponse;
+import com.capstone.skill_service.dto.PaginationData;
 import com.capstone.skill_service.dto.atom.AtomRequestDto;
 import com.capstone.skill_service.dto.atom.AtomResponseDto;
 import com.capstone.skill_service.dto.atom.AtomUpdateRequestDto;
@@ -81,12 +82,15 @@ public class AtomServiceImpl implements AtomService {
 
         return CustomPageResponse.<AtomResponseDto>builder()
                 .items(atoms.getContent())
-                .page(atoms.getNumber())
-                .size(atoms.getSize())
-                .totalElements(atoms.getTotalElements())
-                .totalPages(atoms.getTotalPages())
-                .hasNext(atoms.hasNext())
-                .hasPrevious(atoms.hasPrevious())
+                .pagination(PaginationData.builder()
+                    .page(atoms.getNumber())
+                    .size(atoms.getSize())
+                    .totalElements(atoms.getTotalElements())
+                    .totalPages(atoms.getTotalPages())
+                    .hasNext(atoms.hasNext())
+                    .hasPrevious(atoms.hasPrevious())
+                    .build()
+                )
                 .build();
     }
 

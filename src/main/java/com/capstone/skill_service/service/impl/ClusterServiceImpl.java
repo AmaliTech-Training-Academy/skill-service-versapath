@@ -2,6 +2,7 @@ package com.capstone.skill_service.service.impl;
 
 import com.capstone.skill_service.dto.CustomPageResponse;
 
+import com.capstone.skill_service.dto.PaginationData;
 import com.capstone.skill_service.dto.capsule.CapsuleSummaryWithNoClusterResponseDto;
 import com.capstone.skill_service.dto.cluster.ClusterRequestDto;
 import com.capstone.skill_service.dto.cluster.ClusterResponseDto;
@@ -101,12 +102,14 @@ public class ClusterServiceImpl implements ClusterService {
 
         return CustomPageResponse.<ClusterResponseDto>builder()
                 .items(clusterList.getContent())
-                .page(clusterList.getNumber())
-                .size(clusterList.getSize())
-                .totalElements(clusterList.getTotalElements())
-                .totalPages(clusterList.getTotalPages())
-                .hasNext(clusterList.hasNext())
-                .hasPrevious(clusterList.hasPrevious())
+                .pagination(PaginationData.builder()
+                    .page(clusterList.getNumber())
+                    .size(clusterList.getSize())
+                    .totalElements(clusterList.getTotalElements())
+                    .totalPages(clusterList.getTotalPages())
+                    .hasNext(clusterList.hasNext())
+                    .hasPrevious(clusterList.hasPrevious())
+                    .build())
                 .build();
     }
 

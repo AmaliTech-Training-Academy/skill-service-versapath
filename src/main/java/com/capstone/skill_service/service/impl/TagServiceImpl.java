@@ -1,6 +1,7 @@
 package com.capstone.skill_service.service.impl;
 
 import com.capstone.skill_service.dto.CustomPageResponse;
+import com.capstone.skill_service.dto.PaginationData;
 import com.capstone.skill_service.dto.tag.TagRequestDto;
 import com.capstone.skill_service.dto.tag.TagResponseDto;
 import com.capstone.skill_service.dto.tag.TagUpdateRequestDto;
@@ -69,12 +70,14 @@ public class TagServiceImpl implements TagService {
 
         return CustomPageResponse.<TagResponseDto>builder()
                 .items(tags.getContent())
-                .page(tags.getNumber())
-                .size(tags.getSize())
-                .totalElements(tags.getTotalElements())
-                .totalPages(tags.getTotalPages())
-                .hasNext(tags.hasNext())
-                .hasPrevious(tags.hasPrevious())
+                .pagination(PaginationData.builder()
+                    .page(tags.getNumber())
+                    .size(tags.getSize())
+                    .totalElements(tags.getTotalElements())
+                    .totalPages(tags.getTotalPages())
+                    .hasNext(tags.hasNext())
+                    .hasPrevious(tags.hasPrevious())
+                    .build())
                 .build();
     }
 
@@ -94,12 +97,14 @@ public class TagServiceImpl implements TagService {
 
         return CustomPageResponse.<TagResponseDto>builder()
                 .items(tags.getContent())
-                .page(tags.getNumber())
-                .size(tags.getSize())
-                .totalElements(tags.getTotalElements())
-                .totalPages(tags.getTotalPages())
-                .hasNext(tags.hasNext())
-                .hasPrevious(tags.hasPrevious())
+                .pagination(PaginationData.builder()
+                    .page(tags.getNumber())
+                    .size(tags.getSize())
+                    .totalElements(tags.getTotalElements())
+                    .totalPages(tags.getTotalPages())
+                    .hasNext(tags.hasNext())
+                    .hasPrevious(tags.hasPrevious())
+                    .build())
                 .build();
     }
 

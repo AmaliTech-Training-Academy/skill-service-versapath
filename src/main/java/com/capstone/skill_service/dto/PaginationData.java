@@ -11,7 +11,11 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class CustomPageResponse<T>{
-    private List<T> items;
-    PaginationData pagination;
+public class PaginationData{
+    private int page;
+    private int size;
+    private long totalElements;
+    private int totalPages;
+    private boolean hasNext;
+    private boolean hasPrevious;
 }

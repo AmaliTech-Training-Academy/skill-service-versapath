@@ -1,6 +1,7 @@
 package com.capstone.skill_service.service.impl;
 
 import com.capstone.skill_service.dto.CustomPageResponse;
+import com.capstone.skill_service.dto.PaginationData;
 import com.capstone.skill_service.dto.atom.AtomIdsRequestDto;
 import com.capstone.skill_service.dto.atom.AtomInSequenceOrderResponseDto;
 import com.capstone.skill_service.dto.capsule.*;
@@ -173,12 +174,14 @@ public class CapsuleServiceImpl implements CapsuleService {
 
         return CustomPageResponse.<CapsuleWithAtomCountResponseDto>builder()
                 .items(capsules.getContent())
-                .page(capsules.getNumber())
-                .size(capsules.getSize())
-                .totalElements(capsules.getTotalElements())
-                .totalPages(capsules.getTotalPages())
-                .hasNext(capsules.hasNext())
-                .hasPrevious(capsules.hasPrevious())
+                .pagination(PaginationData.builder()
+                    .page(capsules.getNumber())
+                    .size(capsules.getSize())
+                    .totalElements(capsules.getTotalElements())
+                    .totalPages(capsules.getTotalPages())
+                    .hasNext(capsules.hasNext())
+                    .hasPrevious(capsules.hasPrevious())
+                    .build())
                 .build();
     }
 
