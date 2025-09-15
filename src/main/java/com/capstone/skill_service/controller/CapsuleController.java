@@ -89,7 +89,6 @@ public class CapsuleController {
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
-
     @PatchMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasAuthority('ADMIN')")
     @Operation(summary = "Update skill capsule", description = "This end point allows admin to update a skill capsule")
@@ -141,8 +140,8 @@ public class CapsuleController {
     @PreAuthorize("hasAuthority('ADMIN')")
     @Operation(summary = "Remove a skill atom from capsule", description = "This end point allows admin to remove a skill atom from capsule")
     public ResponseEntity<ClientResponseFormatDto> removeAtomFromCapsule(
-            @RequestParam UUID capsuleId, @RequestParam UUID atomId) {
-        this.capsuleService.removeAtomFromCapsule(capsuleId, atomId);
+            @RequestParam UUID capsuleId, @RequestBody AtomIdsRequestDto atomIds) {
+        this.capsuleService.removeAtomFromCapsule(capsuleId, atomIds);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
                 .success(true)
                 .message("Atom removed from capsule successfully!")
