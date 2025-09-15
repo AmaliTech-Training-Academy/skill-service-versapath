@@ -266,7 +266,7 @@ public class CapsuleServiceImpl implements CapsuleService {
         Page<CapsuleWithAtomCountResponseDto> capsules;
 
         if(name == null || name.trim().isEmpty()){
-             capsules = this.capsuleRepository.findByNameContainingIgnoreCase(null, PageRequest.of(0, 20));
+             capsules = this.capsuleRepository.findCapsuleWithAtomCount(PageRequest.of(0, 20));
         }else{
             capsules = this.capsuleRepository.findByNameContainingIgnoreCase(name, pageable);
         }

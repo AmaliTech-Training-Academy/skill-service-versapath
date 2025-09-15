@@ -29,6 +29,7 @@ import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -239,5 +240,36 @@ public class ClusterServiceImpl implements ClusterService {
         dto.setCapsules(capsulesWithChildren);
 
         return dto;
+    }
+
+    @Override
+    public CustomPageResponse<ClusterResponseDto> filterClusters(String name, Pageable pageable) {
+        Page<ClusterResponseDto> clusterList = null;
+
+        if(name == null || name.trim().isEmpty()){
+            clusterList = this.clusterRepository.findClustersWithCapsuleCount(PageRequest.of(0, 20));
+        }else{
+            clusterList = this.clusterRepository.findByNameContainingIgnoreCase(name, pageable);
+        }
+        for(ClusterResponseDto cluster: clusterList){
+            // generate pre-signed url
+            String imageUrl = FileHelper.getGeneratedPresignedUrl(this.clusterMapper.toEntity(cluster),
+                    preSignedUrlService);
+            cluster.setImageName(imageUrl);
+        }
+
+        logger.info("Clusters list is filtered");
+
+        return CustomPageResponse.<ClusterResponseDto>builder()
+                .items(clusterList.getContent())
+                .pagination(PaginationData.builder()
+                        .page(clusterList.getNumber())
+                        .size(clusterList.getSize())
+                        .totalElements(clusterList.getTotalElements())
+                        .totalPages(clusterList.getTotalPages())
+                        .hasNext(clusterList.hasNext())
+                        .hasPrevious(clusterList.hasPrevious())
+                        .build())
+                .build();
     }
 }
