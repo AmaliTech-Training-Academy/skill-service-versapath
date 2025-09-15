@@ -18,6 +18,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -79,7 +80,14 @@ public class TagServiceImpl implements TagService {
 
     @Override
     public CustomPageResponse<TagResponseDto> filterTags(String name, Pageable pageable) {
-        Page<TagEntity> tagList  = this.tagRepository.findByNameContainingIgnoreCase(name, pageable);
+        Page<TagEntity> tagList = null;
+        // if name isn't provide fetch 20 first items
+        if(name==null || name.trim().isEmpty()){
+            tagList = this.tagRepository.findAll(PageRequest.of(0, 20));
+        }else{
+            tagList  = this.tagRepository.findByNameContainingIgnoreCase(name, pageable);
+        }
+
         Page<TagResponseDto> tags = tagList.map(this.tagMapper::toDto);
 
         logger.info("Tags list is filtered");
