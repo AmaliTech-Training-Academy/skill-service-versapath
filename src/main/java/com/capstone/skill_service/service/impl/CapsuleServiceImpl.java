@@ -30,6 +30,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -258,6 +259,37 @@ public class CapsuleServiceImpl implements CapsuleService {
             logger.info("Capsule with its atom are updated with Moodle data {}", updateSkillEvent.getName());
 
         }
+    }
+
+    @Override
+    public CustomPageResponse<CapsuleWithAtomCountResponseDto> filterCapsules(String name, Pageable pageable) {
+        Page<CapsuleWithAtomCountResponseDto> capsules;
+
+        if(name == null || name.trim().isEmpty()){
+             capsules = this.capsuleRepository.findByNameContainingIgnoreCase(null, PageRequest.of(0, 20));
+        }else{
+            capsules = this.capsuleRepository.findByNameContainingIgnoreCase(name, pageable);
+        }
+
+        for(CapsuleWithAtomCountResponseDto capsule: capsules){
+            // generate presigned url
+            String imageUrl = FileHelper.getGeneratedPresignedUrl(this.capsuleMapper.toEntity(capsule),
+                    preSignedUrlService);
+            capsule.setImage(imageUrl);
+        }
+        logger.info("Capsules list is filtered");
+
+        return CustomPageResponse.<CapsuleWithAtomCountResponseDto>builder()
+                .items(capsules.getContent())
+                .pagination(PaginationData.builder()
+                        .page(capsules.getNumber())
+                        .size(capsules.getSize())
+                        .totalElements(capsules.getTotalElements())
+                        .totalPages(capsules.getTotalPages())
+                        .hasNext(capsules.hasNext())
+                        .hasPrevious(capsules.hasPrevious())
+                        .build())
+                .build();
     }
 
     @Override

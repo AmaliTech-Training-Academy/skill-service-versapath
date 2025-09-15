@@ -60,7 +60,7 @@ public class TagController {
     }
 
     @GetMapping("/filter")
-    @Operation(summary = "Filter skill tags", description = "This end point allows any one to fetch all skill tags")
+    @Operation(summary = "Filter skill tags", description = "This end point allows any one to filter skill tags")
     public ResponseEntity<ClientResponseFormatDto> filterTags(
             @RequestParam(required = false) String name,
             @RequestParam(defaultValue = "0") int page,
