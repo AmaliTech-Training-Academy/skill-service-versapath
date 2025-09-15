@@ -14,7 +14,7 @@ public class UpdateSkillListenerEvent {
     private static final Logger logger = LoggerFactory.getLogger(UpdateSkillListenerEvent.class);
     private final CapsuleService capsuleService;
 
-    @RabbitListener(queues = "versapath.skill.update")
+    @RabbitListener(queues = "${SKILL_UPDATE_QUEUE}")
     public void handleMoodleUserCreation(UpdateSkillEvent updateSkillEvent) {
         logger.info("Start updating skills: {}", updateSkillEvent);
 

@@ -107,7 +107,6 @@ public class CapsuleController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PutMapping
     @PreAuthorize("hasAuthority('ADMIN')")
     @Operation(summary = "Update skill capsule status", description = "This end point allows admin to update a skill capsule as a soft delete")
