@@ -63,9 +63,6 @@ public class ClusterServiceImpl implements ClusterService {
             clusterEntity.setStatus(Status.ACTIVE);
         }
 
-        if (dto.getName() == null || !dto.getName().matches("^[A-Za-z]+$")) {
-            throw new ClusterException("Cluster name must contain only letters");
-        }
 
         if(image != null){
             FileHelper.validateImage(image); // validate image

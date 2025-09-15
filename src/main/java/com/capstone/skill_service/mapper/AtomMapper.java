@@ -20,6 +20,7 @@ public interface AtomMapper {
     @Mapping(target = "moodleModuleId", source = "atom.moodleModuleId")
     @Mapping(target = "moodlePageId", source = "atom.moodlePageId")
     @Mapping(target = "contentType", source = "atom.contentType")
+    @Mapping(target = "estimatedHours", source = "atom.estimatedHours")
     @Mapping(target = "sequenceOrder", source = "sequenceOrder")
     AtomInSequenceOrderResponseDto toInSequenceOrderDto(CapsuleAtomMappingEntity mapping);
 

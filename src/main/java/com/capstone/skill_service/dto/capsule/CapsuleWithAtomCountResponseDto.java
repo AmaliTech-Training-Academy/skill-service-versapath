@@ -3,8 +3,6 @@ package com.capstone.skill_service.dto.capsule;
 import com.capstone.skill_service.util.ProficiencyLevel;
 import com.capstone.skill_service.util.Status;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -21,6 +19,7 @@ public class CapsuleWithAtomCountResponseDto implements Serializable {
     private static final long serialVersionUID = 1L;
     private UUID id;
     private String name;
+    private int moodleCourseId;
     private String difficulty;
     private ProficiencyLevel proficiencyLevel;
     private String categoryType;
@@ -33,7 +32,7 @@ public class CapsuleWithAtomCountResponseDto implements Serializable {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    public CapsuleWithAtomCountResponseDto(UUID id, String name, String difficulty, ProficiencyLevel proficiencyLevel,
+    public CapsuleWithAtomCountResponseDto(UUID id, String name, String difficulty,int moodleCourseId,ProficiencyLevel proficiencyLevel,
                                            String categoryType,String description, String objectives,
                                            int estimatedHours, Status status, long atomNumber, String image,
                                            LocalDateTime createdAt, LocalDateTime updatedAt) {
@@ -43,6 +42,7 @@ public class CapsuleWithAtomCountResponseDto implements Serializable {
         this.status = status;
         this.atomNumber = atomNumber;
         this.difficulty = difficulty;
+        this.moodleCourseId = moodleCourseId;
         this.proficiencyLevel = proficiencyLevel;
         this.categoryType = categoryType;
         this.description = description;

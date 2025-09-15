@@ -19,6 +19,7 @@ public class CapsuleSummaryResponseDto implements Serializable {
     private static final long serialVersionUID = 1L;
     private UUID id;
     private String name;
+    private int moodleCourseId;
     private String difficulty;
     private ProficiencyLevel proficiencyLevel;
 }

@@ -1,11 +1,8 @@
 package com.capstone.skill_service.dto.capsule;
 
 import com.capstone.skill_service.dto.atom.AtomInSequenceOrderResponseDto;
-import com.capstone.skill_service.dto.cluster.ClusterSummaryResponseDto;
 import com.capstone.skill_service.dto.tag.TagSummaryResponseDto;
 import com.capstone.skill_service.util.ProficiencyLevel;
-import com.capstone.skill_service.util.Status;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,7 +10,6 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -28,6 +24,7 @@ public class CapsuleSummaryWithNoClusterResponseDto implements Serializable {
     private UUID id;
     private String name;
     private int estimatedHours;
+    private int moodleCourseId;
     private String difficulty;
     private ProficiencyLevel proficiencyLevel;
     private String description;
