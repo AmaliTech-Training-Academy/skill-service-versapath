@@ -26,7 +26,7 @@ public interface CapsuleService {
     CapsuleResponseDto partialUpdate(CapsuleUpdateRequestDto dto, MultipartFile image) throws IOException;
     CapsuleResponseDto updateStatus(Status status, UUID id);
     CapsuleResponseDto assignAtomToCapsule(UUID capsuleId, AtomIdsRequestDto dto);
-    void removeAtomFromCapsule(UUID capsuleId, UUID atomId);
+    void removeAtomFromCapsule(UUID capsuleId, AtomIdsRequestDto atomIds);
     CapsuleResponseDto reorderAtoms(UUID capsuleId, List<UUID> orderedAtomIds);
     CapsuleResponseDto assignTagToCapsule(UUID capsuleId, TagIdsRequestDto dto);
     void removeTagFromCapsule(UUID capsuleId, UUID tagId);

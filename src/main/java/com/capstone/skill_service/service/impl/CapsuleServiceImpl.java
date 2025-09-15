@@ -408,24 +408,42 @@ public class CapsuleServiceImpl implements CapsuleService {
             @CacheEvict(value = "capsuleWithDetails", key = "#capsuleId")  // evict single capsule details
         }
     )
-    public void removeAtomFromCapsule(UUID capsuleId, UUID atomId) {
+    public void removeAtomFromCapsule(UUID capsuleId, AtomIdsRequestDto atomIds) {
         SkillCapsuleEntity capsuleEntity = findById(capsuleId)
                 .orElseThrow(() -> new CapsuleNotFoundException("A Skill capsule provided doesn't exist"));
 
-        // find the atom to remove from capsule
-        CapsuleAtomMappingEntity atomToRemove = capsuleEntity.getSkillAtoms().stream()
-                .filter(mapping -> mapping.getAtom().getId().equals(atomId))
-                .findFirst()
-                .orElseThrow(() -> new AtomNotFoundException("A skill atom provided doesn't exist in capsule"));
+        List<CapsuleAtomMappingEntity> atomsToRemove = new ArrayList<>(); //atoms to remove from capsule
+        List<UUID> notFoundIds = new ArrayList<>(); // atoms not found
 
-        capsuleEntity.getSkillAtoms().remove(atomToRemove); // remove atom from capsule collection
+        for (UUID atomId : atomIds.getAtomIds()) {
+            capsuleEntity.getSkillAtoms().stream()
+                    .filter(mapping -> mapping.getAtom().getId().equals(atomId))
+                    .findFirst()
+                    .ifPresentOrElse(
+                            atomsToRemove::add,
+                            () -> notFoundIds.add(atomId)
+                    );
+        }
+
+        // Remove atoms that exist
+        capsuleEntity.getSkillAtoms().removeAll(atomsToRemove);
 
         //Rearrange the sequence order
         int order = 1;
         for (CapsuleAtomMappingEntity mapping : capsuleEntity.getSkillAtoms()) {
             mapping.setSequenceOrder(order++);
         }
+
         capsuleRepository.save(capsuleEntity);
+
+        // Throw exception for not found atoms
+        if (!notFoundIds.isEmpty()) {
+            if(notFoundIds.size() == 1){
+                throw new AtomNotFoundException("There is an atom that doesn't belong to this Capsule");
+            }else{
+                throw new AtomNotFoundException("There are some atoms do not belong to this Capsule ");
+            }
+        }
 
     }
 
