@@ -24,4 +24,5 @@ public interface ClusterService {
     ClusterResponseDto partialUpdate(ClusterUpdateRequestDto dto, MultipartFile image) throws IOException;
     ClusterResponseDto updateStatus(Status status, UUID id);
     ClusterWithCapsuleResponseDto getClusterWithCapsules(UUID clusterId);
+    CustomPageResponse<ClusterResponseDto> filterClusters(String name, Pageable pageable);
 }

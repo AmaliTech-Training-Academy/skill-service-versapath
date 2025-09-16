@@ -12,7 +12,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -55,6 +57,24 @@ public class CapsuleController {
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
                 .success(true)
                 .message("Fetch all capsules")
+                .errors(null)
+                .data(capsules)
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @GetMapping("/filter")
+    @Operation(summary = "Filter skill capsules", description = "This end point allows anyone to filter skill capsules")
+    public ResponseEntity<ClientResponseFormatDto> filterCapsules(
+            @RequestParam(required = false) String name,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "${PAGE_SIZE}") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        CustomPageResponse<CapsuleWithAtomCountResponseDto> capsules = this.capsuleService.filterCapsules(name, pageable);
+        ClientResponseFormatDto response = ClientResponseFormatDto.builder()
+                .success(true)
+                .message("Filter skill capsules")
                 .errors(null)
                 .data(capsules)
                 .build();

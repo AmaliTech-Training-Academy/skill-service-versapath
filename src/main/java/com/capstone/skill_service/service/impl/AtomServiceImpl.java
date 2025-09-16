@@ -1,6 +1,7 @@
 package com.capstone.skill_service.service.impl;
 
 import com.capstone.skill_service.dto.CustomPageResponse;
+import com.capstone.skill_service.dto.PaginationData;
 import com.capstone.skill_service.dto.atom.AtomRequestDto;
 import com.capstone.skill_service.dto.atom.AtomResponseDto;
 import com.capstone.skill_service.dto.atom.AtomUpdateRequestDto;
@@ -22,6 +23,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -81,12 +83,14 @@ public class AtomServiceImpl implements AtomService {
 
         return CustomPageResponse.<AtomResponseDto>builder()
                 .items(atoms.getContent())
-                .page(atoms.getNumber())
-                .size(atoms.getSize())
-                .totalElements(atoms.getTotalElements())
-                .totalPages(atoms.getTotalPages())
-                .hasNext(atoms.hasNext())
-                .hasPrevious(atoms.hasPrevious())
+                .pagination(PaginationData.builder()
+                    .page(atoms.getNumber())
+                    .size(atoms.getSize())
+                    .totalElements(atoms.getTotalElements())
+                    .totalPages(atoms.getTotalPages())
+                    .hasNext(atoms.hasNext())
+                    .hasPrevious(atoms.hasPrevious())
+                    .build())
                 .build();
     }
 
@@ -180,6 +184,32 @@ public class AtomServiceImpl implements AtomService {
         atom.setStatus(status);
 
         return this.atomMapper.toDto(this.atomRepository.save(atom));
+    }
+
+    @Override
+    public CustomPageResponse<AtomResponseDto> filterAtoms(String name, Pageable pageable) {
+        Page<SkillAtomEntity> atomList= null;
+        // if name isn't provided fetch 20 first items
+        if(name == null || name.trim().isEmpty()){
+            atomList = this.atomRepository.findAll(PageRequest.of(0, 20));
+        }else{
+            atomList = this.atomRepository.findByNameContainingIgnoreCase(name, pageable);
+        }
+
+        Page<AtomResponseDto> atoms = atomList.map(this.atomMapper::toDto);
+
+        return CustomPageResponse.<AtomResponseDto>builder()
+                .items(atoms.getContent())
+                .pagination(PaginationData.builder()
+                        .page(atoms.getNumber())
+                        .size(atoms.getSize())
+                        .totalElements(atoms.getTotalElements())
+                        .totalPages(atoms.getTotalPages())
+                        .hasNext(atoms.hasNext())
+                        .hasPrevious(atoms.hasPrevious())
+                        .build())
+                .build();
+
     }
 
 }

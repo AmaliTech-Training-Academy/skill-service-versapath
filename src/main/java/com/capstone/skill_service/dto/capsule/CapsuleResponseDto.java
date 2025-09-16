@@ -29,6 +29,7 @@ public class CapsuleResponseDto implements Serializable {
     private UUID id;
     private String name;
     private int estimatedHours;
+    private int moodleCourseId;
     private String difficulty;
     private ProficiencyLevel proficiencyLevel;
     private String categoryType;

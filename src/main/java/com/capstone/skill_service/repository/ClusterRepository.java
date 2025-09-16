@@ -42,4 +42,15 @@ public interface ClusterRepository extends JpaRepository<ClusterEntity, UUID> {
 """)
     List<UUID> findCapsuleIdsByClusterId(@Param("clusterId") UUID clusterId);
 
+
+    @Query("""
+    SELECT new com.capstone.skill_service.dto.cluster.ClusterResponseDto(
+            cl.id, cl.name,cl.type,cl.description,cl.imageName,cl.status,
+            (SELECT COUNT(c.id) FROM cl.capsules c), cl.createdAt, cl.updatedAt
+        )
+        FROM ClusterEntity cl
+        WHERE (:name IS NULL OR LOWER(cl.name) LIKE LOWER(CONCAT('%', :name, '%')))
+""")
+    Page<ClusterResponseDto> findByNameContainingIgnoreCase(@Param("name") String name,Pageable pageable);
+
 }

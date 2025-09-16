@@ -1,6 +1,7 @@
 package com.capstone.skill_service.service.impl;
 
 import com.capstone.skill_service.dto.CustomPageResponse;
+import com.capstone.skill_service.dto.PaginationData;
 import com.capstone.skill_service.dto.atom.AtomInSequenceOrderResponseDto;
 import com.capstone.skill_service.dto.capsule.CapsuleInSequenceOrderResponseDto;
 import com.capstone.skill_service.dto.route.RouteRequestDto;
@@ -161,12 +162,14 @@ public class RouteServiceImpl implements RouteService {
 
         return CustomPageResponse.<RouteResponseDto>builder()
                 .items(routes.getContent())
-                .page(routes.getNumber())
-                .size(routes.getSize())
-                .totalElements(routes.getTotalElements())
-                .totalPages(routes.getTotalPages())
-                .hasNext(routes.hasNext())
-                .hasPrevious(routes.hasPrevious())
+                .pagination(PaginationData.builder()
+                    .page(routes.getNumber())
+                    .size(routes.getSize())
+                    .totalElements(routes.getTotalElements())
+                    .totalPages(routes.getTotalPages())
+                    .hasNext(routes.hasNext())
+                    .hasPrevious(routes.hasPrevious())
+                    .build())
                 .build();
     }
 

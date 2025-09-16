@@ -33,6 +33,6 @@ public interface CapsuleService {
     CapsuleResponseDto assignClusterToCapsule(UUID capsuleId, ClusterIdsRequestDto dto);
     void removeClusterFromCapsule(UUID capsuleId, UUID clusterId);
     CapsuleWithDetailsResponseDto getCapsuleWithDetails(UUID capsuleId);
-
     void updateSkillWithMoodleData(UpdateSkillEvent updateSkillEvent);
+    CustomPageResponse<CapsuleWithAtomCountResponseDto> filterCapsules(String name, Pageable pageable);
 }

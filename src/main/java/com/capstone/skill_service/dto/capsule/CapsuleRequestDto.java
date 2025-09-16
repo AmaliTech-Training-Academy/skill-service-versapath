@@ -18,17 +18,21 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 public class CapsuleRequestDto {
-    @NotBlank(message = "Name is required")
-    @Size(min = 3, message = "Name must have at least 3 characters")
-    @Pattern(regexp = "^[A-Za-z ]+$", message = "name cannot contain numbers")
-    private
-    String name;
+    @NotBlank(message = "Capsule name is required")
+    @Size(min = 3, message = "Capsule name must have at least 3 characters")
+    @Pattern(regexp = "^[A-Za-z ]+$", message = "Capsule name cannot contain numbers")
+    private String name;
 
     @Min(value = 1, message = "Estimated hours Must be at least 1 hour")
     @Max(value = 1000, message = "Estimated hours Must not exceed 1000 hours")
     private int estimatedHours;
 
+    @Pattern(
+            regexp = "^(BEGINNER|INTERMEDIATE|ADVANCED)$",
+            message = "Difficulty must be one of BEGINNER, INTERMEDIATE, or ADVANCED"
+    )
     private String difficulty;
+
     private ProficiencyLevel proficiencyLevel;
     private String categoryType;
     private String description;

@@ -1,10 +1,14 @@
 package com.capstone.skill_service.repository;
 
+import com.capstone.skill_service.dto.CustomPageResponse;
+import com.capstone.skill_service.dto.tag.TagResponseDto;
 import com.capstone.skill_service.model.TagEntity;
+import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -30,5 +34,6 @@ public interface TagRepository extends JpaRepository<TagEntity, UUID> {
 
     @Query("SELECT t.name FROM TagEntity t WHERE t.name IN :names")
     List<String> findExistingTagNames(@Param("names") List<String> names);
+    Page<TagEntity> findByNameContainingIgnoreCase(String name, Pageable pageable);
 
 }

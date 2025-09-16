@@ -22,4 +22,5 @@ public interface TagService {
     TagResponseDto partialUpdate(TagUpdateRequestDto dto, UUID id);
     TagResponseDto updateStatus(Status status, UUID id);
     List<TagResponseDto> addMultipleTags(List<String> tagName);
+    CustomPageResponse<TagResponseDto> filterTags(String name, Pageable pageable);
 }

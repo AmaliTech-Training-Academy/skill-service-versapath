@@ -100,7 +100,7 @@ public class TagServiceTest {
 
         CustomPageResponse<TagResponseDto> result = tagService.findAll(pageable);
 
-        assertEquals(1, result.getTotalElements());
+        assertEquals(1, result.getPagination().getTotalElements());
         assertEquals("Java", result.getItems().get(0).getName());
     }
 

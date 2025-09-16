@@ -1,6 +1,7 @@
 package com.capstone.skill_service.repository;
 
 import com.capstone.skill_service.dto.capsule.CapsuleWithAtomCountResponseDto;
+import com.capstone.skill_service.model.SkillAtomEntity;
 import com.capstone.skill_service.model.SkillCapsuleEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -51,9 +52,20 @@ public interface CapsuleRepository extends JpaRepository<SkillCapsuleEntity, UUI
 
     @Query("""
     SELECT new com.capstone.skill_service.dto.capsule.CapsuleWithAtomCountResponseDto(
-        c.id, c.name, c.difficulty, c.proficiencyLevel, c.categoryType , c.description ,c.objectives,
+        c.id, c.name, c.difficulty, c.moodleCourseId, c.proficiencyLevel, c.categoryType , c.description ,c.objectives,
         c.estimatedHours, c.status, (SELECT COUNT(ma.capsule.id) FROM c.skillAtoms ma), c.image, c.createdAt, c.updatedAt)
     FROM SkillCapsuleEntity c
     """)
     Page<CapsuleWithAtomCountResponseDto> findCapsuleWithAtomCount(Pageable pageable);
+
+    // filter by name
+    @Query("""
+    SELECT new com.capstone.skill_service.dto.capsule.CapsuleWithAtomCountResponseDto(
+        c.id, c.name, c.difficulty, c.moodleCourseId, c.proficiencyLevel, c.categoryType , c.description ,c.objectives,
+        c.estimatedHours, c.status, (SELECT COUNT(ma.capsule.id) FROM c.skillAtoms ma), c.image, c.createdAt, c.updatedAt)
+    FROM SkillCapsuleEntity c
+    WHERE (:name IS NULL OR LOWER(c.name) LIKE LOWER(CONCAT('%', :name, '%')))
+    """)
+    Page<CapsuleWithAtomCountResponseDto> findByNameContainingIgnoreCase(@Param("name") String name, Pageable pageable);
+
 }

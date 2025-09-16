@@ -1,6 +1,7 @@
 package com.capstone.skill_service.service.impl;
 
 import com.capstone.skill_service.dto.CustomPageResponse;
+import com.capstone.skill_service.dto.PaginationData;
 import com.capstone.skill_service.dto.tag.TagRequestDto;
 import com.capstone.skill_service.dto.tag.TagResponseDto;
 import com.capstone.skill_service.dto.tag.TagUpdateRequestDto;
@@ -18,6 +19,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -68,12 +70,41 @@ public class TagServiceImpl implements TagService {
 
         return CustomPageResponse.<TagResponseDto>builder()
                 .items(tags.getContent())
-                .page(tags.getNumber())
-                .size(tags.getSize())
-                .totalElements(tags.getTotalElements())
-                .totalPages(tags.getTotalPages())
-                .hasNext(tags.hasNext())
-                .hasPrevious(tags.hasPrevious())
+                .pagination(PaginationData.builder()
+                    .page(tags.getNumber())
+                    .size(tags.getSize())
+                    .totalElements(tags.getTotalElements())
+                    .totalPages(tags.getTotalPages())
+                    .hasNext(tags.hasNext())
+                    .hasPrevious(tags.hasPrevious())
+                    .build())
+                .build();
+    }
+
+    @Override
+    public CustomPageResponse<TagResponseDto> filterTags(String name, Pageable pageable) {
+        Page<TagEntity> tagList = null;
+        // if name isn't provided fetch 20 first items
+        if(name==null || name.trim().isEmpty()){
+            tagList = this.tagRepository.findAll(PageRequest.of(0, 20));
+        }else{
+            tagList  = this.tagRepository.findByNameContainingIgnoreCase(name, pageable);
+        }
+
+        Page<TagResponseDto> tags = tagList.map(this.tagMapper::toDto);
+
+        logger.info("Tags list is filtered");
+
+        return CustomPageResponse.<TagResponseDto>builder()
+                .items(tags.getContent())
+                .pagination(PaginationData.builder()
+                    .page(tags.getNumber())
+                    .size(tags.getSize())
+                    .totalElements(tags.getTotalElements())
+                    .totalPages(tags.getTotalPages())
+                    .hasNext(tags.hasNext())
+                    .hasPrevious(tags.hasPrevious())
+                    .build())
                 .build();
     }
 

@@ -13,7 +13,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -53,6 +55,24 @@ public class ClusterController {
     @Operation(summary = "Retrieve skill clusters", description = "This end point allows anyone to fetch all skill clusters")
     public ResponseEntity<ClientResponseFormatDto> fetchAllClusters(Pageable pageable) {
         CustomPageResponse<ClusterResponseDto> clusters = this.clusterService.findAll(pageable);
+        ClientResponseFormatDto response = ClientResponseFormatDto.builder()
+                .success(true)
+                .message("Fetch all clusters")
+                .errors(null)
+                .data(clusters)
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @GetMapping("/filter")
+    @Operation(summary = "Filter skill clusters", description = "This end point allows anyone to filter skill clusters")
+    public ResponseEntity<ClientResponseFormatDto> filterClusters(
+            @RequestParam(required = false) String name,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "${PAGE_SIZE}") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        CustomPageResponse<ClusterResponseDto> clusters = this.clusterService.filterClusters(name, pageable);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
                 .success(true)
                 .message("Fetch all clusters")

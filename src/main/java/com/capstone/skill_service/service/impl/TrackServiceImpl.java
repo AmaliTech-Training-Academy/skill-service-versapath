@@ -1,6 +1,7 @@
 package com.capstone.skill_service.service.impl;
 
 import com.capstone.skill_service.dto.CustomPageResponse;
+import com.capstone.skill_service.dto.PaginationData;
 import com.capstone.skill_service.dto.atom.AtomInSequenceOrderResponseDto;
 import com.capstone.skill_service.dto.capsule.CapsuleIdsRequestDto;
 import com.capstone.skill_service.dto.capsule.CapsuleInSequenceOrderResponseDto;
@@ -142,12 +143,14 @@ public class TrackServiceImpl implements TrackService {
 
         return CustomPageResponse.<TrackOnlyResponseDto>builder()
                 .items(growthTracks.getContent())
-                .page(growthTracks.getNumber())
-                .size(growthTracks.getSize())
-                .totalElements(growthTracks.getTotalElements())
-                .totalPages(growthTracks.getTotalPages())
-                .hasNext(growthTracks.hasNext())
-                .hasPrevious(growthTracks.hasPrevious())
+                .pagination(PaginationData.builder()
+                    .page(growthTracks.getNumber())
+                    .size(growthTracks.getSize())
+                    .totalElements(growthTracks.getTotalElements())
+                    .totalPages(growthTracks.getTotalPages())
+                    .hasNext(growthTracks.hasNext())
+                    .hasPrevious(growthTracks.hasPrevious())
+                    .build())
                 .build();
     }
 

@@ -17,9 +17,9 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class ClusterRequestDto {
-    @NotBlank(message = "Name is required")
-    @Size(min = 3, message = "Name must have at least 3 characters")
-    @Pattern(regexp = "^[A-Za-z ]+$", message = "name cannot contain numbers")
+    @NotBlank(message = "Cluster name is required")
+    @Size(min = 3, message = "Cluster name must have at least 3 characters")
+    @Pattern(regexp = "^[A-Za-z ]+$", message = "Cluster name cannot contain numbers")
     private String name;
 
     @Pattern(regexp = "^[A-Za-z ]+$", message = "type cannot contain numbers")
