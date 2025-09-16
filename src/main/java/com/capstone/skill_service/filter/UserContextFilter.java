@@ -14,7 +14,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,6 +35,11 @@ public class UserContextFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
+        if (path.startsWith("/ws")) { // allow websocket endpoints
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         // fetch  user info from header
         String userId = request.getHeader("X-User-Id");
         String userEmail = request.getHeader("X-User-Email");
