@@ -10,6 +10,7 @@ import com.capstone.skill_service.dto.tag.TagIdsRequestDto;
 import com.capstone.skill_service.exception.*;
 import com.capstone.skill_service.mapper.AtomMapper;
 import com.capstone.skill_service.mapper.CapsuleMapper;
+import com.capstone.skill_service.messaging.AssignSkillProducerEvent;
 import com.capstone.skill_service.messaging.CreateSkillProducerEvent;
 import com.capstone.skill_service.messaging.PopulateSkillEvents;
 import com.capstone.skill_service.model.*;
@@ -20,10 +21,7 @@ import com.capstone.skill_service.service.PreSignedUrlService;
 import com.capstone.skill_service.util.FileHelper;
 import com.capstone.skill_service.util.Status;
 import lombok.RequiredArgsConstructor;
-import org.common.event.CreateSkillEvent;
-import org.common.event.SkillAtom;
-import org.common.event.SkillCapsuleEvent;
-import org.common.event.UpdateSkillEvent;
+import org.common.event.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CacheEvict;
@@ -55,6 +53,7 @@ public class CapsuleServiceImpl implements CapsuleService {
     private final PopulateSkillEvents populateSkillEvents;
     private final AwsFileUploadService awsFileUploadService;
     private final PreSignedUrlService preSignedUrlService;
+    private final AssignSkillProducerEvent assignSkillProducerEvent;
 
     @Override
     @CacheEvict(value = "capsuleList",  allEntries = true)
@@ -143,6 +142,18 @@ public class CapsuleServiceImpl implements CapsuleService {
 
         createSkillProducerEvent.sendCreateSkillOnMoodleCommand(createSkillEvent);
 
+    }
+
+    void sendEventToAssignAtomToCapsuleOnMoodle(SkillCapsuleEntity savedCapsule, List<String> atoms){
+
+        if(!atoms.isEmpty()) {
+            AssignAtomToCapsuleEvent event = AssignAtomToCapsuleEvent.builder()
+                    .moodleCourseId(savedCapsule.getMoodleCourseId())
+                    .atoms(atoms)
+                    .build();
+
+            assignSkillProducerEvent.assignSkillOnMoodleCommand(event);
+        }
     }
 
     public CapsuleResponseDto mapCapsuleToResponseDtoWithAtom(SkillCapsuleEntity capsule){
@@ -413,6 +424,8 @@ public class CapsuleServiceImpl implements CapsuleService {
 
         int numberOfAtomsInCapsule = capsuleEntity.getSkillAtoms().size();
 
+        List<String> atomNamesToBeCreatedOnMoodle = new ArrayList<>();
+
         for(int i=0; i<atomIds.size(); i++){
             UUID atomId=atomIds.get(i); //get atom id
 
@@ -435,7 +448,12 @@ public class CapsuleServiceImpl implements CapsuleService {
                     .build();
 
             capsuleEntity.getSkillAtoms().add(assignAtomToCapsule);// add a single assignment to assigment collection
+
+            atomNamesToBeCreatedOnMoodle.add(atom.getName()); // add atom to be sent to Moodle
         }
+
+        // send event to add new lesson to an existing course on Moodle
+        sendEventToAssignAtomToCapsuleOnMoodle(capsuleEntity, atomNamesToBeCreatedOnMoodle);
 
     }
 
