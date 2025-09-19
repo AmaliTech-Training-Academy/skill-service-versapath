@@ -33,11 +33,11 @@ import java.util.UUID;
 public class CapsuleController {
     private final CapsuleService capsuleService;
 
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping()
     @PreAuthorize("hasAuthority('ADMIN')")
     @Operation(summary = "Create skill capsule", description = "This end point allows only admin to create a skill capsule")
     public ResponseEntity<ClientResponseFormatDto> createCapsule(
-            @Valid @RequestPart("capsule") CapsuleRequestDto capsuleRequestDto,
+            @Valid @RequestBody CapsuleRequestDto capsuleRequestDto,
             @RequestParam(value = "image", required = false) MultipartFile image
     ) throws IOException {
         CapsuleResponseDto savedCapsule = this.capsuleService.create(capsuleRequestDto, image);
