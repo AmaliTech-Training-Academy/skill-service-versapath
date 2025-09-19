@@ -123,22 +123,26 @@ public class CapsuleServiceImpl implements CapsuleService {
     }
 
     void sendEventToCreateSkillStructureOnMoodle(SkillCapsuleEntity savedCapsule){
-        // extract capsule atom names to send to Moodle
+        // extract capsule atoms that aren't present on Moodle
         List<SkillAtomEntity> atomEntities = savedCapsule.getSkillAtoms().stream()
-                .map(CapsuleAtomMappingEntity::getAtom)
+                .map(CapsuleAtomMappingEntity::getAtom) // extract all the capsule atoms
+                .filter(atom -> atom.getMoodleModuleId() == 0 || atom.getMoodlePageId() == 0) // only with no contents atoms
                 .toList();
 
         List<String> atomNames = new ArrayList<>();
-        for(SkillAtomEntity atom: atomEntities){
-            atomNames.add(atom.getName());
+        if(!atomEntities.isEmpty()) { // send event when there is new atom that needs content
+            for (SkillAtomEntity atom : atomEntities) {
+                atomNames.add(atom.getName());
+            }
         }
 
         CreateSkillEvent createSkillEvent = CreateSkillEvent.builder()
                 .capsuleName(savedCapsule.getName())
-                .atoms(atomNames)
+                .atoms(atomNames.isEmpty() ? List.of() : atomNames)
                 .build();
 
         createSkillProducerEvent.sendCreateSkillOnMoodleCommand(createSkillEvent);
+
     }
 
     public CapsuleResponseDto mapCapsuleToResponseDtoWithAtom(SkillCapsuleEntity capsule){
