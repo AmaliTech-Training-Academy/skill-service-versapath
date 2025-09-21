@@ -97,7 +97,7 @@ public class CapsuleServiceImpl implements CapsuleService {
         return mapCapsuleToResponseDtoWithAtom(savedCapsule);
     }
 
-    void populateSkillCapsuleEvent(SkillCapsuleEntity capsuleEntity, String type){
+    void populateSkillCapsuleEvent(SkillCapsuleEntity capsuleEntity, String eventType){
 
         List<Map<UUID, Integer>> listOfAtomsInCapsule = new ArrayList<>();
 
@@ -109,7 +109,22 @@ public class CapsuleServiceImpl implements CapsuleService {
             listOfAtomsInCapsule.add(atomWithSequenceOrder);
 
         }
-        if(type.equalsIgnoreCase("assignAtom")){
+
+        if(eventType.equalsIgnoreCase("delete")){
+            populateSkillEvents.populateDeleteCapsule(SkillCapsuleEvent.builder()
+                    .id(capsuleEntity.getId())
+                    .name(capsuleEntity.getName())
+                    .build());
+        }else if(eventType.equalsIgnoreCase("update")){
+            populateSkillEvents.populateUpdateCapsule(SkillCapsuleEvent.builder()
+                    .id(capsuleEntity.getId())
+                    .name(capsuleEntity.getName())
+                    .description(capsuleEntity.getDescription())
+                    .difficulty(capsuleEntity.getDifficulty())
+                    .proficiencyLevel(capsuleEntity.getProficiencyLevel().toString())
+                    .skillAtom(listOfAtomsInCapsule)
+                    .build());
+        }else if(eventType.equalsIgnoreCase("assignAtom")){
             populateSkillEvents.populateAssignCapsule(SkillCapsuleEvent.builder()
                     .id(capsuleEntity.getId())
                     .name(capsuleEntity.getName())
@@ -118,7 +133,8 @@ public class CapsuleServiceImpl implements CapsuleService {
                     .proficiencyLevel(capsuleEntity.getProficiencyLevel().toString())
                     .skillAtom(listOfAtomsInCapsule)
                     .build());
-        }else{
+        }
+        else{
             populateSkillEvents.populateSkillCapsule(SkillCapsuleEvent.builder()
                     .id(capsuleEntity.getId())
                     .name(capsuleEntity.getName())
@@ -128,8 +144,6 @@ public class CapsuleServiceImpl implements CapsuleService {
                     .skillAtom(listOfAtomsInCapsule)
                     .build());
         }
-
-
 
     }
 
@@ -249,9 +263,7 @@ public class CapsuleServiceImpl implements CapsuleService {
         trackCapsuleMappingRepository.deleteAll(mappings);
 
         // publish event to delete capsule
-        populateSkillEvents.populateDeleteCapsule(SkillCapsuleEvent.builder()
-                .id(capsule.getId())
-                .build());
+        populateSkillCapsuleEvent(capsule, "delete");
 
         logger.info("Skill capsule {} deleted", capsule.getName());
 
@@ -393,13 +405,7 @@ public class CapsuleServiceImpl implements CapsuleService {
         SkillCapsuleEntity savedCapsule = capsuleRepository.save(capsule);
 
         // publish event to update capsule
-        populateSkillEvents.populateUpdateCapsule(SkillCapsuleEvent.builder()
-                .id(savedCapsule.getId())
-                .name(savedCapsule.getName())
-                .description(savedCapsule.getDescription())
-                .difficulty(savedCapsule.getDifficulty())
-                .proficiencyLevel(savedCapsule.getProficiencyLevel().toString())
-                .build());
+        populateSkillCapsuleEvent(capsule, "update");
 
         // map capsule to response dto
         return mapCapsuleToResponseDtoWithAtom(savedCapsule);
