@@ -23,6 +23,12 @@ public class PopulateSkillEvents {
     @Value("${ATOM_CREATE_TOPIC}")
     private String atomCreateTopic;
 
+    @Value("${ATOM_UPDATE_TOPIC}")
+    private String atomUpdateTopic;
+
+    @Value("${ATOM_DELETE_TOPIC}")
+    private String atomDeleteTopic;
+
     @Value("${CAPSULE_CREATE_TOPIC}")
     private String capsuleCreateTopic;
 
@@ -36,6 +42,18 @@ public class PopulateSkillEvents {
         kafkaAtomTemplate.send(atomCreateTopic, atomEvent);
 
         logger.info("atom event is populated: {}", atomEvent);
+    }
+
+    public void populateUpdateAtom(SkillAtomEvent atomEvent){
+        kafkaAtomTemplate.send(atomUpdateTopic, atomEvent);
+
+        logger.info("atom event is populated for update: {}", atomEvent);
+    }
+
+    public void populateDeleteAtom(SkillAtomEvent atomEvent){
+        kafkaAtomTemplate.send(atomDeleteTopic, atomEvent);
+
+        logger.info("atom event is populated for delete: {}", atomEvent);
     }
 
     public void populateSkillCapsule(SkillCapsuleEvent capsuleEvent){

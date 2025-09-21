@@ -19,6 +19,9 @@ public class RabbitMQConfig {
     @Value("${SKILL_ASSIGN_QUEUE}")
     private String skillAssignmentQueue;
 
+    @Value("${USER_UPDATE_QUEUE}")
+    private String userUpdateQueue;
+
     @Bean
     public Jackson2JsonMessageConverter jackson2JsonMessageConverter() {
         return new Jackson2JsonMessageConverter();
@@ -46,5 +49,11 @@ public class RabbitMQConfig {
     public Queue assignSkillQueue() {
         return new Queue(skillAssignmentQueue, true);
     }
+
+    @Bean
+    public Queue updateUserQueue() {
+        return new Queue(userUpdateQueue, true);
+    }
+
 
 }
