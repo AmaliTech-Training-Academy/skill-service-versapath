@@ -115,7 +115,7 @@ public class AtomServiceImpl implements AtomService {
     @Caching(
         evict = {
             @CacheEvict(value = "atomList", allEntries = true), // to update the entire list
-            @CacheEvict(value = "atom", key = "#result.id") // evict single atom
+            @CacheEvict(value = "atom", key = "#id") // evict single atom
         }
     )
     public void deleteById(UUID id) {
@@ -125,6 +125,13 @@ public class AtomServiceImpl implements AtomService {
         // first delete all the reference
         List<CapsuleAtomMappingEntity> mappings = capsuleAtomMappingRepository.findBySkillAtomId(id);
         capsuleAtomMappingRepository.deleteAll(mappings);
+
+        //populate event for deleting atom
+        populateSkillEvents.populateDeleteAtom(SkillAtomEvent.builder()
+                .id(atom.getId())
+                .name(atom.getName())
+                .description(atom.getDescription())
+                .build());
 
         logger.info("Skill atom {} deleted", atom.getName());
 
@@ -165,9 +172,18 @@ public class AtomServiceImpl implements AtomService {
         }
         atom.setUpdatedAt(LocalDateTime.now());
 
+        SkillAtomEntity savedAtom = this.atomRepository.save(atom);
+
+        //populate event for updating atom
+        populateSkillEvents.populateUpdateAtom(SkillAtomEvent.builder()
+                .id(savedAtom.getId())
+                .name(savedAtom.getName())
+                .description(savedAtom.getDescription())
+                .build());
+
         logger.info("Skill atom {} updated", atom.getName());
 
-        return this.atomMapper.toDto(this.atomRepository.save(atom));
+        return this.atomMapper.toDto(savedAtom);
     }
 
     @Override
