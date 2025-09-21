@@ -32,6 +32,15 @@ public class PopulateSkillEvents {
     @Value("${CAPSULE_CREATE_TOPIC}")
     private String capsuleCreateTopic;
 
+    @Value("${CAPSULE_UPDATE_TOPIC}")
+    private String capsuleUpdateTopic;
+
+    @Value("${CAPSULE_DELETE_TOPIC}")
+    private String capsuleDeleteTopic;
+
+    @Value("${CAPSULE_ASSIGN_TOPIC}")
+    private String capsuleAssignTopic;
+
     @Value("${GROWTH_TRACK_CREATE_TOPIC}")
     private String growthTrackCreateTopic;
 
@@ -60,6 +69,24 @@ public class PopulateSkillEvents {
         kafkaCapsuleTemplate.send(capsuleCreateTopic, capsuleEvent);
 
         logger.info("capsule event is populated: {}", capsuleEvent);
+    }
+
+    public void populateUpdateCapsule(SkillCapsuleEvent capsuleEvent){
+        kafkaCapsuleTemplate.send(capsuleUpdateTopic, capsuleEvent);
+
+        logger.info("capsule event is populated for update: {}", capsuleEvent);
+    }
+
+    public void populateDeleteCapsule(SkillCapsuleEvent capsuleEvent){
+        kafkaCapsuleTemplate.send(capsuleDeleteTopic, capsuleEvent);
+
+        logger.info("capsule event is populated for delete: {}", capsuleEvent);
+    }
+
+    public void populateAssignCapsule(SkillCapsuleEvent capsuleEvent){
+        kafkaCapsuleTemplate.send(capsuleAssignTopic, capsuleEvent);
+
+        logger.info("capsule event is populated for atom assignment: {}", capsuleEvent);
     }
 
     public void populateGrowthTrack(GrowthTrackEvent growthTrackEvent){
