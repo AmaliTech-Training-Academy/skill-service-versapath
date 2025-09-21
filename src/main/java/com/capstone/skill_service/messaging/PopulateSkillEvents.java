@@ -56,6 +56,15 @@ public class PopulateSkillEvents {
     @Value("${TALENT_ROUTE_CREATE_TOPIC}")
     private String talentRouteCreateTopic;
 
+    @Value("${TALENT_ROUTE_UPDATE_TOPIC}")
+    private String talentRouteUpdateTopic;
+
+    @Value("${TALENT_ROUTE_DELETE_TOPIC}")
+    private String talentRouteDeleteTopic;
+
+    @Value("${TALENT_ROUTE_ASSIGN_TOPIC}")
+    private String talentRouteAssignTopic;
+
     public void populateSkillAtom(SkillAtomEvent atomEvent){
         kafkaAtomTemplate.send(atomCreateTopic, atomEvent);
 
@@ -126,6 +135,24 @@ public class PopulateSkillEvents {
         kafkaTalentRouteTemplate.send(talentRouteCreateTopic, talentRouteEvent);
 
         logger.info("talent route event is populated: {}", talentRouteEvent);
+    }
+
+    public void populateUpdateTalentRoute(TalentRouteEvent talentRouteEvent){
+        kafkaTalentRouteTemplate.send(talentRouteUpdateTopic, talentRouteEvent);
+
+        logger.info("talentRoute event is populated for update: {}", talentRouteEvent);
+    }
+
+    public void populateDeleteTalentRoute(TalentRouteEvent talentRouteEvent){
+        kafkaTalentRouteTemplate.send(talentRouteDeleteTopic, talentRouteEvent);
+
+        logger.info("talentRoute event is populated for delete: {}", talentRouteEvent);
+    }
+
+    public void populateAssignTalentRoute(TalentRouteEvent talentRouteEvent){
+        kafkaTalentRouteTemplate.send(talentRouteAssignTopic, talentRouteEvent);
+
+        logger.info("talentRoute event is populated for growth track assignment: {}", talentRouteEvent);
     }
 
 }
