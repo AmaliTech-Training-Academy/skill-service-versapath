@@ -129,8 +129,6 @@ public class AtomServiceImpl implements AtomService {
         //populate event for deleting atom
         populateSkillEvents.populateDeleteAtom(SkillAtomEvent.builder()
                 .id(atom.getId())
-                .name(atom.getName())
-                .description(atom.getDescription())
                 .build());
 
         logger.info("Skill atom {} deleted", atom.getName());
