@@ -64,14 +64,14 @@ public class TrackServiceImpl implements TrackService {
         GrowthTrackEntity savedTrack = trackRepository.save(trackEntity);
         logger.info("Admin created skill track: {}", trackEntity.getName());
 
-        // populate an event
-        populateGrowthTrackEvent(savedTrack);
+        // populate an event to create growth track
+        populateGrowthTrackEvent(savedTrack, "create");
 
         return this.trackMapper.toDto(trackRepository.save(trackEntity));
 
     }
 
-    void populateGrowthTrackEvent(GrowthTrackEntity savedTrack){
+    void populateGrowthTrackEvent(GrowthTrackEntity savedTrack, String eventType){
         List<Map<UUID, Integer>> listOfCapsulesInGrowthTrack = new ArrayList<>();
 
         for(TrackCapsuleMappingEntity mapping: savedTrack.getSkillCapsules()){
@@ -81,12 +81,33 @@ public class TrackServiceImpl implements TrackService {
             listOfCapsulesInGrowthTrack.add(capsuleWithSequenceOrder);
         }
 
-        populateSkillEvents.populateGrowthTrack(GrowthTrackEvent.builder()
-                        .id(savedTrack.getId())
-                        .name(savedTrack.getName())
-                        .description(savedTrack.getDescription())
-                        .skillCapsules(listOfCapsulesInGrowthTrack)
-                        .build());
+        if(eventType.equalsIgnoreCase("delete")){
+            populateSkillEvents.populateDeleteGrowthTrack(GrowthTrackEvent.builder()
+                    .id(savedTrack.getId())
+                    .name(savedTrack.getName())
+                    .build());
+        } else if (eventType.equalsIgnoreCase("update")) {
+            populateSkillEvents.populateUpdateGrowthTrack(GrowthTrackEvent.builder()
+                    .id(savedTrack.getId())
+                    .name(savedTrack.getName())
+                    .description(savedTrack.getDescription())
+                    .skillCapsules(listOfCapsulesInGrowthTrack)
+                    .build());
+        } else if (eventType.equalsIgnoreCase("assignCapsule")) {
+            populateSkillEvents.populateAssignGrowthTrack(GrowthTrackEvent.builder()
+                    .id(savedTrack.getId())
+                    .name(savedTrack.getName())
+                    .description(savedTrack.getDescription())
+                    .skillCapsules(listOfCapsulesInGrowthTrack)
+                    .build());
+        } else{
+            populateSkillEvents.populateGrowthTrack(GrowthTrackEvent.builder()
+                    .id(savedTrack.getId())
+                    .name(savedTrack.getName())
+                    .description(savedTrack.getDescription())
+                    .skillCapsules(listOfCapsulesInGrowthTrack)
+                    .build());
+        }
 
     }
 
@@ -234,6 +255,9 @@ public class TrackServiceImpl implements TrackService {
         List<RouteTrackMappingEntity> mappings = routeTrackMappingRepository.findByTrackId(id);
         routeTrackMappingRepository.deleteAll(mappings);
 
+        // populate event to delete growth track
+        populateGrowthTrackEvent(track, "delete");
+
         logger.info("Growth track {} deleted", track.getName());
 
         this.trackRepository.deleteById(id);
@@ -281,9 +305,14 @@ public class TrackServiceImpl implements TrackService {
 
         track.setUpdatedAt(LocalDateTime.now());
 
+        GrowthTrackEntity savedTrack = this.trackRepository.save(track);
+
+        // populate event to update growth track
+        populateGrowthTrackEvent(savedTrack, "update");
+
         logger.info("Growth track {} updated", track.getName());
 
-        return this.trackMapper.toDto(this.trackRepository.save(track));
+        return this.trackMapper.toDto(savedTrack);
     }
 
     @Override
@@ -317,9 +346,13 @@ public class TrackServiceImpl implements TrackService {
 
         addCapsulesToTrack(track, dto.getCapsuleIds()); // link track to all the capsules assigned to it
 
+        GrowthTrackEntity savedTrack = trackRepository.save(track);
         logger.info("Admin added new skill capsule to growth track: {}", track.getName());
 
-        return this.trackMapper.toDto(trackRepository.save(track));
+        // publish event to assign new capsule
+        populateGrowthTrackEvent(savedTrack, "assignCapsule");
+
+        return this.trackMapper.toDto(savedTrack);
 
     }
 

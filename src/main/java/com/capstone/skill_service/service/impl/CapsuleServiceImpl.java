@@ -405,7 +405,7 @@ public class CapsuleServiceImpl implements CapsuleService {
         SkillCapsuleEntity savedCapsule = capsuleRepository.save(capsule);
 
         // publish event to update capsule
-        populateSkillCapsuleEvent(capsule, "update");
+        populateSkillCapsuleEvent(savedCapsule, "update");
 
         // map capsule to response dto
         return mapCapsuleToResponseDtoWithAtom(savedCapsule);

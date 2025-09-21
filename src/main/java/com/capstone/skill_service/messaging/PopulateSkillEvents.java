@@ -44,6 +44,15 @@ public class PopulateSkillEvents {
     @Value("${GROWTH_TRACK_CREATE_TOPIC}")
     private String growthTrackCreateTopic;
 
+    @Value("${GROWTH_TRACK_UPDATE_TOPIC}")
+    private String growthTrackUpdateTopic;
+
+    @Value("${GROWTH_TRACK_DELETE_TOPIC}")
+    private String growthTrackDeleteTopic;
+
+    @Value("${GROWTH_TRACK_ASSIGN_TOPIC}")
+    private String growthTrackAssignTopic;
+
     @Value("${TALENT_ROUTE_CREATE_TOPIC}")
     private String talentRouteCreateTopic;
 
@@ -93,6 +102,24 @@ public class PopulateSkillEvents {
         kafkaGrowthTrackTemplate.send(growthTrackCreateTopic, growthTrackEvent);
 
         logger.info("growth track event is populated: {}", growthTrackEvent);
+    }
+
+    public void populateUpdateGrowthTrack(GrowthTrackEvent growthTrackEvent){
+        kafkaGrowthTrackTemplate.send(growthTrackUpdateTopic, growthTrackEvent);
+
+        logger.info("growthTrack event is populated for update: {}", growthTrackEvent);
+    }
+
+    public void populateDeleteGrowthTrack(GrowthTrackEvent growthTrackEvent){
+        kafkaGrowthTrackTemplate.send(growthTrackDeleteTopic, growthTrackEvent);
+
+        logger.info("growthTrack event is populated for delete: {}", growthTrackEvent);
+    }
+
+    public void populateAssignGrowthTrack(GrowthTrackEvent growthTrackEvent){
+        kafkaGrowthTrackTemplate.send(growthTrackAssignTopic, growthTrackEvent);
+
+        logger.info("growthTrack event is populated for capsule assignment: {}", growthTrackEvent);
     }
 
     public void populateTalentRoute(TalentRouteEvent talentRouteEvent){
