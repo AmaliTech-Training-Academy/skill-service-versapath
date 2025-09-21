@@ -79,7 +79,7 @@ public class RouteController {
         this.routeService.deleteById(id);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
                 .success(true)
-                .message("Growth Route deleted successfully!")
+                .message("Talent Route deleted successfully!")
                 .errors(null)
                 .data(null)
                 .build();

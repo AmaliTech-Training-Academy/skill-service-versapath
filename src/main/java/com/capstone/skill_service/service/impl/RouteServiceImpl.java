@@ -76,14 +76,14 @@ public class RouteServiceImpl implements RouteService {
 
         logger.info("Admin created skill track: {}", routeEntity.getName());
 
-        //populate an event
-        populateTalentRouteEvent(savedTalentRoute);
+        //publish an event to create talent route
+        populateTalentRouteEvent(savedTalentRoute, "create");
 
         return this.routeMapper.toDto(savedTalentRoute);
 
     }
 
-    void populateTalentRouteEvent(TalentRouteEntity talentRoute){
+    void populateTalentRouteEvent(TalentRouteEntity talentRoute, String eventType){
         List<Map<UUID, Integer>> listOfTrackInTalentRoute = new ArrayList<>();
 
         for(RouteTrackMappingEntity mapping: talentRoute.getTracks()){
@@ -92,13 +92,33 @@ public class RouteServiceImpl implements RouteService {
 
             listOfTrackInTalentRoute.add(growthTrackWithSequenceOrder);
         }
-
-        populateSkillEvents.populateTalentRoute(TalentRouteEvent.builder()
-                .id(talentRoute.getId())
-                .name(talentRoute.getName())
-                .description(talentRoute.getDescription())
-                .growthTracks(listOfTrackInTalentRoute)
-                .build());
+        if(eventType.equalsIgnoreCase("delete")){
+            populateSkillEvents.populateDeleteTalentRoute(TalentRouteEvent.builder()
+                    .id(talentRoute.getId())
+                    .name(talentRoute.getName())
+                    .build());
+        }else if (eventType.equalsIgnoreCase("update")){
+            populateSkillEvents.populateUpdateTalentRoute(TalentRouteEvent.builder()
+                    .id(talentRoute.getId())
+                    .name(talentRoute.getName())
+                    .description(talentRoute.getDescription())
+                    .growthTracks(listOfTrackInTalentRoute)
+                    .build());
+        }else if (eventType.equalsIgnoreCase("assignGrowthTrack")){
+            populateSkillEvents.populateAssignTalentRoute(TalentRouteEvent.builder()
+                    .id(talentRoute.getId())
+                    .name(talentRoute.getName())
+                    .description(talentRoute.getDescription())
+                    .growthTracks(listOfTrackInTalentRoute)
+                    .build());
+        } else {
+            populateSkillEvents.populateTalentRoute(TalentRouteEvent.builder()
+                    .id(talentRoute.getId())
+                    .name(talentRoute.getName())
+                    .description(talentRoute.getDescription())
+                    .growthTracks(listOfTrackInTalentRoute)
+                    .build());
+        }
 
     }
 
@@ -274,6 +294,9 @@ public class RouteServiceImpl implements RouteService {
 
         logger.info("Talent route {} deleted", route.getName());
 
+        //publish an event to delete talent route
+        populateTalentRouteEvent(route, "delete");
+
         this.routeRepository.deleteById(id);
     }
 
@@ -320,9 +343,14 @@ public class RouteServiceImpl implements RouteService {
 
         route.setUpdatedAt(LocalDateTime.now());
 
+        TalentRouteEntity savedTalentRoute = this.routeRepository.save(route);
+
+        //publish an event to update talent route
+        populateTalentRouteEvent(savedTalentRoute, "update");
+
         logger.info("Talent route {} updated", route.getName());
 
-        return this.routeMapper.toDto(this.routeRepository.save(route));
+        return this.routeMapper.toDto(savedTalentRoute);
 
     }
 
@@ -358,6 +386,9 @@ public class RouteServiceImpl implements RouteService {
                 );
 
         addTrackToRoute(route, dto.getTrackIds()); // link route to all the growth track assigned to it
+
+        //publish an event to assign growth track to talent route
+        populateTalentRouteEvent(route, "assignGrowthTrack");
 
         logger.info("Admin added new growth track to talent route: {}", route.getName());
 
