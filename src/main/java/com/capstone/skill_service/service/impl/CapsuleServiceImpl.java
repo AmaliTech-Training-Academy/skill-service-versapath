@@ -119,6 +119,7 @@ public class CapsuleServiceImpl implements CapsuleService {
             populateSkillEvents.populateUpdateCapsule(SkillCapsuleEvent.builder()
                     .id(capsuleEntity.getId())
                     .name(capsuleEntity.getName())
+                    .moodleCourseId(capsuleEntity.getMoodleCourseId())
                     .description(capsuleEntity.getDescription())
                     .difficulty(capsuleEntity.getDifficulty())
                     .proficiencyLevel(capsuleEntity.getProficiencyLevel().toString())
@@ -171,7 +172,6 @@ public class CapsuleServiceImpl implements CapsuleService {
     }
 
     void sendEventToAssignAtomToCapsuleOnMoodle(SkillCapsuleEntity savedCapsule, List<String> atoms){
-
         if(!atoms.isEmpty()) {
             AssignAtomToCapsuleEvent event = AssignAtomToCapsuleEvent.builder()
                     .moodleCourseId(savedCapsule.getMoodleCourseId())
@@ -298,12 +298,23 @@ public class CapsuleServiceImpl implements CapsuleService {
                 atomEntity.setMoodleModuleId(atom.getCourseModuleId());
                 atomEntity.setMoodlePageId(atom.getPageId());
 
-                atomRepository.save(atomEntity); //save to DB
+                SkillAtomEntity savedAtom = atomRepository.save(atomEntity); //save to DB
+
+                //populate event to update atom with moodle id
+                populateSkillEvents.populateUpdateAtom(SkillAtomEvent.builder()
+                        .id(savedAtom.getId())
+                        .name(savedAtom.getName())
+                        .moodleModuleId(savedAtom.getMoodleModuleId())
+                        .moodlePageId(savedAtom.getMoodlePageId())
+                        .description(savedAtom.getDescription())
+                        .build());
             }
 
             capsuleEntity.setMoodleCourseId(updateSkillEvent.getCourseId()); // map capsule to Moodle course id
-            capsuleRepository.save(capsuleEntity); // save to DB
+            SkillCapsuleEntity savedCapsule= capsuleRepository.save(capsuleEntity); // save to DB
 
+            // publish event to update capsule with moodle data
+            populateSkillCapsuleEvent(savedCapsule, "update");
 
             logger.info("Capsule with its atom are updated with Moodle data {}", updateSkillEvent.getName());
 
