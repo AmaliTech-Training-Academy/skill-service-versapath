@@ -175,6 +175,7 @@ public class CapsuleServiceImpl implements CapsuleService {
         if(!atoms.isEmpty()) {
             AssignAtomToCapsuleEvent event = AssignAtomToCapsuleEvent.builder()
                     .moodleCourseId(savedCapsule.getMoodleCourseId())
+                    .courseName(savedCapsule.getName())
                     .atoms(atoms)
                     .build();
 
@@ -500,7 +501,10 @@ public class CapsuleServiceImpl implements CapsuleService {
 
             capsuleEntity.getSkillAtoms().add(assignAtomToCapsule);// add a single assignment to assigment collection
 
-            atomNamesToBeCreatedOnMoodle.add(atom.getName()); // add atom to be sent to Moodle
+            if(atom.getMoodlePageId() != 0){
+                atomNamesToBeCreatedOnMoodle.add(atom.getName()); // add atom to be sent to Moodle
+            }
+
         }
 
         // send event to add new lesson to an existing course on Moodle
