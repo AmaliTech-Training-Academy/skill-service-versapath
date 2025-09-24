@@ -176,6 +176,8 @@ public class AtomServiceImpl implements AtomService {
         populateSkillEvents.populateUpdateAtom(SkillAtomEvent.builder()
                 .id(savedAtom.getId())
                 .name(savedAtom.getName())
+                .moodleModuleId(savedAtom.getMoodleModuleId())
+                .moodlePageId(savedAtom.getMoodlePageId())
                 .description(savedAtom.getDescription())
                 .build());
 
