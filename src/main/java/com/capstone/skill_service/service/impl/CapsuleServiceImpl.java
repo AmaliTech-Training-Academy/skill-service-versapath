@@ -129,6 +129,7 @@ public class CapsuleServiceImpl implements CapsuleService {
             populateSkillEvents.populateAssignCapsule(SkillCapsuleEvent.builder()
                     .id(capsuleEntity.getId())
                     .name(capsuleEntity.getName())
+                    .moodleCourseId(capsuleEntity.getMoodleCourseId())
                     .description(capsuleEntity.getDescription())
                     .difficulty(capsuleEntity.getDifficulty())
                     .proficiencyLevel(capsuleEntity.getProficiencyLevel().toString())
@@ -139,6 +140,7 @@ public class CapsuleServiceImpl implements CapsuleService {
             populateSkillEvents.populateSkillCapsule(SkillCapsuleEvent.builder()
                     .id(capsuleEntity.getId())
                     .name(capsuleEntity.getName())
+                    .moodleCourseId(capsuleEntity.getMoodleCourseId())
                     .description(capsuleEntity.getDescription())
                     .difficulty(capsuleEntity.getDifficulty())
                     .proficiencyLevel(capsuleEntity.getProficiencyLevel().toString())
@@ -501,15 +503,16 @@ public class CapsuleServiceImpl implements CapsuleService {
 
             capsuleEntity.getSkillAtoms().add(assignAtomToCapsule);// add a single assignment to assigment collection
 
-            if(atom.getMoodlePageId() != 0){
+            if(atom.getMoodlePageId() == 0){
                 atomNamesToBeCreatedOnMoodle.add(atom.getName()); // add atom to be sent to Moodle
             }
 
         }
 
-        // send event to add new lesson to an existing course on Moodle
-        sendEventToAssignAtomToCapsuleOnMoodle(capsuleEntity, atomNamesToBeCreatedOnMoodle);
-
+        if(capsuleEntity.getMoodleCourseId() != 0){
+            // send event to add new lesson to an existing course on Moodle
+            sendEventToAssignAtomToCapsuleOnMoodle(capsuleEntity, atomNamesToBeCreatedOnMoodle);
+        }
     }
 
     @Override
