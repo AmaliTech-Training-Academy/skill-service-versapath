@@ -26,5 +26,6 @@ public interface TrackService {
     TrackResponseDto assignCapsuleToTrack(UUID trackId, CapsuleIdsRequestDto dto);
     void removeCapsuleFromTrack(UUID trackId, UUID capsuleId);
     TrackResponseDto reorderCapsules(UUID trackId, List<UUID> orderedCapsuleIds);
+    CustomPageResponse<TrackOnlyResponseDto> filterByName(String name, Pageable pageable);
 
 }
