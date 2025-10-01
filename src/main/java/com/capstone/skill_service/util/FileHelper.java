@@ -2,8 +2,10 @@ package com.capstone.skill_service.util;
 
 import com.capstone.skill_service.dto.capsule.CapsuleResponseDto;
 import com.capstone.skill_service.dto.cluster.ClusterResponseDto;
+import com.capstone.skill_service.dto.track.TrackResponseDto;
 import com.capstone.skill_service.exception.FileException;
 import com.capstone.skill_service.model.ClusterEntity;
+import com.capstone.skill_service.model.GrowthTrackEntity;
 import com.capstone.skill_service.model.SkillCapsuleEntity;
 import com.capstone.skill_service.service.PreSignedUrlService;
 import org.springframework.util.unit.DataSize;
@@ -45,6 +47,15 @@ public class FileHelper {
         if (savedCluster.getImageName() != null) {
             String presignedUrl = preSignedUrlService.generatePresignedUrl(savedCluster.getImageName());
             responseDto.setImageName(presignedUrl);
+        }
+    }
+
+    public static void generatePresignedUrl(GrowthTrackEntity savedTrack,
+                                            TrackResponseDto responseDto,
+                                            PreSignedUrlService preSignedUrlService ){
+        if (savedTrack.getImage() != null) {
+            String presignedUrl = preSignedUrlService.generatePresignedUrl(savedTrack.getImage());
+            responseDto.setImage(presignedUrl);
         }
     }
 

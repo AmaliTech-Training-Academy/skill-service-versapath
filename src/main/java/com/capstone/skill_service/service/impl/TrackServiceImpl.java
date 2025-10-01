@@ -13,7 +13,10 @@ import com.capstone.skill_service.mapper.TrackMapper;
 import com.capstone.skill_service.messaging.PopulateSkillEvents;
 import com.capstone.skill_service.model.*;
 import com.capstone.skill_service.repository.*;
+import com.capstone.skill_service.service.AwsFileUploadService;
+import com.capstone.skill_service.service.PreSignedUrlService;
 import com.capstone.skill_service.service.TrackService;
+import com.capstone.skill_service.util.FileHelper;
 import com.capstone.skill_service.util.Status;
 import lombok.RequiredArgsConstructor;
 import org.common.event.GrowthTrackEvent;
@@ -25,7 +28,9 @@ import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -42,10 +47,12 @@ public class TrackServiceImpl implements TrackService {
     private final RouteTrackMappingRepository routeTrackMappingRepository;
     private final CapsuleAtomMappingRepository capsuleAtomMappingRepository;
     private final PopulateSkillEvents populateSkillEvents;
+    private final AwsFileUploadService awsFileUploadService;
+    private final PreSignedUrlService preSignedUrlService;
 
     @Override
     @CacheEvict(value = "growthTrackList",  allEntries = true)
-    public TrackResponseDto create(TrackRequestDto dto) {
+    public TrackResponseDto create(TrackRequestDto dto, MultipartFile image) throws IOException {
         if(findByName(dto.getName()).isPresent()){
             throw new TrackExistsException(
                     String.format("A Growth Track with the name '%s' already exist",
@@ -58,16 +65,22 @@ public class TrackServiceImpl implements TrackService {
         if(dto.getStatus() == null){ // set default value
             trackEntity.setStatus(Status.ACTIVE);
         }
+        if(image != null){
+            FileHelper.validateImage(image); // validate image
+            trackEntity.setImage(awsFileUploadService.uploadFile(image)); //upload image
+        }
         addCapsulesToTrack(trackEntity, dto.getCapsuleIds()); // link track to all the capsules assigned to
 
-
         GrowthTrackEntity savedTrack = trackRepository.save(trackEntity);
+        TrackResponseDto response = this.trackMapper.toDto(savedTrack);
         logger.info("Admin created skill track: {}", trackEntity.getName());
+
+        FileHelper.generatePresignedUrl(savedTrack, response, preSignedUrlService);
 
         // populate an event to create growth track
         populateGrowthTrackEvent(savedTrack, "create");
 
-        return this.trackMapper.toDto(trackRepository.save(trackEntity));
+        return response;
 
     }
 
@@ -267,11 +280,11 @@ public class TrackServiceImpl implements TrackService {
     @Caching(
         evict = {
             @CacheEvict(value = "growthTrackList", allEntries = true), // to update the entire list
-            @CacheEvict(value = "track", key = "#id") // evict single track
+            @CacheEvict(value = "track", key = "#dto.getTrackId()") // evict single track
         }
     )
-    public TrackResponseDto partialUpdate(TrackUpdateRequestDto dto, UUID id) {
-        GrowthTrackEntity track = findById(id)
+    public TrackResponseDto partialUpdate(TrackUpdateRequestDto dto, MultipartFile image) throws IOException {
+        GrowthTrackEntity track = findById(dto.getTrackId())
                 .orElseThrow( () -> new TrackNotFoundException("A growth track provided doesn't exist")
                 );
         if(dto.getName() != null){
@@ -302,17 +315,24 @@ public class TrackServiceImpl implements TrackService {
         if(dto.getCapsuleIds() != null){
             addCapsulesToTrack(track, dto.getCapsuleIds());
         }
+        if(image != null){
+            FileHelper.validateImage(image); // validate image
+            track.setImage(awsFileUploadService.uploadFile(image)); //upload image
+        }
 
         track.setUpdatedAt(LocalDateTime.now());
 
         GrowthTrackEntity savedTrack = this.trackRepository.save(track);
+        TrackResponseDto response = this.trackMapper.toDto(savedTrack);
 
         // populate event to update growth track
         populateGrowthTrackEvent(savedTrack, "update");
 
+        FileHelper.generatePresignedUrl(savedTrack, response, preSignedUrlService);
+
         logger.info("Growth track {} updated", track.getName());
 
-        return this.trackMapper.toDto(savedTrack);
+        return response;
     }
 
     @Override

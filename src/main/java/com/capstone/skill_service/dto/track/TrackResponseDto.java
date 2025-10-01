@@ -27,6 +27,7 @@ public class TrackResponseDto implements Serializable {
     private String description;
     private int estimatedMonths;
     private Status status;
+    private String image;
     private List<CapsuleSummaryResponseDto> capsules;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

@@ -12,10 +12,13 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.UUID;
 
@@ -26,13 +29,14 @@ import java.util.UUID;
 public class TrackController {
     private final TrackService trackService;
 
-    @PostMapping()
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasAuthority('ADMIN')")
     @Operation(summary = "Create growth track", description = "This end point allows only admin to create a growth track")
     public ResponseEntity<ClientResponseFormatDto> createTrack(
-            @Valid @RequestBody TrackRequestDto trackRequestDto
-    ) {
-        TrackResponseDto savedTrack = this.trackService.create(trackRequestDto);
+            @Valid @RequestPart("growthTrack") TrackRequestDto trackRequestDto,
+            @RequestParam(value = "image", required = false) MultipartFile image
+    )throws IOException {
+        TrackResponseDto savedTrack = this.trackService.create(trackRequestDto, image);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
                 .success(true)
                 .message("Track created successfully!")
@@ -84,12 +88,13 @@ public class TrackController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @PatchMapping("/{trackId}")
+    @PatchMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasAuthority('ADMIN')")
     @Operation(summary = "Update growth track", description = "This end point allows admin to update a growth track")
     public ResponseEntity<ClientResponseFormatDto> updateTrack(
-            @Valid @RequestBody TrackUpdateRequestDto trackRequestDto, @PathVariable UUID trackId) {
-        TrackResponseDto updatedTrack = this.trackService.partialUpdate(trackRequestDto, trackId);
+            @Valid @RequestPart("growthTrack") TrackUpdateRequestDto trackRequestDto,
+            @RequestParam(value = "image", required = false) MultipartFile image) throws IOException{
+        TrackResponseDto updatedTrack = this.trackService.partialUpdate(trackRequestDto, image);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
                 .success(true)
                 .message("Growth Track updated successfully!")
