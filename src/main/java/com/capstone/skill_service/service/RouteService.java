@@ -30,5 +30,6 @@ public interface RouteService {
     RouteResponseDto assignTrackToRoute(UUID routeId, TrackIdsRequestDto dto);
     void removeTrackFromRoute(UUID routeId, UUID trackId);
     RouteResponseDto reorderTracks(UUID routeId, List<UUID> orderedTrackIds);
+    CustomPageResponse<RouteResponseDto> filterByName(String name, Pageable pageable);
 
 }
