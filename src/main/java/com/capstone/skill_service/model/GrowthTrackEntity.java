@@ -37,7 +37,7 @@ public class GrowthTrackEntity {
     private List<TrackCapsuleMappingEntity> skillCapsules = new ArrayList<>();
 
     private int estimatedMonths;
-
+    private String image;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

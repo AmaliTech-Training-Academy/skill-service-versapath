@@ -17,7 +17,10 @@ import com.capstone.skill_service.mapper.TrackMapper;
 import com.capstone.skill_service.messaging.PopulateSkillEvents;
 import com.capstone.skill_service.model.*;
 import com.capstone.skill_service.repository.*;
+import com.capstone.skill_service.service.AwsFileUploadService;
+import com.capstone.skill_service.service.PreSignedUrlService;
 import com.capstone.skill_service.service.RouteService;
+import com.capstone.skill_service.util.FileHelper;
 import com.capstone.skill_service.util.Status;
 import lombok.RequiredArgsConstructor;
 import org.common.event.TalentRouteEvent;
@@ -29,7 +32,9 @@ import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -47,11 +52,13 @@ public class RouteServiceImpl implements RouteService {
     private final AtomMapper atomMapper;
     private final CapsuleAtomMappingRepository capsuleAtomMappingRepository;
     private final PopulateSkillEvents populateSkillEvents;
+    private final AwsFileUploadService awsFileUploadService;
+    private final PreSignedUrlService preSignedUrlService;
 
 
     @Override
     @CacheEvict(value = "talentRouteList",  allEntries = true)
-    public RouteResponseDto create(RouteRequestDto dto) {
+    public RouteResponseDto create(RouteRequestDto dto, MultipartFile image) throws IOException {
         if(findByName(dto.getName()).isPresent()){
             throw new RouteExistsException(
                     String.format("A talent route with the name '%s' already exist",
@@ -69,18 +76,24 @@ public class RouteServiceImpl implements RouteService {
         if(dto.getStatus() == null){ // set default value
             routeEntity.setStatus(Status.ACTIVE);
         }
+        if(image != null){
+            FileHelper.validateImage(image); // validate image
+            routeEntity.setImage(awsFileUploadService.uploadFile(image)); //upload image
+        }
 
         addTrackToRoute(routeEntity, dto.getTrackIds()); // link talent route to all the talent route assigned to
 
         TalentRouteEntity savedTalentRoute = routeRepository.save(routeEntity);
-
-        logger.info("Admin created skill track: {}", routeEntity.getName());
+        RouteResponseDto response = this.routeMapper.toDto(savedTalentRoute);
 
         //publish an event to create talent route
         populateTalentRouteEvent(savedTalentRoute, "create");
 
-        return this.routeMapper.toDto(savedTalentRoute);
+        logger.info("Admin created skill track: {}", routeEntity.getName());
 
+        FileHelper.generatePresignedUrl(savedTalentRoute, response, preSignedUrlService);
+
+        return response;
     }
 
     void populateTalentRouteEvent(TalentRouteEntity talentRoute, String eventType){
@@ -101,6 +114,7 @@ public class RouteServiceImpl implements RouteService {
             populateSkillEvents.populateUpdateTalentRoute(TalentRouteEvent.builder()
                     .id(talentRoute.getId())
                     .name(talentRoute.getName())
+                    .image(talentRoute.getImage())
                     .description(talentRoute.getDescription())
                     .growthTracks(listOfTrackInTalentRoute)
                     .build());
@@ -108,6 +122,7 @@ public class RouteServiceImpl implements RouteService {
             populateSkillEvents.populateAssignTalentRoute(TalentRouteEvent.builder()
                     .id(talentRoute.getId())
                     .name(talentRoute.getName())
+                    .image(talentRoute.getImage())
                     .description(talentRoute.getDescription())
                     .growthTracks(listOfTrackInTalentRoute)
                     .build());
@@ -115,6 +130,7 @@ public class RouteServiceImpl implements RouteService {
             populateSkillEvents.populateTalentRoute(TalentRouteEvent.builder()
                     .id(talentRoute.getId())
                     .name(talentRoute.getName())
+                    .image(talentRoute.getImage())
                     .description(talentRoute.getDescription())
                     .growthTracks(listOfTrackInTalentRoute)
                     .build());
@@ -178,6 +194,13 @@ public class RouteServiceImpl implements RouteService {
         Page<TalentRouteEntity> routeList = this.routeRepository.findAllWithGrowthTrack(pageable);
         Page<RouteResponseDto> routes = routeList.map(this.routeMapper::toDto);
 
+        for(RouteResponseDto route: routes){
+            // generate presigned url
+            String imageUrl = FileHelper.getGeneratedPresignedUrl(this.routeMapper.toEntity(route),
+                    preSignedUrlService);
+            route.setImage(imageUrl);
+        }
+
         logger.info("Talent route list is fetched");
 
         return CustomPageResponse.<RouteResponseDto>builder()
@@ -210,6 +233,11 @@ public class RouteServiceImpl implements RouteService {
     public RouteWithTrackResponseDto getRouteWithTracks(UUID routeId) {
         TalentRouteEntity route = routeRepository.findByIdWithGrowthTracks(routeId)
                 .orElseThrow(() -> new RouteNotFoundException("A Talent Route not found"));
+
+        // generate presigned url
+        String imageUrl = FileHelper.getGeneratedPresignedUrl(route,
+                preSignedUrlService);
+        route.setImage(imageUrl);
 
         // get mappings (growth track and sequence order)
         List<RouteTrackMappingEntity> mappings = route.getTracks();
@@ -304,11 +332,11 @@ public class RouteServiceImpl implements RouteService {
     @Caching(
         evict = {
             @CacheEvict(value = "talentRouteList", allEntries = true), // to update the entire list
-            @CacheEvict(value = "talentRoute", key = "#id") // evict single talent route
+            @CacheEvict(value = "talentRoute", key = "#dto.getTalentRouteId()") // evict single talent route
         }
     )
-    public RouteResponseDto partialUpdate(RouteUpdateRequestDto dto, UUID id) {
-        TalentRouteEntity route = findById(id)
+    public RouteResponseDto partialUpdate(RouteUpdateRequestDto dto, MultipartFile image) throws IOException {
+        TalentRouteEntity route = findById(dto.getTalentRouteId())
                 .orElseThrow( () -> new RouteNotFoundException("A talent route provided doesn't exist")
                 );
         if(dto.getName() != null){
@@ -340,17 +368,24 @@ public class RouteServiceImpl implements RouteService {
         if(dto.getGrowthTrackIds() != null){
             addTrackToRoute(route, dto.getGrowthTrackIds());
         }
+        if(image != null){
+            FileHelper.validateImage(image); // validate image
+            route.setImage(awsFileUploadService.uploadFile(image)); //upload image
+        }
 
         route.setUpdatedAt(LocalDateTime.now());
 
         TalentRouteEntity savedTalentRoute = this.routeRepository.save(route);
+        RouteResponseDto response = this.routeMapper.toDto(savedTalentRoute);
 
         //publish an event to update talent route
         populateTalentRouteEvent(savedTalentRoute, "update");
 
+        FileHelper.generatePresignedUrl(savedTalentRoute, response, preSignedUrlService);
+
         logger.info("Talent route {} updated", route.getName());
 
-        return this.routeMapper.toDto(savedTalentRoute);
+        return response;
 
     }
 

@@ -27,6 +27,7 @@ public class RouteWithTrackResponseDto implements Serializable {
     private String roleName;
     private String description;
     private Status status;
+    private String image;
     private List<TrackInSequenceOrderResponseDto> tracks;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

@@ -15,6 +15,7 @@ public interface RouteMapper {
     RouteResponseDto toDto(TalentRouteEntity entity);
 
     TalentRouteEntity toEntity(RouteRequestDto dto);
+    TalentRouteEntity toEntity(RouteResponseDto dto);
     @Mapping(target = "tracks",  source = "tracks")
     RouteWithTrackResponseDto toWithTrackDto(TalentRouteEntity entity);
 

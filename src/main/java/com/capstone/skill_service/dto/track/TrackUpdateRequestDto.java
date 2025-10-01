@@ -19,8 +19,9 @@ public class TrackUpdateRequestDto {
     @Size(min = 3, message = "Name must have at least 3 characters")
     @Pattern(regexp = "^[A-Za-z ]+$", message = "name cannot contain numbers")
     private String name;
-    private int estimatedMonths;
 
+    private UUID trackId;
+    private int estimatedMonths;
     List<UUID> capsuleIds; // list of capsule ids
     private String description;
     private Status status;

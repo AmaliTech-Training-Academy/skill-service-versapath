@@ -2,9 +2,13 @@ package com.capstone.skill_service.util;
 
 import com.capstone.skill_service.dto.capsule.CapsuleResponseDto;
 import com.capstone.skill_service.dto.cluster.ClusterResponseDto;
+import com.capstone.skill_service.dto.route.RouteResponseDto;
+import com.capstone.skill_service.dto.track.TrackResponseDto;
 import com.capstone.skill_service.exception.FileException;
 import com.capstone.skill_service.model.ClusterEntity;
+import com.capstone.skill_service.model.GrowthTrackEntity;
 import com.capstone.skill_service.model.SkillCapsuleEntity;
+import com.capstone.skill_service.model.TalentRouteEntity;
 import com.capstone.skill_service.service.PreSignedUrlService;
 import org.springframework.util.unit.DataSize;
 import org.springframework.web.multipart.MultipartFile;
@@ -48,6 +52,24 @@ public class FileHelper {
         }
     }
 
+    public static void generatePresignedUrl(GrowthTrackEntity savedTrack,
+                                            TrackResponseDto responseDto,
+                                            PreSignedUrlService preSignedUrlService ){
+        if (savedTrack.getImage() != null) {
+            String presignedUrl = preSignedUrlService.generatePresignedUrl(savedTrack.getImage());
+            responseDto.setImage(presignedUrl);
+        }
+    }
+
+    public static void generatePresignedUrl(TalentRouteEntity savedTalentRoute,
+                                            RouteResponseDto responseDto,
+                                            PreSignedUrlService preSignedUrlService ){
+        if (savedTalentRoute.getImage() != null) {
+            String presignedUrl = preSignedUrlService.generatePresignedUrl(savedTalentRoute.getImage());
+            responseDto.setImage(presignedUrl);
+        }
+    }
+
     public static String getGeneratedPresignedUrl(ClusterEntity savedCluster,
                                             PreSignedUrlService preSignedUrlService ){
         if (savedCluster.getImageName() != null) {
@@ -60,6 +82,22 @@ public class FileHelper {
                                             PreSignedUrlService preSignedUrlService ){
         if (savedCapsule.getImage() != null) {
             return preSignedUrlService.generatePresignedUrl(savedCapsule.getImage());
+        }
+        return null;
+    }
+
+    public static String getGeneratedPresignedUrl(TalentRouteEntity savedTalentRoute,
+                                                  PreSignedUrlService preSignedUrlService ){
+        if (savedTalentRoute.getImage() != null) {
+            return preSignedUrlService.generatePresignedUrl(savedTalentRoute.getImage());
+        }
+        return null;
+    }
+
+    public static String getGeneratedPresignedUrl(GrowthTrackEntity savedTrack,
+                                                  PreSignedUrlService preSignedUrlService ){
+        if (savedTrack.getImage() != null) {
+            return preSignedUrlService.generatePresignedUrl(savedTrack.getImage());
         }
         return null;
     }

@@ -21,17 +21,20 @@ public class TrackOnlyResponseDto implements Serializable {
     private String description;
     private int estimatedMonths;
     private Status status;
+    private String image;
     private long capsuleNumber;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
+
     public TrackOnlyResponseDto(UUID id, String name, String description, int estimatedMonths, Status status,
-                                long capsuleNumber, LocalDateTime createdAt, LocalDateTime updatedAt) {
+                                String image, long capsuleNumber, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.estimatedMonths = estimatedMonths;
         this.status = status;
+        this.image = image;
         this.capsuleNumber = capsuleNumber;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
