@@ -10,5 +10,4 @@ public class SkillServiceApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(SkillServiceApplication.class, args);
 	}
-
 }

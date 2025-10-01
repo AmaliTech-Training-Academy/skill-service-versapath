@@ -73,12 +73,13 @@ public class TrackServiceImpl implements TrackService {
 
         GrowthTrackEntity savedTrack = trackRepository.save(trackEntity);
         TrackResponseDto response = this.trackMapper.toDto(savedTrack);
-        logger.info("Admin created skill track: {}", trackEntity.getName());
-
-        FileHelper.generatePresignedUrl(savedTrack, response, preSignedUrlService);
 
         // populate an event to create growth track
         populateGrowthTrackEvent(savedTrack, "create");
+
+        logger.info("Admin created skill track: {}", trackEntity.getName());
+
+        FileHelper.generatePresignedUrl(savedTrack, response, preSignedUrlService);
 
         return response;
 
@@ -103,6 +104,7 @@ public class TrackServiceImpl implements TrackService {
             populateSkillEvents.populateUpdateGrowthTrack(GrowthTrackEvent.builder()
                     .id(savedTrack.getId())
                     .name(savedTrack.getName())
+                    .image(savedTrack.getImage())
                     .description(savedTrack.getDescription())
                     .skillCapsules(listOfCapsulesInGrowthTrack)
                     .build());
@@ -110,6 +112,7 @@ public class TrackServiceImpl implements TrackService {
             populateSkillEvents.populateAssignGrowthTrack(GrowthTrackEvent.builder()
                     .id(savedTrack.getId())
                     .name(savedTrack.getName())
+                    .image(savedTrack.getImage())
                     .description(savedTrack.getDescription())
                     .skillCapsules(listOfCapsulesInGrowthTrack)
                     .build());
@@ -117,6 +120,7 @@ public class TrackServiceImpl implements TrackService {
             populateSkillEvents.populateGrowthTrack(GrowthTrackEvent.builder()
                     .id(savedTrack.getId())
                     .name(savedTrack.getName())
+                    .image(savedTrack.getImage())
                     .description(savedTrack.getDescription())
                     .skillCapsules(listOfCapsulesInGrowthTrack)
                     .build());
@@ -173,6 +177,13 @@ public class TrackServiceImpl implements TrackService {
     public CustomPageResponse<TrackOnlyResponseDto> findAll(Pageable pageable) {
         Page<TrackOnlyResponseDto> growthTracks = this.trackRepository.findTrackWithCapsuleCount(pageable);
 
+        for(TrackOnlyResponseDto growthTrack: growthTracks){
+            // generate presigned url
+            String imageUrl = FileHelper.getGeneratedPresignedUrl(this.trackMapper.toEntity(growthTrack),
+                    preSignedUrlService);
+            growthTrack.setImage(imageUrl);
+        }
+
         logger.info("Growth tracks list is fetched");
 
         return CustomPageResponse.<TrackOnlyResponseDto>builder()
@@ -193,6 +204,11 @@ public class TrackServiceImpl implements TrackService {
     public TrackWithCapsuleResponseDto getTrackWithCapsules(UUID trackId) {
         GrowthTrackEntity track = trackRepository.findByIdWithCapsules(trackId)
                 .orElseThrow(() -> new TrackNotFoundException("A Growth Track not found"));
+
+        // generate presigned url
+        String imageUrl = FileHelper.getGeneratedPresignedUrl(track,
+                preSignedUrlService);
+        track.setImage(imageUrl);
 
         // get mappings (capsule and sequence order)
         List<TrackCapsuleMappingEntity> mappings = track.getSkillCapsules();

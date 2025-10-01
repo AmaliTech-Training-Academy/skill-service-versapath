@@ -16,6 +16,7 @@ public interface TrackMapper {
     TrackOnlyResponseDto toOnlyTrackDto(GrowthTrackEntity entity);
 
     GrowthTrackEntity toEntity(TrackRequestDto dto);
+    GrowthTrackEntity toEntity(TrackOnlyResponseDto dto);
     @Mapping(target = "capsules",  source = "skillCapsules")
     TrackWithCapsuleResponseDto toWithCapsuleDto(GrowthTrackEntity entity);
 

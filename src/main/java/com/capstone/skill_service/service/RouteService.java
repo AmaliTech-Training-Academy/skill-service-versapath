@@ -9,13 +9,15 @@ import com.capstone.skill_service.dto.track.*;
 import com.capstone.skill_service.model.TalentRouteEntity;
 import com.capstone.skill_service.util.Status;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 public interface RouteService {
-    RouteResponseDto create(RouteRequestDto dto);
+    RouteResponseDto create(RouteRequestDto dto, MultipartFile image) throws IOException;
     Optional<TalentRouteEntity> findByName(String name);
     Optional<TalentRouteEntity> findByRoleName(String roleName);
     Optional<TalentRouteEntity> findById(UUID id);
@@ -23,7 +25,7 @@ public interface RouteService {
     RouteResponseDto getRoute(UUID id);
     RouteWithTrackResponseDto getRouteWithTracks(UUID routeId);
     void deleteById(UUID id);
-    RouteResponseDto partialUpdate(RouteUpdateRequestDto dto, UUID id);
+    RouteResponseDto partialUpdate(RouteUpdateRequestDto dto, MultipartFile image) throws IOException;
     RouteResponseDto updateStatus(Status status, UUID id);
     RouteResponseDto assignTrackToRoute(UUID routeId, TrackIdsRequestDto dto);
     void removeTrackFromRoute(UUID routeId, UUID trackId);

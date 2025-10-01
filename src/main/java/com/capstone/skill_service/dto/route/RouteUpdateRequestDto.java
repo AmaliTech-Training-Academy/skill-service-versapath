@@ -26,6 +26,8 @@ public class RouteUpdateRequestDto {
     @Pattern(regexp = "^[A-Za-z ]+$", message = "Role name cannot contain numbers")
     private String roleName;
 
+    private UUID talentRouteId;
+
     List<UUID> growthTrackIds; // list of growth track ids
     private String description;
     private Status status;

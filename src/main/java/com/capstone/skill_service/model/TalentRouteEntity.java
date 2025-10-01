@@ -35,6 +35,8 @@ public class TalentRouteEntity {
     @Enumerated(EnumType.STRING)
     private Status status;
 
+    private String image;
+
     @OneToMany(mappedBy = "talentRoute", cascade = CascadeType.ALL, orphanRemoval = true) // just remove child from talent route list
     @OrderBy("sequenceOrder ASC") // to always display growth track in sequence order
     private List<RouteTrackMappingEntity> tracks = new ArrayList<>();

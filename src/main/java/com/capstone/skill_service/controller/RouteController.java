@@ -15,10 +15,13 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.UUID;
 
@@ -29,13 +32,14 @@ import java.util.UUID;
 public class RouteController {
     private final RouteService routeService;
 
-    @PostMapping()
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasAuthority('ADMIN')")
     @Operation(summary = "Create talent route", description = "This end point allows only admin to create a talent route")
     public ResponseEntity<ClientResponseFormatDto> createRoute(
-            @Valid @RequestBody RouteRequestDto routeRequestDto
-    ) {
-        RouteResponseDto savedRoute = this.routeService.create(routeRequestDto);
+            @Valid @RequestPart("talentRoute") RouteRequestDto routeRequestDto,
+            @RequestParam(value = "image", required = false) MultipartFile image
+    )throws IOException {
+        RouteResponseDto savedRoute = this.routeService.create(routeRequestDto, image);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
                 .success(true)
                 .message("Route created successfully!")
@@ -87,12 +91,13 @@ public class RouteController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @PatchMapping("/{routeId}")
+    @PatchMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasAuthority('ADMIN')")
     @Operation(summary = "Update talent route", description = "This end point allows admin to update a talent route")
     public ResponseEntity<ClientResponseFormatDto> updateRoute(
-            @Valid @RequestBody RouteUpdateRequestDto routeRequestDto, @PathVariable UUID routeId) {
-        RouteResponseDto updatedRoute = this.routeService.partialUpdate(routeRequestDto, routeId);
+            @Valid @RequestPart("talentRoute") RouteUpdateRequestDto routeRequestDto,
+            @RequestParam(value = "image", required = false) MultipartFile image) throws IOException{
+        RouteResponseDto updatedRoute = this.routeService.partialUpdate(routeRequestDto, image);
         ClientResponseFormatDto response = ClientResponseFormatDto.builder()
                 .success(true)
                 .message("Talent route updated successfully!")
