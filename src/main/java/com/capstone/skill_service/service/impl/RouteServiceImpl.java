@@ -30,6 +30,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -496,5 +497,39 @@ public class RouteServiceImpl implements RouteService {
         }
         return routeMapper.toDto(routeRepository.save(route));
 
+    }
+
+    @Override
+    public CustomPageResponse<RouteResponseDto> filterByName(String name, Pageable pageable) {
+        Page<TalentRouteEntity> routeList;
+
+        if(name == null || name.trim().isEmpty()){
+            routeList = this.routeRepository.findAllWithGrowthTrack(PageRequest.of(0, 20));
+        }else{
+            routeList = this.routeRepository.filterByNameContainingIgnoreCase(name, pageable);
+        }
+
+        Page<RouteResponseDto> routes = routeList.map(this.routeMapper::toDto);
+
+        for(RouteResponseDto route: routes){
+            // generate presigned url
+            String imageUrl = FileHelper.getGeneratedPresignedUrl(this.routeMapper.toEntity(route),
+                    preSignedUrlService);
+            route.setImage(imageUrl);
+        }
+
+        logger.info("Talent route list is filtered");
+
+        return CustomPageResponse.<RouteResponseDto>builder()
+                .items(routes.getContent())
+                .pagination(PaginationData.builder()
+                        .page(routes.getNumber())
+                        .size(routes.getSize())
+                        .totalElements(routes.getTotalElements())
+                        .totalPages(routes.getTotalPages())
+                        .hasNext(routes.hasNext())
+                        .hasPrevious(routes.hasPrevious())
+                        .build())
+                .build();
     }
 }

@@ -26,6 +26,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -455,6 +456,38 @@ public class TrackServiceImpl implements TrackService {
         }
         return trackMapper.toDto(trackRepository.save(trackEntity));
 
+    }
+
+    @Override
+    public CustomPageResponse<TrackOnlyResponseDto> filterByName(String name, Pageable pageable) {
+        Page<TrackOnlyResponseDto> growthTracks;
+
+        if(name == null || name.trim().isEmpty()){
+            growthTracks = this.trackRepository.findTrackWithCapsuleCount(PageRequest.of(0, 20));
+        }else{
+            growthTracks = this.trackRepository.filterByNameContainingIgnoreCase(name, pageable);
+        }
+
+        for(TrackOnlyResponseDto growthTrack: growthTracks){
+            // generate presigned url
+            String imageUrl = FileHelper.getGeneratedPresignedUrl(this.trackMapper.toEntity(growthTrack),
+                    preSignedUrlService);
+            growthTrack.setImage(imageUrl);
+        }
+
+        logger.info("Growth tracks list is filtered");
+
+        return CustomPageResponse.<TrackOnlyResponseDto>builder()
+                .items(growthTracks.getContent())
+                .pagination(PaginationData.builder()
+                        .page(growthTracks.getNumber())
+                        .size(growthTracks.getSize())
+                        .totalElements(growthTracks.getTotalElements())
+                        .totalPages(growthTracks.getTotalPages())
+                        .hasNext(growthTracks.hasNext())
+                        .hasPrevious(growthTracks.hasPrevious())
+                        .build())
+                .build();
     }
 
 }

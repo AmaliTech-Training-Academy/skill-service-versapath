@@ -31,4 +31,12 @@ public interface RouteRepository extends JpaRepository<TalentRouteEntity, UUID> 
         ORDER BY tr.createdAt DESC
     """)
     Page<TalentRouteEntity> findAllWithGrowthTrack(Pageable pageable);
+
+    @Query("""
+        SELECT tr FROM TalentRouteEntity tr
+        LEFT JOIN FETCH tr.tracks c
+        WHERE (:name IS NULL OR LOWER(tr.name) LIKE LOWER(CONCAT('%', :name, '%')))
+        ORDER BY tr.createdAt DESC
+    """)
+    Page<TalentRouteEntity> filterByNameContainingIgnoreCase(@Param("name") String name, Pageable pageable);
 }

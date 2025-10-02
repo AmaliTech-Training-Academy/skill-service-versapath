@@ -7,13 +7,16 @@ import com.capstone.skill_service.dto.route.RouteResponseDto;
 import com.capstone.skill_service.dto.route.RouteUpdateRequestDto;
 import com.capstone.skill_service.dto.route.RouteWithTrackResponseDto;
 import com.capstone.skill_service.dto.track.TrackIdsRequestDto;
+import com.capstone.skill_service.dto.track.TrackOnlyResponseDto;
 import com.capstone.skill_service.service.RouteService;
 import com.capstone.skill_service.util.Status;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -164,6 +167,25 @@ public class RouteController {
                 .message("Tracks reordered in route successfully!")
                 .errors(null)
                 .data(Map.of("item", updatedRoute))
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+
+    @GetMapping("/filter")
+    @Operation(summary = "Filter talent route", description = "This end point allows user to filter talent route list")
+    public ResponseEntity<ClientResponseFormatDto> filterGrowthTracks(
+            @RequestParam(required = false) String name,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "${PAGE_SIZE}") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        CustomPageResponse<RouteResponseDto> tracks = this.routeService.filterByName(name, pageable);
+        ClientResponseFormatDto response = ClientResponseFormatDto.builder()
+                .success(true)
+                .message("Filter talent routes")
+                .errors(null)
+                .data(tracks)
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }

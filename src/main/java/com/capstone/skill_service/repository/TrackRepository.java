@@ -34,4 +34,14 @@ public interface TrackRepository extends JpaRepository<GrowthTrackEntity, UUID> 
     """)
     Page<TrackOnlyResponseDto> findTrackWithCapsuleCount(Pageable pageable);
 
+    @Query("""
+    SELECT new com.capstone.skill_service.dto.track.TrackOnlyResponseDto(
+        t.id,t.name,t.description,t.estimatedMonths,t.status,t.image,(SELECT COUNT(mc.growthTrack.id) FROM t.skillCapsules mc),
+        t.createdAt,t.updatedAt)
+    FROM GrowthTrackEntity t
+    WHERE (:name IS NULL OR LOWER(t.name) LIKE LOWER(CONCAT('%', :name, '%')))
+    """)
+    Page<TrackOnlyResponseDto> filterByNameContainingIgnoreCase(@Param("name") String name, Pageable pageable);
+
+
 }
