@@ -41,7 +41,7 @@ public class SecurityConfig {
                             response.getWriter().write(
                                     "{"
                                     + "\"success\":false,"
-                                    + "\"message\":\"JWT token is missing or invalid\","
+                                    + "\"message\":\"Unauthorized\","
                                     + "\"data\":null,"
                                     + "\"errors\":null"
                                     + "}"
