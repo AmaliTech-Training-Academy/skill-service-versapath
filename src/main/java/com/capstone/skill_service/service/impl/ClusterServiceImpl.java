@@ -13,6 +13,7 @@ import com.capstone.skill_service.exception.ClusterExistsException;
 import com.capstone.skill_service.exception.ClusterNotFoundException;
 import com.capstone.skill_service.mapper.CapsuleMapper;
 import com.capstone.skill_service.mapper.ClusterMapper;
+import com.capstone.skill_service.messaging.PopulateClusterEvents;
 import com.capstone.skill_service.model.ClusterEntity;
 import com.capstone.skill_service.model.SkillCapsuleEntity;
 import com.capstone.skill_service.repository.*;
@@ -22,6 +23,7 @@ import com.capstone.skill_service.service.PreSignedUrlService;
 import com.capstone.skill_service.util.FileHelper;
 import com.capstone.skill_service.util.Status;
 import lombok.RequiredArgsConstructor;
+import org.common.event.ClusterEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CacheEvict;
@@ -48,6 +50,7 @@ public class ClusterServiceImpl implements ClusterService {
     private final ClusterMapper clusterMapper;
     private final AwsFileUploadService awsFileUploadService;
     private final PreSignedUrlService preSignedUrlService;
+    private final PopulateClusterEvents populateClusterEvents;
 
     @Override
     @CacheEvict(value = "clusterList",allEntries = true)
@@ -78,6 +81,14 @@ public class ClusterServiceImpl implements ClusterService {
         FileHelper.generatePresignedUrl(saved, responseDto, preSignedUrlService);
 
         logger.info("Admin created skill cluster: {}", clusterEntity.getName());
+
+        // publish cluster event
+        ClusterEvent clusterEvent = ClusterEvent.builder()
+                .clusterId(saved.getId())
+                .clusterName(saved.getName())
+                .description(saved.getDescription())
+                .build();
+        populateClusterEvents.populateCreateCluster(clusterEvent);
 
         return responseDto;
     }
