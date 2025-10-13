@@ -18,11 +18,11 @@ import java.util.UUID;
 @Builder
 public class ClusterUpdateRequestDto {
     @Size(min = 3, message = "Name must have at least 3 characters")
-    @Pattern(regexp = "^[A-Za-z ]+$", message = "name cannot contain numbers")
+    @Pattern(regexp = "^[A-Za-z0-9 ]+$", message = "Invalid name")
     private String name;
     private UUID clusterId;
 
-    @Pattern(regexp = "^[A-Za-z ]+$", message = "type cannot contain numbers")
+    @Pattern(regexp = "^[A-Za-z0-9 ]+$", message = "Invalid name")
     private String type;
 
     private String description;

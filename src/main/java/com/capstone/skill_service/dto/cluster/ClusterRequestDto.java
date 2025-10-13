@@ -19,10 +19,10 @@ import java.time.LocalDateTime;
 public class ClusterRequestDto {
     @NotBlank(message = "Cluster name is required")
     @Size(min = 3, message = "Cluster name must have at least 3 characters")
-    @Pattern(regexp = "^[A-Za-z ]+$", message = "Cluster name cannot contain numbers")
+    @Pattern(regexp = "^[A-Za-z0-9 ]+$", message = "Invalid name")
     private String name;
 
-    @Pattern(regexp = "^[A-Za-z ]+$", message = "type cannot contain numbers")
+    @Pattern(regexp = "^[A-Za-z0-9 ]+$", message = "Invalid type")
     private String type;
 
     private String description;
