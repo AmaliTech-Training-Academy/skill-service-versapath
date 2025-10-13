@@ -20,7 +20,7 @@ import java.util.UUID;
 public class CapsuleRequestDto {
     @NotBlank(message = "Capsule name is required")
     @Size(min = 3, message = "Capsule name must have at least 3 characters")
-    @Pattern(regexp = "^[A-Za-z ]+$", message = "Capsule name cannot contain numbers")
+    @Pattern(regexp = "^[A-Za-z0-9 ]+$", message = "Invalid name")
     private String name;
 
     @Min(value = 1, message = "Estimated hours Must be at least 1 hour")
