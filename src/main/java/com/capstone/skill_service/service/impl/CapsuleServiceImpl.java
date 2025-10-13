@@ -110,6 +110,11 @@ public class CapsuleServiceImpl implements CapsuleService {
 
         }
 
+        // extract cluster ids
+        List<UUID> clusterIds = capsuleEntity.getClusters().stream()
+                .map(ClusterEntity::getId).toList();
+
+
         if(eventType.equalsIgnoreCase("delete")){
             populateSkillEvents.populateDeleteCapsule(SkillCapsuleEvent.builder()
                     .id(capsuleEntity.getId())
@@ -124,6 +129,7 @@ public class CapsuleServiceImpl implements CapsuleService {
                     .difficulty(capsuleEntity.getDifficulty())
                     .proficiencyLevel(capsuleEntity.getProficiencyLevel().toString())
                     .skillAtom(listOfAtomsInCapsule)
+                    .clusters(clusterIds)
                     .build());
         }else if(eventType.equalsIgnoreCase("assignAtom")){
             populateSkillEvents.populateAssignCapsule(SkillCapsuleEvent.builder()
@@ -134,6 +140,7 @@ public class CapsuleServiceImpl implements CapsuleService {
                     .difficulty(capsuleEntity.getDifficulty())
                     .proficiencyLevel(capsuleEntity.getProficiencyLevel().toString())
                     .skillAtom(listOfAtomsInCapsule)
+                    .clusters(clusterIds)
                     .build());
         }
         else{
@@ -145,6 +152,7 @@ public class CapsuleServiceImpl implements CapsuleService {
                     .difficulty(capsuleEntity.getDifficulty())
                     .proficiencyLevel(capsuleEntity.getProficiencyLevel().toString())
                     .skillAtom(listOfAtomsInCapsule)
+                    .clusters(clusterIds)
                     .build());
         }
 
